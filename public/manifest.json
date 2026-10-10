@@ -1,0 +1,19 @@
+{
+  "short_name": "MOSA",
+  "name": "Mandela Old Students Association (MASSH)",
+  "description": "Official Alumni Portal and Digital Credential Pass for Mandela Secondary School Hoima (Founded 1997)",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#061325",
+  "theme_color": "#0d2040",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "categories": ["education", "community", "social"]
+}

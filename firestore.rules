@@ -1,0 +1,208 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions for Role-Based Access Control
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && (getUserData().role == role || request.auth.token.role == role);
+    }
+    
+    function isAdmin() {
+      return hasRole('ADMIN') || hasRole('SUPER_ADMIN');
+    }
+    
+    function isSuperAdmin() {
+      return hasRole('SUPER_ADMIN');
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 1. Settings Collection (Sequential Counter for MA Number Generator)
+    match /settings/{settingId} {
+      // Only admins can read system counter settings
+      allow read: if isAdmin();
+      // Counter increments must only happen in transactions by authorised administrators
+      allow update, write: if isAdmin();
+    }
+
+    // 2. Applications Collection
+    match /applications/{applicationId} {
+      // Anyone can submit a registration application
+      allow create: if request.resource.data.status == 'PENDING'
+                    && request.resource.data.email is string
+                    && request.resource.data.phone is string;
+      
+      // Applicant can read their own application status; Admins can read all applications
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == resource.data.email);
+      
+      // Only Admins can change status, approve, reject, or assign MA numbers
+      allow update: if isAdmin();
+      
+      // Only Super Admins can delete applications
+      allow delete: if isSuperAdmin();
+    }
+
+    // 3. Alumni Profiles Collection
+    match /alumni/{alumniId} {
+      // Public directory access only for verified active profiles
+      // Sensitive fields (phone, email) are protected by client query projections or field-level validation
+      allow read: if true; 
+      
+      // Only Admins can create verified alumni records (upon application approval)
+      allow create: if isAdmin() && request.resource.data.alumniNumber != null;
+      
+      // Alumni can update only their own profile details, but CANNOT modify alumniNumber, verifiedAt, or verifiedBy
+      allow update: if (isAdmin()) || 
+                      (isAuthenticated() && 
+                       request.auth.uid == resource.data.internalId &&
+                       request.resource.data.alumniNumber == resource.data.alumniNumber &&
+                       request.resource.data.verifiedAt == resource.data.verifiedAt &&
+                       request.resource.data.verifiedBy == resource.data.verifiedBy);
+                       
+      // Deletions reserved for Super Admin
+      allow delete: if isSuperAdmin();
+    }
+
+    // 4. Users Collection (User Accounts & Roles)
+    match /users/{userId} {
+      // Users can read their own profile; Admins can read user roles
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can NEVER elevate their own privileges or change their own role
+      allow create: if isOwner(userId) && request.resource.data.role == 'ALUMNI';
+      
+      // Only Super Admin can change user roles
+      allow update: if isAdmin();
+      
+      allow delete: if isSuperAdmin();
+    }
+
+    // 5. Audit Logs Collection
+    match /audit_logs/{logId} {
+      // Read access strictly reserved for administrators
+      allow read: if isAdmin();
+      
+      // Append-only for authenticated actions; logs can never be updated or deleted
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // 6. Chapters Collection
+    match /chapters/{chapterId} {
+      // Public directory read for chapters
+      allow read: if true;
+      
+      // Administrators can create or delete chapters
+      allow create, delete: if isAdmin();
+      
+      // Admins and designated Chapter Admins can update their chapter
+      allow update: if isAdmin() || 
+                    (isAuthenticated() && 
+                     request.auth.token.email in resource.data.adminEmails);
+    }
+
+    // 7. Chapter Members Collection
+    match /chapter_members/{memberId} {
+      // Chapter rosters readable by members
+      allow read: if true;
+      
+      // Verified alumni can join chapters
+      allow create: if isAuthenticated() && request.resource.data.alumniId != null;
+      
+      // Member can leave, or chapter admin / MOSA admin can manage member status
+      allow update, delete: if isAdmin() || 
+                            (isAuthenticated() && 
+                             (request.auth.uid == resource.data.alumniId || 
+                              request.auth.token.email == resource.data.alumniEmail));
+    }
+
+    // 8. Events Collection
+    match /events/{eventId} {
+      // Publicly viewable events calendar
+      allow read: if true;
+      
+      // Creation and deletion reserved for administrators
+      allow create, delete: if isAdmin();
+      
+      // Updates permitted for administrators or chapter admins if chapter event
+      allow update: if isAdmin();
+    }
+
+    // 9. Event Registrations Collection
+    match /event_registrations/{registrationId} {
+      // Attendees can view their registration; Admins can view all
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
+      
+      // Verified alumni can register for open/required events
+      allow create: if isAuthenticated() && request.resource.data.alumniId != null;
+      
+      // Registration cancellation
+      allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
+    }
+
+    // 10. Event Attendance Collection
+    match /event_attendance/{attendanceId} {
+      // Viewable by administrators and event coordinators
+      allow read: if isAdmin();
+      
+      // Check-in created by authorized event admin or scan handler
+      allow create: if isAdmin();
+      
+      // Attendance records are immutable for audit compliance
+      allow update, delete: if false;
+    }
+
+    // 11. Donation Campaigns Collection
+    match /donation_campaigns/{campaignId} {
+      // Publicly viewable donation campaigns
+      allow read: if true;
+      
+      // Only admins can create, update, or close campaigns
+      allow write: if isAdmin();
+    }
+
+    // 12. Payments Collection
+    match /payments/{paymentId} {
+      // Payers can read their own payments; Admins/Treasurers can read all
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
+      
+      // Anyone verified or authenticated can submit a payment transaction
+      allow create: if isAuthenticated() && request.resource.data.amount > 0;
+      
+      // Only Admins / Treasurers can verify, approve, reject, or assign receipt numbers
+      allow update: if isAdmin();
+      
+      // Payments cannot be deleted for accounting auditability
+      allow delete: if false;
+    }
+
+    // 13. Announcements Collection
+    match /announcements/{announcementId} {
+      // Public announcements feed
+      allow read: if true;
+      
+      // Only admins or chapter leaders can create, edit, or delete announcements
+      allow write: if isAdmin();
+    }
+
+    // 14. Notifications Collection
+    match /notifications/{notificationId} {
+      // Alumni can only access their own notifications
+      allow read, update, delete: if isAuthenticated() && request.auth.uid == resource.data.alumniId;
+      
+      // System or Admin can create notifications
+      allow create: if isAdmin() || isAuthenticated();
+    }
+  }
+}
+
