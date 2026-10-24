@@ -158,12 +158,13 @@ export const MembershipView: React.FC<MembershipViewProps> = ({
       <div 
         className="mosa-card" 
         style={{ 
-          background: 'linear-gradient(135deg, #07152B 0%, #0B203E 60%, #163663 100%)', 
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 60%, #18533B 100%)', 
           color: '#FFFFFF', 
           padding: '2.5rem', 
           borderRadius: '16px', 
           marginBottom: '3rem',
-          borderLeft: '6px solid #D97706',
+          borderLeft: '6px solid #C68A24',
+          boxShadow: '0 8px 24px rgba(10, 39, 27, 0.18)',
         }}
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'center' }}>
@@ -213,10 +214,10 @@ export const MembershipView: React.FC<MembershipViewProps> = ({
                 fontWeight: 800, 
                 color: '#FBBF24', 
                 letterSpacing: '0.05em',
-                background: '#07152B',
+                background: '#0A271B',
                 padding: '0.75rem 1.25rem',
                 borderRadius: '8px',
-                border: '1px dashed #D97706',
+                border: '1px dashed #C68A24',
                 display: 'inline-block',
                 marginBottom: '1rem',
               }}

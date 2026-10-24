@@ -137,13 +137,13 @@ export const NotificationsView: React.FC<Props> = ({
       {/* Top Header Card */}
       <div 
         style={{ 
-          background: 'linear-gradient(135deg, #07152B 0%, #0B203E 65%, #163663 100%)', 
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)', 
           borderRadius: '16px', 
           padding: '1.75rem 1.5rem', 
           color: '#FFFFFF',
           marginBottom: '1.5rem',
-          boxShadow: '0 10px 25px -5px rgba(11, 32, 62, 0.25)',
-          border: '1.5px solid rgba(217, 119, 6, 0.3)',
+          boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.25)',
+          border: '1.5px solid rgba(198, 138, 36, 0.3)',
         }}
       >
         {/* Back Button */}

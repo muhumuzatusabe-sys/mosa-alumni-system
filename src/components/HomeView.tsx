@@ -115,7 +115,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     : 70;
 
   return (
-    <div className="home-container" style={{ padding: '1rem 1rem 2.5rem 1rem', background: '#F8FAFC', maxWidth: '1160px', margin: '0 auto' }}>
+    <div className="home-container" style={{ padding: '1rem 1rem 2.5rem 1rem', background: 'transparent', maxWidth: '1160px', margin: '0 auto' }}>
       
       {/* ============================================================== */}
       {/* 1. COMPACT MEMBER IDENTITY & PROFILE SUMMARY                   */}
@@ -124,12 +124,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div
           className="member-identity-card"
           style={{
-            background: 'linear-gradient(135deg, #07152B 0%, #0B203E 65%, #163663 100%)',
+            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)',
             borderRadius: '14px',
             padding: '1.15rem 1.35rem',
             color: '#FFFFFF',
-            boxShadow: '0 6px 18px rgba(11, 32, 62, 0.14)',
-            border: '1.5px solid rgba(217, 119, 6, 0.35)',
+            boxShadow: '0 6px 18px rgba(10, 39, 27, 0.16)',
+            border: '1.5px solid rgba(198, 138, 36, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -301,13 +301,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '0.65rem 0.85rem',
               borderRadius: '10px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              color: '#0B203E',
+              border: '1px solid #E5DFD1',
+              color: '#0B271C',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -325,16 +325,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '0.65rem 0.85rem',
               borderRadius: '10px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              color: '#0B203E',
+              border: '1px solid #E5DFD1',
+              color: '#0B271C',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#D1FAE5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Coins size={16} />
             </div>
             <span>Donations</span>
@@ -349,16 +349,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '0.65rem 0.85rem',
               borderRadius: '10px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              color: '#0B203E',
+              border: '1px solid #E5DFD1',
+              color: '#0B271C',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#EDE9FE', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#E8F5E9', color: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <ClipboardCheck size={16} />
             </div>
             <span>Attendance</span>
@@ -373,16 +373,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '0.65rem 0.85rem',
               borderRadius: '10px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              color: '#0B203E',
+              border: '1px solid #E5DFD1',
+              color: '#0B271C',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Award size={16} />
             </div>
             <span>Membership</span>
@@ -405,8 +405,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '1.25rem',
               borderRadius: '14px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              boxShadow: '0 3px 10px rgba(11, 32, 62, 0.04)',
+              border: '1px solid #E5DFD1',
+              boxShadow: '0 3px 10px rgba(10, 39, 27, 0.04)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -416,20 +416,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#D1FAE5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Coins size={18} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.05rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                    <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>
                       Donations &amp; Giving
                     </h3>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
                       Voluntary alumni philanthropy &amp; projects
                     </div>
                   </div>
                 </div>
                 
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#059669', background: '#D1FAE5', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803D', background: '#DCFCE7', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>
                   Contributions
                 </span>
               </div>
@@ -437,45 +437,46 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Total Contributions Snippet */}
               <div 
                 style={{ 
-                  background: 'linear-gradient(135deg, #0B203E 0%, #163663 100%)', 
+                  background: 'linear-gradient(135deg, #113D2B 0%, #18533B 100%)', 
                   borderRadius: '10px', 
                   padding: '0.9rem 1rem', 
                   color: '#FFFFFF',
                   marginBottom: '0.85rem',
+                  boxShadow: '0 4px 12px rgba(10, 39, 27, 0.15)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <div style={{ fontSize: '0.68rem', color: '#CBD5E1', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                    <div style={{ fontSize: '0.68rem', color: '#D1FAE5', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
                       Verified Contributions to Date
                     </div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FBBF24', margin: '0.1rem 0' }}>
+                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FDE68A', margin: '0.1rem 0' }}>
                       UGX {totalVerifiedGiving > 0 ? totalVerifiedGiving.toLocaleString() : '350,000'}
                     </div>
                   </div>
 
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D1FAE5', background: 'rgba(5, 150, 105, 0.35)', padding: '0.2rem 0.55rem', borderRadius: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D1FAE5', background: 'rgba(22, 163, 74, 0.35)', padding: '0.2rem 0.55rem', borderRadius: '6px' }}>
                     Active Contributor
                   </span>
                 </div>
               </div>
 
               {/* Active Project Progress */}
-              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E2E8F0', marginBottom: '1rem' }}>
+              <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E5DFD1', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0B203E', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0B271C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {featuredCampaign?.title || 'MASSH Science Complex Appeal'}
                   </span>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D97706', flexShrink: 0 }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#C68A24', flexShrink: 0 }}>
                     {campaignPercent}%
                   </span>
                 </div>
                 
                 {/* Progress Bar */}
-                <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '999px', overflow: 'hidden' }}>
-                  <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #D97706, #FBBF24)', borderRadius: '999px' }} />
+                <div style={{ width: '100%', height: '6px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
+                  <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #16A34A, #C68A24)', borderRadius: '999px' }} />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748B', marginTop: '0.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.25rem' }}>
                   <span>Raised: UGX {featuredCampaign ? featuredCampaign.raisedAmount.toLocaleString() : '42,500,000'}</span>
                   <span>Goal: UGX {featuredCampaign ? featuredCampaign.targetAmount.toLocaleString() : '60,000,000'}</span>
                 </div>
@@ -538,8 +539,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
               padding: '1.25rem',
               borderRadius: '14px',
               background: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              boxShadow: '0 3px 10px rgba(11, 32, 62, 0.04)',
+              border: '1px solid #E5DFD1',
+              boxShadow: '0 3px 10px rgba(10, 39, 27, 0.04)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -547,16 +548,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           >
             <div>
               {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', paddingBottom: '0.5rem', borderBottom: '1px solid #F1F5F9' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', paddingBottom: '0.5rem', borderBottom: '1px solid #F2EFE6' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Users size={18} />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.05rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                    <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>
                       Alumni Registry
                     </h3>
-                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                    <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
                       {totalAlumniCount.toLocaleString()} verified scholars recorded
                     </div>
                   </div>
@@ -567,7 +568,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#D97706',
+                    color: '#C68A24',
                     fontWeight: 700,
                     fontSize: '0.78rem',
                     cursor: 'pointer',
@@ -598,8 +599,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         gap: '0.65rem',
                         padding: '0.55rem 0.6rem',
                         borderRadius: '8px',
-                        background: '#F8FAFC',
-                        border: '1px solid #F1F5F9',
+                        background: '#FAF7EE',
+                        border: '1px solid #E5DFD1',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                       }}
@@ -614,7 +615,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                             height: '34px',
                             borderRadius: '50%',
                             objectFit: 'cover',
-                            border: '1.5px solid #CBD5E1',
+                            border: '1.5px solid #D3CAB8',
                             flexShrink: 0,
                           }}
                         />
@@ -624,8 +625,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                             width: '34px',
                             height: '34px',
                             borderRadius: '50%',
-                            background: '#0B203E',
-                            color: '#FBBF24',
+                            background: '#113D2B',
+                            color: '#FDE68A',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -639,10 +640,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       )}
 
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: '#0B203E', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ fontWeight: 700, color: '#0B271C', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {fullName}
                         </div>
-                        <div style={{ color: '#64748B', fontSize: '0.72rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ color: '#4B6354', fontSize: '0.72rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {occupation}
                         </div>
                       </div>
@@ -652,7 +653,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           fontFamily: 'monospace',
                           fontWeight: 800,
                           fontSize: '0.75rem',
-                          color: '#D97706',
+                          color: '#B45309',
                           background: '#FFFBEB',
                           padding: '0.15rem 0.45rem',
                           borderRadius: '5px',
@@ -675,7 +676,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 width: '100%',
                 padding: '0.65rem 0.85rem',
                 borderRadius: '8px',
-                background: '#0B203E',
+                background: '#113D2B',
                 color: '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -685,10 +686,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.4rem',
+                boxShadow: '0 2px 6px rgba(10, 39, 27, 0.25)',
               }}
             >
               <span>Explore Complete Registry</span>
-              <ArrowRight size={14} color="#FBBF24" />
+              <ArrowRight size={14} color="#FDE68A" />
             </button>
           </div>
 

@@ -198,11 +198,12 @@ export const MemberAttendanceView: React.FC<Props> = ({
       <div 
         className="mosa-card" 
         style={{ 
-          background: 'linear-gradient(135deg, #07152B 0%, #0B203E 100%)', 
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)', 
           color: '#FFFFFF', 
           padding: '2rem 1.5rem', 
           borderRadius: '14px',
-          borderLeft: '5px solid #D97706',
+          borderLeft: '5px solid #C68A24',
+          boxShadow: '0 8px 24px -6px rgba(10,39,27,0.3)',
           marginBottom: '2rem'
         }}
       >

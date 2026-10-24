@@ -4,16 +4,16 @@
  */
 
 export const MOSA_COLORS = {
-  creamBg: '#F3F6E8',         // Pale ivory/cream background from template
-  navyDeep: '#0B203E',        // Deep MASSH Navy
-  navyHeader: '#0B203E',      // Heading color
+  creamBg: '#F8F6F0',         // Pale ivory/cream background
+  navyDeep: '#113D2B',        // Deep MASSH Forest Green
+  navyHeader: '#0A271B',      // Heading dark green
   limeAccent: '#D2E038',      // Bright lime-yellow border arc
-  greenBadge: '#548C4E',      // Green "Membership ID Card" pill badge
-  greenCorner: '#589152',     // Green QR corner brackets
-  grayLabel: '#5A6874',       // Field label gray
-  textDark: '#0B203E',        // Field text dark
+  greenBadge: '#2E7D32',      // Green "Membership ID Card" pill badge
+  greenCorner: '#1B5E20',     // Green QR corner brackets
+  grayLabel: '#4B6354',       // Field label sage gray
+  textDark: '#0B271C',        // Field text dark evergreen
   white: '#FFFFFF',
-  goldBorder: '#D97706',
+  goldBorder: '#C68A24',
 };
 
 /**

@@ -557,7 +557,7 @@ export const BroadcastDesk: React.FC<Props> = ({ currentUser, onOpenAuth }) => {
               <Smartphone size={18} color="#D97706" /> Live Handset Delivery Preview
             </h3>
             <p style={{ fontSize: '0.82rem', color: '#64748B', marginBottom: '1.25rem' }}>
-              Simulating recipient view for <strong>{sampleAlumnus?.fullName || 'Verified Alumnus'}</strong> (Cohort: {sampleAlumnus?.cohort || 'Class of 2018'})
+              Simulating recipient view for <strong>{sampleAlumnus?.fullName || 'Verified Alumnus'}</strong> (Cohort: {sampleAlumnus?.schoolHistory?.aLevel?.yearCompleted ? `Class of ${sampleAlumnus.schoolHistory.aLevel.yearCompleted}` : sampleAlumnus?.schoolHistory?.oLevel?.yearCompleted ? `Class of ${sampleAlumnus.schoolHistory.oLevel.yearCompleted}` : 'Class of 2018'})
             </p>
 
             {/* Mobile Device Frame */}

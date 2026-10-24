@@ -103,11 +103,17 @@ export const App: React.FC = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authPortal, setAuthPortal] = useState<'alumni' | 'admin'>('alumni');
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isMembershipCardOpen, setIsMembershipCardOpen] = useState(false);
   const [cardTargetAlumnus, setCardTargetAlumnus] = useState<AlumniProfile | null>(null);
   const [selectedAlumnus, setSelectedAlumnus] = useState<AlumniProfile | null>(null);
   const [verifyInitialQuery, setVerifyInitialQuery] = useState<string>('');
+
+  const openAuth = (portal: 'alumni' | 'admin' = 'alumni') => {
+    setAuthPortal(portal);
+    setIsAuthOpen(true);
+  };
 
   const refreshUserData = async () => {
     const user = dataService.getCurrentUser();
@@ -158,7 +164,7 @@ export const App: React.FC = () => {
     if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role))) {
       setPortalMode('admin');
     } else {
-      setIsAuthOpen(true);
+      openAuth('admin');
     }
   };
 
@@ -175,12 +181,12 @@ export const App: React.FC = () => {
     } else {
       // Admin authentication prompt
       return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#07152B', padding: '1.5rem' }}>
-          <div className="mosa-card" style={{ maxWidth: '480px', width: '100%', padding: '2.5rem', textAlign: 'center', background: '#FFFFFF' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0A271B', padding: '1.5rem' }}>
+          <div className="mosa-card" style={{ maxWidth: '480px', width: '100%', padding: '2.5rem', textAlign: 'center', background: '#FFFFFF', border: '1px solid #E5DFD1' }}>
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem auto' }}>
-              <ShieldCheck size={36} color="#D97706" />
+              <ShieldCheck size={36} color="#B45309" />
             </div>
-            <h2 style={{ fontSize: '1.4rem', color: '#0B203E', marginBottom: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.4rem', color: '#0B271C', marginBottom: '0.5rem' }}>
               MOSA Administrative Portal
             </h2>
             <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '1.75rem', lineHeight: '1.6' }}>
@@ -189,7 +195,7 @@ export const App: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               <button
                 className="btn btn-primary"
-                onClick={() => setIsAuthOpen(true)}
+                onClick={() => openAuth('admin')}
                 style={{ width: '100%', padding: '0.85rem' }}
               >
                 Sign In as Administrator
@@ -205,6 +211,7 @@ export const App: React.FC = () => {
           </div>
           <AuthModal
             isOpen={isAuthOpen}
+            initialPortal={authPortal}
             onClose={() => setIsAuthOpen(false)}
             onLoginSuccess={handleLoginSuccess}
           />
@@ -217,7 +224,7 @@ export const App: React.FC = () => {
   // USER / MEMBER PORTAL ENVIRONMENT
   // ==========================================
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8F6F0' }}>
       {/* Member Navigation Bar */}
       <Navbar
         currentTab={currentTab}
@@ -228,7 +235,7 @@ export const App: React.FC = () => {
         onOpenNotifications={() => handleNavigate('notifications')}
         onOpenRegister={() => setIsRegisterOpen(true)}
         onOpenVerify={() => setIsVerifyOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={() => openAuth('alumni')}
         onLogout={handleLogout}
         onOpenAdmin={handleAdminGateClick}
         onSwitchToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : handleAdminGateClick}
@@ -243,12 +250,12 @@ export const App: React.FC = () => {
             className="universal-back-bar"
             style={{ 
               background: '#FFFFFF', 
-              borderBottom: '1px solid #E2E8F0', 
+              borderBottom: '1px solid #E5DFD1', 
               position: 'sticky', 
               top: 0, 
               zIndex: 90,
               padding: '0.65rem 1.25rem',
-              boxShadow: '0 2px 4px rgba(11, 32, 62, 0.04)'
+              boxShadow: '0 2px 4px rgba(10, 39, 27, 0.04)'
             }}
           >
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -259,7 +266,7 @@ export const App: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  background: '#0B203E',
+                  background: '#113D2B',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '8px',
@@ -275,15 +282,15 @@ export const App: React.FC = () => {
                 <span>Back</span>
               </button>
 
-              <div className="universal-back-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#64748B' }}>
+              <div className="universal-back-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#4B6354' }}>
                 <button 
                   onClick={() => { setCurrentTab('home'); setTabHistory(['home']); }}
-                  style={{ background: 'none', border: 'none', color: '#D97706', cursor: 'pointer', fontWeight: 600, padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: '#C68A24', cursor: 'pointer', fontWeight: 600, padding: 0 }}
                 >
                   Dashboard
                 </button>
                 <span>/</span>
-                <span style={{ color: '#0B203E', fontWeight: 600 }}>{getTabLabel(currentTab)}</span>
+                <span style={{ color: '#0B271C', fontWeight: 600 }}>{getTabLabel(currentTab)}</span>
               </div>
             </div>
           </aside>
@@ -343,7 +350,7 @@ export const App: React.FC = () => {
         {currentTab === 'attendance' && moduleSettings.attendance && (
           <MemberAttendanceView
             currentUser={currentUser}
-            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenAuth={() => openAuth('alumni')}
             onOpenRegister={() => setIsRegisterOpen(true)}
             onBack={handleBack}
           />
@@ -353,7 +360,7 @@ export const App: React.FC = () => {
         {currentTab === 'news' && moduleSettings.news && (
           <CommunicationsHub
             currentUser={currentUser}
-            onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenAuth={() => openAuth('alumni')}
             onBack={handleBack}
           />
         )}
@@ -443,16 +450,16 @@ export const App: React.FC = () => {
       </main>
 
       {/* Member Portal Footer */}
-      <footer style={{ background: '#07152B', color: '#94A3B8', padding: '2.5rem 1.25rem', borderTop: '2px solid #D97706', fontSize: '0.85rem' }}>
+      <footer style={{ background: '#0A271B', color: '#CBD5CD', padding: '2.5rem 1.25rem', borderTop: '2px solid #C68A24', fontSize: '0.85rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
             <div style={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em' }}>
               Mandela Secondary School Hoima (MASSH)
             </div>
-            <div style={{ color: '#FBBF24', fontSize: '0.82rem', marginTop: '0.2rem', fontWeight: 600 }}>
+            <div style={{ color: '#FDE68A', fontSize: '0.82rem', marginTop: '0.2rem', fontWeight: 600 }}>
               Mandela Old Students Association (MOSA) • Founded 1997
             </div>
-            <div style={{ color: '#64748B', fontSize: '0.78rem', marginTop: '0.35rem', fontStyle: 'italic' }}>
+            <div style={{ color: '#8BA193', fontSize: '0.78rem', marginTop: '0.35rem', fontStyle: 'italic' }}>
               "Education is the Most Powerful Weapon"
             </div>
           </div>
@@ -523,6 +530,7 @@ export const App: React.FC = () => {
       {/* Authentication Modal */}
       <AuthModal
         isOpen={isAuthOpen}
+        initialPortal={authPortal}
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />

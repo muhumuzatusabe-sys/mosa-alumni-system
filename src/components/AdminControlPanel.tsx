@@ -36,7 +36,8 @@ import {
   Briefcase,
   Vote,
   XCircle,
-  ExternalLink
+  ExternalLink,
+  CreditCard
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -526,18 +527,18 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8FAFC', paddingBottom: '4rem' }}>
+    <div style={{ minHeight: '100vh', background: '#F8F6F0', paddingBottom: '4rem' }}>
       {/* Top Administrative Header Bar */}
       <header 
         style={{
-          background: 'linear-gradient(135deg, #07152B 0%, #0B203E 60%, #163663 100%)',
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 60%, #18533B 100%)',
           color: '#FFFFFF',
-          borderBottom: '3px solid #D97706',
+          borderBottom: '3px solid #C68A24',
           padding: '1.25rem 1.5rem',
           position: 'sticky',
           top: 0,
           zIndex: 90,
-          boxShadow: '0 4px 20px rgba(7, 21, 43, 0.25)',
+          boxShadow: '0 4px 20px rgba(10, 39, 27, 0.25)',
         }}
       >
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>

@@ -155,48 +155,48 @@ export const AboutView: React.FC<AboutViewProps> = ({ onBack }) => {
         className="mosa-card"
         style={{
           padding: '2.5rem',
-          background: 'linear-gradient(135deg, #0B203E 0%, #163663 100%)',
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)',
           color: '#FFFFFF',
           marginBottom: '3rem',
           borderRadius: '16px',
-          border: 'none',
-          boxShadow: '0 12px 30px rgba(11, 32, 62, 0.15)',
+          border: '1px solid rgba(198, 138, 36, 0.35)',
+          boxShadow: '0 12px 30px rgba(10, 39, 27, 0.2)',
         }}
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
           <div>
-            <div style={{ color: '#FBBF24', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+            <div style={{ color: '#FDE68A', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
               {content?.profileBadge || 'Alma Mater Profile'}
             </div>
             <h2 style={{ color: '#FFFFFF', fontSize: '1.85rem', marginBottom: '1rem', lineHeight: '1.25' }}>
               {content?.profileTitle || 'Mandela Secondary School Hoima (MASSH)'}
             </h2>
-            <p style={{ color: '#CBD5E1', fontSize: '0.95rem', lineHeight: '1.65', marginBottom: '1.25rem' }}>
+            <p style={{ color: '#CBD5CD', fontSize: '0.95rem', lineHeight: '1.65', marginBottom: '1.25rem' }}>
               {content?.profileParagraph1 || 'Mandela Secondary School Hoima was founded in 1997 in Hoima City, Uganda. Named in honour of the legendary statesman Nelson Mandela, the school has consistently championed academic diligence, moral integrity, leadership, and community service.'}
             </p>
-            <p style={{ color: '#CBD5E1', fontSize: '0.95rem', lineHeight: '1.65' }}>
+            <p style={{ color: '#CBD5CD', fontSize: '0.95rem', lineHeight: '1.65' }}>
               {content?.profileParagraph2 || 'Offering both O-Level (UCE) and A-Level (UACE) curricula, MASSH has graduated thousands of professionals serving with distinction across Africa and internationally.'}
             </p>
           </div>
 
-          <div style={{ background: 'rgba(255, 255, 255, 0.06)', borderRadius: '12px', padding: '1.75rem', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-            <h3 style={{ color: '#FBBF24', fontSize: '1.1rem', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.15)', paddingBottom: '0.5rem' }}>
-              Official Identity & Motto
+          <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1.75rem', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+            <h3 style={{ color: '#FDE68A', fontSize: '1.1rem', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.15)', paddingBottom: '0.5rem' }}>
+              Official Identity &amp; Motto
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <div style={{ fontSize: '0.78rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 600 }}>School Motto</div>
+                <div style={{ fontSize: '0.78rem', color: '#D1FAE5', textTransform: 'uppercase', fontWeight: 600 }}>School Motto</div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', fontStyle: 'italic' }}>
                   "{content?.motto || 'Education is the Most Powerful Weapon'}"
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '0.78rem', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 600 }}>Official Colours</div>
-                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
-                  <span style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#0B203E', border: '1px solid #FFF' }}></span> Navy Blue
-                  <span style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#D97706', border: '1px solid #FFF' }}></span> Gold
-                  <span style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid #CCC' }}></span> White
-                  <span style={{ fontSize: '0.8rem', color: '#CBD5E1', marginLeft: '0.25rem' }}>({content?.colors || 'Navy Blue, Gold, and White'})</span>
+                <div style={{ fontSize: '0.78rem', color: '#D1FAE5', textTransform: 'uppercase', fontWeight: 600 }}>Official Colours</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#113D2B', border: '1.5px solid #F8F6F0' }}></span> Forest Green
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#F8F6F0', border: '1.5px solid #113D2B' }}></span> Cream
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#C68A24', border: '1.5px solid #FFF' }}></span> Gold
+                  <span style={{ fontSize: '0.8rem', color: '#FDE68A', marginLeft: '0.25rem' }}>({content?.colors || 'Forest Green, Cream, and Gold'})</span>
                 </div>
               </div>
               <div>

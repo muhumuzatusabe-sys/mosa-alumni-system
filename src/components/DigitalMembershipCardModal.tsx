@@ -49,7 +49,7 @@ export const DigitalMembershipCardModal: React.FC<DigitalMembershipCardModalProp
         alumniId: alumnus.internalId,
         fullName: alumnus.fullName || `${alumnus.firstName} ${alumnus.lastName}`,
         alumniNumber: alumnus.alumniNumber,
-        cohort: alumnus.schoolHistory?.oLevel?.yearCompleted || alumnus.schoolHistory?.aLevel?.yearCompleted || 2022,
+        cohort: String(alumnus.schoolHistory?.oLevel?.yearCompleted || alumnus.schoolHistory?.aLevel?.yearCompleted || '2022'),
         category: 'Official Membership ID',
         photoUrl: alumnus.photoUrl,
         verificationToken: `MOSA-PASS-${alumnus.alumniNumber}`,

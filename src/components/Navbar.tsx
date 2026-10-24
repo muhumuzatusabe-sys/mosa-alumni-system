@@ -210,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2px solid #07152B',
+                  border: '2px solid #0A271B',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
                 }}
               >
@@ -329,7 +329,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(7, 21, 43, 0.65)',
+              background: 'rgba(10, 39, 27, 0.65)',
               backdropFilter: 'blur(3px)',
               zIndex: 1050,
             }}
@@ -342,8 +342,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               top: '100%',
               left: 0,
               right: 0,
-              background: 'linear-gradient(180deg, #0B203E 0%, #07152B 100%)',
-              borderBottom: '3px solid #D97706',
+              background: 'linear-gradient(180deg, #113D2B 0%, #0A271B 100%)',
+              borderBottom: '3px solid #C68A24',
               boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
               padding: '1.5rem 1.25rem 2rem 1.25rem',
               zIndex: 1060,

@@ -1,4 +1,5 @@
 import {
+  UserRole,
   AlumniApplication,
   AlumniProfile,
   ApplicationStatus,
@@ -98,6 +99,7 @@ const STORAGE_KEYS = {
   BALLOTS: 'mosa_ballots',
   BROADCASTS: 'mosa_broadcasts',
   BROADCAST_LOGS: 'mosa_broadcast_logs',
+  CREDENTIALS: 'mosa_user_credentials',
 };
 
 const memoryStore: Record<string, string> = {};
@@ -2845,83 +2847,320 @@ export const dataService = {
     }
   },
 
-  // Authentication Simulation & Session
-  async login(email: string, password?: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
+  // CREDENTIAL & PASSWORD MANAGEMENT
+  getUserCredentials(): Record<string, { email: string; password: string; role: UserRole; displayName: string; alumniId?: string; alumniNumber?: string; updatedAt: string }> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.CREDENTIALS);
+    if (raw) {
+      try {
+        return JSON.parse(raw);
+      } catch {}
+    }
+    // Seed initial credentials
+    const seeded: Record<string, any> = {
+      'admin@massh.ac.ug': {
+        email: 'admin@massh.ac.ug',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'Head of ICT / MOSA Admin',
+        updatedAt: new Date().toISOString()
+      },
+      'secretary@massh.ac.ug': {
+        email: 'secretary@massh.ac.ug',
+        password: 'admin123',
+        role: 'SECRETARY',
+        displayName: 'MOSA Secretary General',
+        updatedAt: new Date().toISOString()
+      },
+      'treasurer@massh.ac.ug': {
+        email: 'treasurer@massh.ac.ug',
+        password: 'admin123',
+        role: 'TREASURER',
+        displayName: 'MOSA Honorary Treasurer',
+        updatedAt: new Date().toISOString()
+      },
+      'publicity@massh.ac.ug': {
+        email: 'publicity@massh.ac.ug',
+        password: 'admin123',
+        role: 'PUBLICITY',
+        displayName: 'MOSA Publicity Secretary',
+        updatedAt: new Date().toISOString()
+      },
+      'muhammad.z@alumni.massh.ac.ug': {
+        email: 'muhammad.z@alumni.massh.ac.ug',
+        password: 'alumni123',
+        role: 'ALUMNI',
+        displayName: 'Muhammad Zatusave',
+        alumniId: 'alumni-0001',
+        alumniNumber: 'MA. 0001',
+        updatedAt: new Date().toISOString()
+      }
+    };
+    safeStorage.setItem(STORAGE_KEYS.CREDENTIALS, JSON.stringify(seeded));
+    return seeded;
+  },
+
+  saveUserCredential(cred: { email: string; password: string; role: UserRole; displayName: string; alumniId?: string; alumniNumber?: string }) {
+    const all = this.getUserCredentials();
+    all[cred.email.toLowerCase()] = {
+      ...cred,
+      email: cred.email.toLowerCase(),
+      updatedAt: new Date().toISOString()
+    };
+    safeStorage.setItem(STORAGE_KEYS.CREDENTIALS, JSON.stringify(all));
+  },
+
+  async checkEmailStatus(email: string): Promise<{ 
+    found: boolean; 
+    isAlumnus: boolean; 
+    isAdmin: boolean; 
+    hasPassword: boolean; 
+    alumnus?: AlumniProfile; 
+    displayName?: string;
+    alumniNumber?: string;
+  }> {
     const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = email.replace(/[\s\-\(\)]/g, '');
-
-    // Configured authentication strategy (managed by Super Admin)
-    let auth = { allowEmailPassword: true, allowPhonePassword: true, allowPhoneOtp: false, allowMANumberPassword: false };
-    try {
-      const rawAuth = safeStorage.getItem('mosa_auth_settings');
-      if (rawAuth) auth = { ...auth, ...JSON.parse(rawAuth) };
-    } catch {}
-
-    // Check pre-configured admin or seed users
-    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
-    const matchedUser = users.find(u =>
-      (u.email && u.email.toLowerCase() === cleanEmail) ||
-      (auth.allowPhonePassword && !!u.phone && u.phone.replace(/[\s\-\(\)]/g, '') === cleanPhone)
-    );
-    if (matchedUser && matchedUser.active === false) {
-      return { success: false, error: 'This account has been deactivated. Please contact the MOSA Secretariat.' };
+    if (!cleanEmail) {
+      return { found: false, isAlumnus: false, isAdmin: false, hasPassword: false };
     }
 
-    if (cleanEmail === 'admin@massh.ac.ug') {
-      const adminUser: AuthUser = matchedUser || {
+    const creds = this.getUserCredentials();
+    const cred = creds[cleanEmail];
+
+    // Check admin / staff accounts
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+    const matchedAdmin = users.find(u => u.email?.toLowerCase() === cleanEmail);
+
+    if (matchedAdmin || cleanEmail === 'admin@massh.ac.ug') {
+      return {
+        found: true,
+        isAlumnus: false,
+        isAdmin: true,
+        hasPassword: !!cred?.password,
+        displayName: matchedAdmin?.displayName || 'MOSA Administrator'
+      };
+    }
+
+    // Check alumni registry
+    const alumniList = await this.getAlumniList();
+    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
+
+    if (alumnus) {
+      return {
+        found: true,
+        isAlumnus: true,
+        isAdmin: false,
+        hasPassword: !!cred?.password,
+        alumnus,
+        displayName: `${alumnus.firstName} ${alumnus.lastName}`,
+        alumniNumber: alumnus.alumniNumber
+      };
+    }
+
+    return { found: false, isAlumnus: false, isAdmin: false, hasPassword: false };
+  },
+
+  async createAlumniPassword(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      return { success: false, error: 'Email address is required.' };
+    }
+    if (!password || password.length < 4) {
+      return { success: false, error: 'Password must be at least 4 characters long.' };
+    }
+
+    const alumniList = await this.getAlumniList();
+    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
+
+    if (!alumnus) {
+      return { 
+        success: false, 
+        error: `No registered alumnus found with email "${cleanEmail}". Please register first in the Alumni Registry.` 
+      };
+    }
+
+    // Save linked credential permanently
+    const displayName = `${alumnus.firstName} ${alumnus.lastName}`;
+    this.saveUserCredential({
+      email: cleanEmail,
+      password: password,
+      role: 'ALUMNI',
+      displayName,
+      alumniId: alumnus.internalId,
+      alumniNumber: alumnus.alumniNumber
+    });
+
+    // Mark account activated in alumni registry
+    alumnus.accountActivated = true;
+    alumnus.updatedAt = new Date().toISOString();
+    safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify(alumniList));
+
+    const alumniUser: AuthUser = {
+      uid: `user-${alumnus.internalId}`,
+      email: alumnus.email,
+      role: 'ALUMNI',
+      displayName,
+      alumniId: alumnus.internalId,
+      alumniNumber: alumnus.alumniNumber,
+      photoUrl: alumnus.photoUrl,
+      phone: alumnus.phone,
+    };
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(alumniUser));
+
+    await this.logAudit({
+      action: 'PASSWORD_CREATED',
+      performedBy: alumniUser.email,
+      affectedRecord: alumniUser.uid,
+      metadata: { role: 'ALUMNI', alumniNumber: alumnus.alumniNumber, action: 'Permanent password linked to email' },
+    });
+
+    return { success: true, user: alumniUser };
+  },
+
+  // Enhanced Login with separate Admin & Alumni Password protection
+  async login(
+    email: string, 
+    password?: string, 
+    portal: 'alumni' | 'admin' = 'alumni'
+  ): Promise<{ 
+    success: boolean; 
+    user?: AuthUser; 
+    error?: string; 
+    needsPasswordCreation?: boolean;
+    alumnusName?: string;
+    alumniNumber?: string;
+  }> {
+    const cleanEmail = email.trim().toLowerCase();
+    const creds = this.getUserCredentials();
+    const userCred = creds[cleanEmail];
+
+    if (!cleanEmail) {
+      return { success: false, error: 'Email address is required.' };
+    }
+
+    // ----------------------------------------------------
+    // PORTAL 1: ADMINISTRATIVE SIGN IN
+    // ----------------------------------------------------
+    if (portal === 'admin') {
+      const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+      const matchedAdmin = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+
+      const isRecognizedAdmin = matchedAdmin || cleanEmail === 'admin@massh.ac.ug';
+      if (!isRecognizedAdmin) {
+        return { 
+          success: false, 
+          error: 'This email is not authorized for administrative access. Please use Alumni Sign In.' 
+        };
+      }
+
+      if (matchedAdmin && matchedAdmin.active === false) {
+        return { success: false, error: 'This administrative account has been deactivated.' };
+      }
+
+      // Check Admin Password
+      const expectedPassword = userCred?.password || 'admin123';
+      if (!password || password !== expectedPassword) {
+        return { success: false, error: 'Incorrect administrator password. Please check your credentials.' };
+      }
+
+      const adminUser: AuthUser = matchedAdmin || {
         uid: 'admin-super-01',
-        email: 'admin@massh.ac.ug',
+        email: cleanEmail,
         role: 'SUPER_ADMIN',
         displayName: 'Head of ICT / MOSA Admin',
       };
+
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(adminUser));
       await this.logAudit({
-        action: 'USER_LOGIN',
+        action: 'ADMIN_LOGIN',
         performedBy: adminUser.email,
         affectedRecord: adminUser.uid,
         metadata: { role: adminUser.role },
       });
+
       return { success: true, user: adminUser };
     }
 
-    if (matchedUser) {
-      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(matchedUser));
-      await this.logAudit({
-        action: 'USER_LOGIN',
-        performedBy: matchedUser.email,
-        affectedRecord: matchedUser.uid,
-        metadata: { role: matchedUser.role },
-      });
-      return { success: true, user: matchedUser };
-    }
-
-    // Check if an alumnus exists with this email, phone, or (if enabled) MA number
+    // ----------------------------------------------------
+    // PORTAL 2: ALUMNI MEMBER SIGN IN
+    // ----------------------------------------------------
     const alumniList = await this.getAlumniList();
-    const alumnus = alumniList.find(a =>
-      (!!a.email && a.email.toLowerCase() === cleanEmail) ||
-      (auth.allowPhonePassword && !!a.phone && a.phone.replace(/[\s\-\(\)]/g, '') === cleanPhone) ||
-      (auth.allowMANumberPassword && a.alumniNumber.replace(/\s/g, '').toUpperCase() === email.replace(/\s/g, '').toUpperCase())
-    );
-    if (alumnus) {
-      const alumniUser: AuthUser = {
-        uid: `user-${alumnus.internalId}`,
-        email: alumnus.email,
-        role: 'ALUMNI',
-        displayName: `${alumnus.firstName} ${alumnus.lastName}`,
-        alumniId: alumnus.internalId,
-        alumniNumber: alumnus.alumniNumber,
+    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
+
+    if (!alumnus) {
+      if (cleanEmail === 'admin@massh.ac.ug' || cleanEmail.includes('@massh.ac.ug')) {
+        return {
+          success: false,
+          error: 'This appears to be an administrator email. Please switch to the "Administrator Sign In" tab.'
+        };
+      }
+      return {
+        success: false,
+        error: `No alumni account found for "${cleanEmail}". Please check the spelling or register first.`
       };
-      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(alumniUser));
-      await this.logAudit({
-        action: 'USER_LOGIN',
-        performedBy: alumniUser.email,
-        affectedRecord: alumniUser.uid,
-        metadata: { role: 'ALUMNI', alumniNumber: alumnus.alumniNumber },
-      });
-      return { success: true, user: alumniUser };
     }
 
-    return { success: false, error: 'No account found matching these credentials. Please register or contact MOSA administration.' };
+    // Check if alumnus has already created a password
+    if (!userCred || !userCred.password) {
+      return {
+        success: false,
+        needsPasswordCreation: true,
+        alumnusName: `${alumnus.firstName} ${alumnus.lastName}`,
+        alumniNumber: alumnus.alumniNumber,
+        error: `Welcome, ${alumnus.firstName}! You have not set a password yet. Please create your password below to activate sign in.`
+      };
+    }
+
+    // Verify Password
+    if (!password || password !== userCred.password) {
+      return {
+        success: false,
+        error: 'Incorrect password. Please verify and try again, or create/reset your password.'
+      };
+    }
+
+    const alumniUser: AuthUser = {
+      uid: `user-${alumnus.internalId}`,
+      email: alumnus.email,
+      role: 'ALUMNI',
+      displayName: `${alumnus.firstName} ${alumnus.lastName}`,
+      alumniId: alumnus.internalId,
+      alumniNumber: alumnus.alumniNumber,
+      photoUrl: alumnus.photoUrl,
+      phone: alumnus.phone,
+    };
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(alumniUser));
+    await this.logAudit({
+      action: 'USER_LOGIN',
+      performedBy: alumniUser.email,
+      affectedRecord: alumniUser.uid,
+      metadata: { role: 'ALUMNI', alumniNumber: alumnus.alumniNumber },
+    });
+
+    return { success: true, user: alumniUser };
+  },
+
+  async setAdminPassword(newPassword: string, adminEmail = 'admin@massh.ac.ug'): Promise<{ success: boolean; error?: string }> {
+    if (!newPassword || newPassword.length < 4) {
+      return { success: false, error: 'Admin password must be at least 4 characters long.' };
+    }
+    const creds = this.getUserCredentials();
+    creds[adminEmail.toLowerCase()] = {
+      ...(creds[adminEmail.toLowerCase()] || {}),
+      email: adminEmail.toLowerCase(),
+      password: newPassword,
+      role: 'SUPER_ADMIN',
+      displayName: 'Head of ICT / MOSA Admin',
+      updatedAt: new Date().toISOString()
+    };
+    safeStorage.setItem(STORAGE_KEYS.CREDENTIALS, JSON.stringify(creds));
+    await this.logAudit({
+      action: 'ADMIN_PASSWORD_UPDATED',
+      performedBy: adminEmail,
+      affectedRecord: 'admin-password',
+      metadata: { action: 'Admin password updated' }
+    });
+    return { success: true };
   },
 
   getCurrentUser(): AuthUser | null {
@@ -5197,11 +5436,13 @@ export const dataService = {
     return items;
   },
 
-  previewInterpolatedMessage(template: string, sample: Partial<AlumniProfile>): string {
+  previewInterpolatedMessage(template: string, sample: Partial<AlumniProfile> & { cohort?: string; chapter?: string }): string {
     let result = template;
-    const name = sample.fullName || 'Alumnus';
+    const name = sample.fullName || (sample.firstName ? `${sample.firstName} ${sample.lastName || ''}`.trim() : 'Alumnus');
     const num = sample.alumniNumber || 'MA. 0001';
-    const cohort = sample.cohort || 'Class of 2012';
+    const cohort = sample.cohort || 
+      (sample.schoolHistory?.aLevel?.yearCompleted ? `Class of ${sample.schoolHistory.aLevel.yearCompleted}` :
+       sample.schoolHistory?.oLevel?.yearCompleted ? `Class of ${sample.schoolHistory.oLevel.yearCompleted}` : 'Class of 2012');
     const chapter = sample.chapter || 'Kampala Metropolitan Chapter';
 
     result = result.replace(/\{\{fullName\}\}/g, name);
@@ -5217,13 +5458,17 @@ export const dataService = {
     return allAlumni.filter(a => {
       if (filter.scope === 'ALL_ALUMNI') return true;
       if (filter.scope === 'VERIFIED_ONLY') {
-        return a.membershipStatus === 'ACTIVE' || a.status === 'APPROVED';
+        return a.membershipStatus === 'ACTIVE' || a.membershipStatus === 'APPROVED';
       }
       if (filter.scope === 'COHORT' && filter.cohortYear) {
-        return (a.cohort && a.cohort.includes(String(filter.cohortYear))) || a.aLevel?.yearCompleted === filter.cohortYear || a.oLevel?.yearCompleted === filter.cohortYear;
+        const oYear = a.schoolHistory?.oLevel?.yearCompleted;
+        const aYear = a.schoolHistory?.aLevel?.yearCompleted;
+        const rawCohort = (a as unknown as { cohort?: string }).cohort;
+        return (rawCohort && rawCohort.includes(String(filter.cohortYear))) || aYear === filter.cohortYear || oYear === filter.cohortYear;
       }
       if (filter.scope === 'CHAPTER' && filter.chapterId) {
-        return a.chapterId === filter.chapterId || a.chapter === filter.chapterId;
+        const rawChapter = a as unknown as { chapterId?: string; chapter?: string };
+        return rawChapter.chapterId === filter.chapterId || rawChapter.chapter === filter.chapterId;
       }
       return true;
     });

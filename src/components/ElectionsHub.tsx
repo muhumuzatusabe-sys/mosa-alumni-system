@@ -280,7 +280,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
 
       {/* Quorum & Turnout Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, #07152B 0%, #0B203E 100%)',
+        background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)',
         borderRadius: '16px',
         padding: '1.5rem',
         color: '#FFFFFF',
@@ -288,8 +288,8 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '1.25rem',
-        border: '1px solid #D97706',
-        boxShadow: '0 8px 24px -6px rgba(11,32,62,0.3)'
+        border: '1px solid #C68A24',
+        boxShadow: '0 8px 24px -6px rgba(10,39,27,0.3)'
       }}>
         <div>
           <div style={{ fontSize: '0.75rem', color: '#FCD34D', fontWeight: 800, letterSpacing: '0.5px' }}>

@@ -61,7 +61,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
         const url = await QRCode.toDataURL(targetUrl, {
           margin: 1,
           width: 240,
-          color: { dark: '#0B203E', light: '#FFFFFF' }
+          color: { dark: '#113D2B', light: '#FFFFFF' }
         });
         if (isMounted) setQrDataUrl(url);
       } catch (err) {

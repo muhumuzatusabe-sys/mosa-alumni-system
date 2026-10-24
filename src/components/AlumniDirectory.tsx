@@ -67,14 +67,14 @@ export const AlumniDirectory: React.FC<Props> = ({ currentUser, onSelectAlumni, 
       {/* Hero Welcome Card for MASSH & MOSA */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, #0B203E 0%, #163663 100%)',
+          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)',
           borderRadius: '20px',
           padding: '2.25rem',
           color: '#ffffff',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 10px 25px rgba(11, 32, 62, 0.2)',
-          border: '1px solid rgba(217, 119, 6, 0.3)',
+          boxShadow: '0 10px 25px rgba(10, 39, 27, 0.2)',
+          border: '1px solid rgba(198, 138, 36, 0.35)',
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
@@ -222,9 +222,9 @@ export const AlumniDirectory: React.FC<Props> = ({ currentUser, onSelectAlumni, 
                     fontSize: '0.8rem',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    border: levelFilter === item.id ? '1px solid #0B203E' : '1px solid #CBD5E1',
-                    background: levelFilter === item.id ? '#0B203E' : '#FFFFFF',
-                    color: levelFilter === item.id ? '#FFFFFF' : '#475569',
+                    border: levelFilter === item.id ? '1px solid #113D2B' : '1px solid #E5DFD1',
+                    background: levelFilter === item.id ? '#113D2B' : '#FFFFFF',
+                    color: levelFilter === item.id ? '#FFFFFF' : '#4B6354',
                   }}
                 >
                   {item.label}
