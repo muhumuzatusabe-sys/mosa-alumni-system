@@ -1,7 +1,7 @@
-// MOSA Service Worker v1.0.0
+// MASSH ALUMNI PORTAL Service Worker v2.0.0
 // Caches core application shells, fonts, brand assets, and offline membership card passes
 
-const CACHE_NAME = 'mosa-alumni-cache-v1';
+const CACHE_NAME = 'massh-alumni-cache-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

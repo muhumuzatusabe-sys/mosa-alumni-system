@@ -148,7 +148,7 @@ export const NotificationsModal: React.FC<Props> = ({
                 MOSA Notification Centre
               </h3>
               <div style={{ fontSize: '0.75rem', color: '#CBD5E1' }}>
-                Actionable alerts & deep-links for Mandela scholars
+                Actionable alerts & deep-links for MASSH alumni
               </div>
             </div>
           </div>

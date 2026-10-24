@@ -187,7 +187,7 @@ export const NotificationsView: React.FC<Props> = ({
                 )}
               </div>
               <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#CBD5E1' }}>
-                Interactive alerts, verified contributions, meeting calls & announcements for Mandela scholars
+                Interactive alerts, verified contributions, meeting calls & announcements for MASSH alumni
               </p>
             </div>
           </div>

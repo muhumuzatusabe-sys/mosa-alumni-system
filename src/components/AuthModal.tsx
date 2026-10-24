@@ -269,7 +269,10 @@ export const AuthModal: React.FC<Props> = ({
                 )}
               </div>
               <div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: '#FAF8F3', letterSpacing: '-0.01em' }}>
+                <div style={{ fontSize: '0.65rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.07em', fontWeight: 800 }}>
+                  MASSH ALUMNI PORTAL
+                </div>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0.1rem 0 0 0', color: '#FAF8F3', letterSpacing: '-0.01em' }}>
                   {portal === 'admin' ? 'MOSA Administrative Portal' : 'MOSA Member Sign In'}
                 </h3>
                 <p style={{ fontSize: '0.78rem', margin: 0, color: '#E5DFD1', opacity: 0.85 }}>

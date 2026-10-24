@@ -164,9 +164,9 @@ const defaultSettings: SystemSettings = {
 const defaultWebsiteContent: WebsiteContent = {
   home: {
     badgeText: 'MANDELA SECONDARY SCHOOL HOIMA (MASSH) • EST. 1997',
-    heroTitle: 'Connecting Generations of Mandela Scholars Across the Globe.',
-    heroSubtitle: 'Welcome to the official alumni platform of the Mandela Old Students Association (MOSA). Reconnect with classmates, access your official membership registry, join university chapters, and support our alma mater in Hoima.',
-    heroHighlightWord: 'Mandela Scholars',
+    heroTitle: 'Connecting Generations of MASSH Alumni Across the Globe.',
+    heroSubtitle: 'Welcome to the MASSH ALUMNI PORTAL, the official digital platform of the Mandela Old Students Association (MOSA). Reconnect with classmates, access your official membership registry, join university chapters, and support our alma mater in Hoima.',
+    heroHighlightWord: 'MASSH Alumni',
     statsHeritageText: '1997 – Present',
     statsHeritageSub: '27+ Years of Heritage',
     statsVerifiedText: '100% Verified',

@@ -120,7 +120,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 1. COMPACT MEMBER IDENTITY & PROFILE SUMMARY                   */}
       {/* ============================================================== */}
-      <section style={{ marginBottom: '1rem' }}>
+      {/* ============================================================== */}
+      {/* 1. COMPACT MEMBER IDENTITY & DIGITAL ALUMNI PASS               */}
+      {/* ============================================================== */}
+      <section style={{ marginBottom: '1.25rem' }}>
         <div
           className="member-identity-card"
           style={{
@@ -132,150 +135,127 @@ export const HomeView: React.FC<HomeViewProps> = ({
             border: '1.5px solid rgba(198, 138, 36, 0.35)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '1rem',
+            gap: '1.25rem',
           }}
         >
-          {/* Identity Info */}
-          <div className="identity-info-block" style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', minWidth: 0 }}>
+          {/* Member Photo Block with Exact Heading */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+            <span
+              style={{
+                fontSize: '0.66rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.07em',
+                color: '#FCD34D',
+                fontWeight: 800,
+              }}
+            >
+              MASH Alumni Photo
+            </span>
+
             {memberProfile?.photoUrl ? (
               <img
                 src={memberProfile.photoUrl}
-                alt={memberProfile.firstName}
+                alt={memberProfile.firstName || 'MASSH Alumnus'}
                 style={{
-                  width: '52px',
-                  height: '52px',
+                  width: '58px',
+                  height: '58px',
                   borderRadius: '50%',
                   objectFit: 'cover',
                   border: '2px solid #FBBF24',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                  flexShrink: 0,
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
                 }}
               />
             ) : (
               <div
                 style={{
-                  width: '52px',
-                  height: '52px',
+                  width: '58px',
+                  height: '58px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #D97706, #B45309)',
                   color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.2rem',
+                  fontSize: '1.25rem',
                   fontWeight: 800,
                   border: '2px solid #FDE68A',
-                  flexShrink: 0,
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
                 }}
               >
-                {memberProfile ? `${memberProfile.firstName[0]}${memberProfile.lastName[0]}` : 'MS'}
+                {memberProfile ? `${memberProfile.firstName?.[0] || 'M'}${memberProfile.lastName?.[0] || 'A'}` : 'MA'}
               </div>
             )}
+          </div>
 
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
-                {currentUser ? 'MOSA Member Account' : 'Mandela Scholar Portal'}
-              </div>
-              
-              <h2 style={{ fontSize: '1.2rem', color: '#FFFFFF', margin: '0.1rem 0 0.25rem 0', fontWeight: 800, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : 'Muhammad Zatusave'}
-              </h2>
+          {/* Member Details Hierarchy */}
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
+              MASSH ALUMNI PORTAL
+            </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <h2
+              style={{
+                fontSize: '1.25rem',
+                color: '#FFFFFF',
+                margin: '0.15rem 0 0.35rem 0',
+                fontWeight: 800,
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {memberProfile?.fullName || (memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : 'Muhammad Zatusave')}
+            </h2>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  fontFamily: 'monospace',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  color: '#FDE68A',
+                  background: 'rgba(217, 119, 6, 0.25)',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                }}
+              >
+                <Award size={13} color="#FBBF24" />
+                <span>{memberProfile?.alumniNumber || 'MA. 0001'}</span>
+              </span>
+
+              {(memberProfile?.verifiedAt || memberProfile?.membershipStatus === 'ACTIVE' || memberProfile?.membershipStatus === 'APPROVED' || !memberProfile) && (
                 <span
                   style={{
-                    fontFamily: 'monospace',
-                    fontWeight: 800,
-                    fontSize: '0.8rem',
-                    color: '#FDE68A',
-                    background: 'rgba(217, 119, 6, 0.25)',
-                    padding: '0.15rem 0.5rem',
-                    borderRadius: '5px',
-                    border: '1px solid rgba(245, 158, 11, 0.4)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                  }}
-                >
-                  <Award size={12} color="#FBBF24" />
-                  <span>{memberProfile?.alumniNumber || 'MA. 0125'}</span>
-                </span>
-
-                <span
-                  style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
                     color: '#D1FAE5',
                     background: 'rgba(5, 150, 105, 0.3)',
-                    padding: '0.15rem 0.5rem',
+                    padding: '0.2rem 0.6rem',
                     borderRadius: '999px',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    border: '1px solid rgba(16, 185, 129, 0.45)',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.2rem',
+                    gap: '0.25rem',
                   }}
                 >
-                  <CheckCircle2 size={11} color="#34D399" />
+                  <CheckCircle2 size={12} color="#34D399" />
                   <span>Verified Member</span>
                 </span>
+              )}
 
-                <span style={{ fontSize: '0.74rem', color: '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                  <MapPin size={11} color="#FBBF24" />
-                  <span>{memberProfile?.city ? `${memberProfile.city} Chapter` : 'Main Campus Hoima'}</span>
+              {memberProfile?.city && (
+                <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <MapPin size={12} color="#FBBF24" />
+                  <span>{`${memberProfile.city} Chapter`}</span>
                 </span>
-              </div>
+              )}
             </div>
-          </div>
-
-          {/* Quick Header Actions: Digital Pass & Notifications Trigger */}
-          <div className="identity-actions-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexShrink: 0 }}>
-            {onOpenNotifications && (
-              <button
-                onClick={onOpenNotifications}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  background: unreadNotificationsCount > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-                  border: unreadNotificationsCount > 0 ? '1px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.15)',
-                  color: unreadNotificationsCount > 0 ? '#FECACA' : '#E2E8F0',
-                  padding: '0.45rem 0.75rem',
-                  borderRadius: '8px',
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-                title="Open Dedicated Notifications Centre"
-              >
-                <Bell size={14} color={unreadNotificationsCount > 0 ? '#F87171' : '#FCD34D'} />
-                <span>{unreadNotificationsCount > 0 ? `${unreadNotificationsCount} New Alerts` : 'Alerts'}</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => onNavigate('my-profile')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                background: 'linear-gradient(135deg, #D97706, #B45309)',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '0.45rem 0.85rem',
-                borderRadius: '8px',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(217, 119, 6, 0.3)',
-              }}
-              title="View Digital Membership Pass"
-            >
-              <QrCode size={14} />
-              <span>My Pass</span>
-            </button>
           </div>
         </div>
       </section>

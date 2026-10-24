@@ -65,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Registry & Membership',
       items: [
         { key: 'home', label: 'Home Dashboard', icon: Home, enabled: moduleSettings.home, desc: 'Personalized identity, statements & live alerts' },
-        { key: 'directory', label: 'Alumni Directory & Registry', icon: Users, enabled: moduleSettings.directory, desc: 'Search classmates, chapters & cohorts' },
+        { key: 'directory', label: 'Alumni Registry', icon: Users, enabled: moduleSettings.directory, desc: 'Explore registered alumni of Mandela Secondary School Hoima' },
         { key: 'verify', label: 'Verified Alumni Lookup', icon: ShieldCheck, enabled: true, isAction: true, desc: 'Instant official MA number authentication' },
         { key: 'membership', label: 'Official Membership Guide', icon: Award, enabled: moduleSettings.membership, desc: 'Permanent MA numbers & member rights' },
       ]
@@ -160,11 +160,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>MASSH</span>
           </div>
           <div className="brand-text">
-            <h1 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
-              MOSA Portal
+            <h1 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+              MASSH ALUMNI PORTAL
             </h1>
-            <div className="subtext" style={{ fontSize: '0.68rem', color: '#FCD34D', letterSpacing: '0.04em', fontWeight: 600 }}>
-              Mandela SS Hoima • Est. 1997
+            <div className="subtext" style={{ fontSize: '0.68rem', color: '#FCD34D', letterSpacing: '0.03em', fontWeight: 600 }}>
+              MOSA — Mandela Old Students Association • Est. 1997
             </div>
           </div>
         </div>
@@ -360,7 +360,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     Navigation Centre
                   </div>
                   <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#FFFFFF', fontWeight: 800 }}>
-                    Mandela Old Students Association Sections
+                    MASSH ALUMNI PORTAL • MOSA Sections
                   </h3>
                 </div>
                 <button

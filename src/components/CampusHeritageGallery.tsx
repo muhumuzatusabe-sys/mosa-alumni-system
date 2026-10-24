@@ -139,7 +139,7 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
   };
 
   return (
-    <div className="campus-gallery-section" style={{ marginTop: '2.5rem', marginBottom: '2.5rem' }}>
+    <div className="campus-gallery-section" style={{ marginTop: '0.5rem', marginBottom: '2.5rem' }}>
       
       {/* Section Header */}
       <div style={{ 
@@ -177,13 +177,13 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
             </div>
           )}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(217, 119, 6, 0.12)', color: '#D97706', padding: '0.25rem 0.75rem', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-            <Sparkles size={14} /> Official School Heritage &amp; Landmark Moments
+            <Sparkles size={14} /> Official School Heritage, Events &amp; Campus Memories
           </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0B203E', margin: 0, letterSpacing: '-0.02em' }}>
-            MASSH Campus Life &amp; Heritage Gallery
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0B203E', margin: 0, letterSpacing: '-0.02em' }}>
+            MASSH Campus Life, Events &amp; Heritage Gallery
           </h2>
-          <p style={{ color: '#64748B', fontSize: '0.9rem', margin: '0.35rem 0 0 0' }}>
-            Preserving historic milestones, laboratory inspections, and official visits at Mandela Secondary School Hoima • Motto: <em>"Caring to Achieve"</em>.
+          <p style={{ color: '#64748B', fontSize: '0.92rem', margin: '0.35rem 0 0 0' }}>
+            Preserving historic milestones, alumni reunions, conferences, laboratory inspections, sports, and campus activities at Mandela Secondary School Hoima • Motto: <em>"Caring to Achieve"</em>.
           </p>
         </div>
 

@@ -63,7 +63,7 @@ export const App: React.FC = () => {
   const getTabLabel = (tab: string) => {
     switch (tab) {
       case 'notifications': return 'MOSA Notification Centre';
-      case 'directory': return 'Alumni Directory & Registry';
+      case 'directory': return 'Alumni Registry';
       case 'membership': return 'Membership & Number Guide';
       case 'payments': return 'Donations & Giving';
       case 'events': return 'Events & Reunions';
@@ -453,10 +453,13 @@ export const App: React.FC = () => {
       <footer style={{ background: '#0A271B', color: '#CBD5CD', padding: '2.5rem 1.25rem', borderTop: '2px solid #C68A24', fontSize: '0.85rem' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <div style={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em' }}>
+            <div style={{ color: '#FDE68A', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
+              MASSH ALUMNI PORTAL
+            </div>
+            <div style={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em', marginTop: '0.15rem' }}>
               Mandela Secondary School Hoima (MASSH)
             </div>
-            <div style={{ color: '#FDE68A', fontSize: '0.82rem', marginTop: '0.2rem', fontWeight: 600 }}>
+            <div style={{ color: '#CBD5CD', fontSize: '0.82rem', marginTop: '0.2rem', fontWeight: 600 }}>
               Mandela Old Students Association (MOSA) • Founded 1997
             </div>
             <div style={{ color: '#8BA193', fontSize: '0.78rem', marginTop: '0.35rem', fontStyle: 'italic' }}>
