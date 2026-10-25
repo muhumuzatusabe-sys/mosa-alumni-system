@@ -551,17 +551,29 @@ export interface SecretariatContact {
   publishedPhone: string;
   whatsAppNumber: string;
   email?: string;
+  officeCategory?: string;
   status: 'ACTIVE' | 'INACTIVE';
   displayOrder?: number;
+  notes?: string;
+  updatedAt?: string;
 }
 
 export interface LegacyAlumniRecord {
   id: string;
-  alumniNumber: string; // e.g. "MA. 0001"
+  membershipNumber: string;
+  alumniNumber?: string; // Alias or compatibility
   fullName: string;
-  cohortYear?: number;
+  cohortYear?: string | number;
   level?: 'O_LEVEL' | 'A_LEVEL' | 'BOTH';
+  phone?: string;
+  email?: string;
+  physicalRegisterPage?: string;
+  verifiedStatus: 'TRUSTED' | 'FLAGGED' | 'LINKED' | 'VERIFIED';
+  linkedUserId?: string;
+  linkedAlumniId?: string;
+  linkedDate?: string;
   verifiedDate?: string;
+  importedAt?: string;
   notes?: string;
 }
 
@@ -1195,17 +1207,30 @@ export interface LeadershipOffice {
 // MOSA WELCOME PAGE MANAGEMENT
 // ==========================================
 
+export interface CarouselImageItem {
+  id: string;
+  url: string;
+  title?: string;
+  caption?: string;
+  isFeatured?: boolean;
+  order: number;
+}
+
 export interface WelcomePageConfig {
   heroTitle: string; // e.g. "WELCOME TO MOSA"
   slogan: string; // e.g. "PROUDLY MANDELIAN"
   subtitle: string; // e.g. "One family. One legacy. A lifetime of connection."
-  introMessage: string; // e.g. "Your journey with the Mandela Old Students Association starts here."
+  introMessage: string; // Concise community introductory text
   heroImageUrl?: string;
+  carouselImages?: CarouselImageItem[];
+  carouselIntervalSeconds?: number;
   draftHeroTitle?: string;
   draftSlogan?: string;
   draftSubtitle?: string;
   draftIntroMessage?: string;
   draftHeroImageUrl?: string;
+  draftCarouselImages?: CarouselImageItem[];
+  draftCarouselIntervalSeconds?: number;
   hasUnpublishedDraft?: boolean;
   lastPublishedAt?: string;
   lastPublishedBy?: string;
@@ -1221,42 +1246,3 @@ export interface MemberExportFilter {
   officeId?: string | 'ALL';
   searchTerm?: string;
 }
-
-// ==========================================
-// SECRETARIAT & OFFICIAL CONTACTS
-// ==========================================
-export interface SecretariatContact {
-  id: string;
-  name: string;
-  title: string;
-  publishedPhone: string;
-  whatsAppNumber: string;
-  email?: string;
-  officeCategory?: string;
-  status: 'ACTIVE' | 'INACTIVE';
-  displayOrder: number;
-  notes?: string;
-  updatedAt?: string;
-}
-
-// ==========================================
-// LEGACY ALUMNI PHYSICAL REGISTER
-// ==========================================
-export interface LegacyAlumniRecord {
-  id: string;
-  membershipNumber: string;
-  fullName: string;
-  cohortYear?: string | number;
-  phone?: string;
-  email?: string;
-  physicalRegisterPage?: string;
-  verifiedStatus: 'TRUSTED' | 'FLAGGED' | 'LINKED' | 'VERIFIED';
-  linkedUserId?: string;
-  linkedAlumniId?: string;
-  linkedDate?: string;
-  importedAt?: string;
-  notes?: string;
-}
-
-
-

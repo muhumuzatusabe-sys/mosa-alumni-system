@@ -11,9 +11,9 @@ Set-Location -Path $PSScriptRoot
 
 # Step 1: Build Production Assets
 Write-Host "`n[1/4] Building production bundle (TypeScript + Vite)..." -ForegroundColor Green
-npm.cmd run build 2>&1 | Tee-Object -FilePath "build_log.txt"
+npm.cmd run build
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Build failed! Check TypeScript errors above or in build_log.txt." -ForegroundColor Red
+    Write-Host "[ERROR] Build failed! Check TypeScript errors above." -ForegroundColor Red
     exit 1
 }
 Write-Host "[SUCCESS] Production bundle compiled successfully into ./dist" -ForegroundColor Green

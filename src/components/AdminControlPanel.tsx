@@ -42,7 +42,8 @@ import {
   Download,
   Key,
   Phone,
-  BookOpen
+  BookOpen,
+  ShieldAlert
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -1620,6 +1621,15 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 if (onRefreshData) onRefreshData();
               }}
             />
+          </div>
+        )}
+        {activeSection === 'registry' && !canAccessRegistry && (
+          <div className="mosa-card" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+            <ShieldAlert size={44} color="#DC2626" style={{ margin: '0 auto 1rem' }} />
+            <h3 style={{ fontSize: '1.25rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>Registry Access Restricted</h3>
+            <p style={{ color: '#64748B', maxWidth: '500px', margin: '0 auto' }}>
+              Your current administrative role (<strong>{currentUser.role}</strong>) does not have authorization to view or manage the alumni membership registry.
+            </p>
           </div>
         )}
 

@@ -1,5 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
 echo ==========================================================
 echo    MOSA ALUMNI MANAGEMENT SYSTEM (MASSH Est. 1997)
@@ -10,10 +10,10 @@ cd /d "%~dp0"
 
 echo.
 echo [1/4] Building production bundle (TypeScript + Vite)...
-call npm run build > build_log.txt 2>&1
-type build_log.txt
+call npm.cmd run build
 if %errorlevel% neq 0 (
-    echo [ERROR] Build failed! Check TypeScript errors above or in build_log.txt.
+    echo.
+    echo [ERROR] Build failed! Aborting deployment.
     pause
     exit /b %errorlevel%
 )
@@ -21,24 +21,18 @@ echo [OK] Production bundle compiled successfully into ./dist
 
 echo.
 echo [2/4] Deploying to Firebase Hosting (mtech-46634)...
-where firebase >nul 2>nul
-if %errorlevel% equ 0 (
-    call firebase deploy
+call npx.cmd -y firebase-tools deploy
+if %errorlevel% neq 0 (
+    echo [WARNING] Firebase deploy reported an issue.
 ) else (
-    echo firebase CLI not found in PATH, using npx firebase-tools...
-    call npx -y firebase-tools deploy
+    echo [OK] Deployed to Firebase Hosting successfully.
 )
 
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git diff --quiet && git diff --staged --quiet
-if %errorlevel% neq 0 (
-    git commit -m "feat: complete MOSA master restoration - admin panel, secretariat WhatsApp directory, permanent MA numbers, legacy register auto-verification, accordion navigation, and mobile UX"
-    echo [OK] Changes committed.
-) else (
-    echo [INFO] No new changes to commit.
-)
+git commit -m "feat: refine portal navigation menu - cyan active section highlight, separate submenu window, compact footprint, and removal of Secretariat, Admin Console, Verify Alumni Number, and Register as Member entries"
+echo [OK] Staged and committed changes.
 
 echo.
 echo [4/4] Pushing to GitHub (origin/main)...

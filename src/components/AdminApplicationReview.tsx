@@ -40,7 +40,8 @@ import {
   X,
   BookOpen,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Trash2
 } from 'lucide-react';
 import { AuthUser } from '../types';
 import { DigitalMembershipCardModal } from './DigitalMembershipCardModal';
@@ -167,9 +168,9 @@ export const AdminApplicationReview: React.FC<Props> = ({
 
   // Single Discreet Admin Management Modal State
   const [adminManagingMember, setAdminManagingMember] = useState<AlumniProfile | null>(null);
-  const [adminModalTab, setAdminModalTab] = useState<'status' | 'number' | 'history' | 'profile'>('status');
+  const [adminModalTab, setAdminModalTab] = useState<'status' | 'number' | 'history' | 'profile' | 'delete'>('status');
 
-  const handleOpenAdminManagement = (member: AlumniProfile, defaultTab: 'status' | 'number' | 'history' | 'profile' = 'status') => {
+  const handleOpenAdminManagement = (member: AlumniProfile, defaultTab: 'status' | 'number' | 'history' | 'profile' | 'delete' = 'status') => {
     setAdminManagingMember(member);
     setAdminModalTab(defaultTab);
     setSelectedNewStatus(member.membershipStatus || 'ACTIVE');

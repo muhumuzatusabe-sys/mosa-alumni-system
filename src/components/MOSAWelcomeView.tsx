@@ -1,32 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   GraduationCap, 
   Award, 
   Users, 
   Calendar, 
-  ArrowRight, 
   ShieldCheck, 
   Sparkles, 
-  CheckCircle2, 
-  HeartHandshake, 
-  BookOpen, 
-  Search,
-  ExternalLink,
-  ChevronDown,
-  Building,
-  MapPin,
-  Lock,
-  UserPlus,
-  LogIn
+  Building, 
+  Lock, 
+  UserPlus, 
+  LogIn,
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
-import { AuthUser, WelcomePageConfig, AlumniProfile } from '../types';
+import { AuthUser, WelcomePageConfig, CarouselImageItem } from '../types';
 import { dataService } from '../services/dataService';
 
 interface MOSAWelcomeViewProps {
   currentUser: AuthUser | null;
   onOpenLogin: () => void;
   onOpenRegisterAccount: () => void;
-  onOpenAlumniRegistration: () => void;
   onOpenVerify: () => void;
   onGoToPortal: () => void;
   onGoToAdmin?: () => void;
@@ -36,7 +30,6 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
   currentUser,
   onOpenLogin,
   onOpenRegisterAccount,
-  onOpenAlumniRegistration,
   onOpenVerify,
   onGoToPortal,
   onGoToAdmin,
@@ -50,6 +43,11 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
     eventsHeld: 0,
   });
   const [loading, setLoading] = useState(true);
+
+  // Dynamic Image Carousel State
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const slideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -89,40 +87,125 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
     loadData();
   }, []);
 
-  const scrollToExplore = () => {
-    const el = document.getElementById('explore-mosa-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  // Carousel images list
+  const carouselImages: CarouselImageItem[] = 
+    welcomeConfig?.carouselImages && welcomeConfig.carouselImages.length > 0
+      ? [...welcomeConfig.carouselImages].sort((a, b) => a.order - b.order)
+      : [
+          {
+            id: 'img-1',
+            url: '/images/massh-flag-unveiling-ceremony.jpg',
+            title: 'Flag Unveiling & Assembly',
+            caption: 'Mandela Secondary School Hoima official assembly ceremony',
+            isFeatured: true,
+            order: 1
+          },
+          {
+            id: 'img-2',
+            url: '/images/massh-gate-welcoming.jpg',
+            title: 'Campus Main Gate',
+            caption: 'Welcoming generations of proud Mandelians since 1997',
+            isFeatured: false,
+            order: 2
+          },
+          {
+            id: 'img-3',
+            url: '/images/massh-courtyard-briefing.jpg',
+            title: 'Alumni Gathering',
+            caption: 'Courtyard briefing and reunion networking',
+            isFeatured: false,
+            order: 3
+          },
+          {
+            id: 'img-4',
+            url: '/images/massh-official-handover.jpg',
+            title: 'Secretariat Leadership',
+            caption: 'Official executive handover and leadership stewardship',
+            isFeatured: false,
+            order: 4
+          },
+          {
+            id: 'img-5',
+            url: '/images/massh-foundation-stone-unveiled.jpg',
+            title: 'School Heritage',
+            caption: 'Historic foundation stone commemorating MASSH founding',
+            isFeatured: false,
+            order: 5
+          },
+          {
+            id: 'img-6',
+            url: '/images/massh-science-lab-inspection.jpg',
+            title: 'Academic Excellence',
+            caption: 'State-of-the-art science laboratories and student innovation',
+            isFeatured: false,
+            order: 6
+          }
+        ];
+
+  const intervalSeconds = welcomeConfig?.carouselIntervalSeconds || 6;
+
+  // Auto-advance Carousel timer with visibility check & reduced motion check
+  useEffect(() => {
+    if (carouselImages.length <= 1) return;
+
+    // Check prefers-reduced-motion
+    const prefersReducedMotion = typeof window !== 'undefined' && 
+      window.matchMedia && 
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) return;
+
+    // Handle document visibility
+    const handleVisibilityChange = () => {
+      setIsPaused(document.hidden);
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    if (!isPaused) {
+      slideTimerRef.current = setInterval(() => {
+        setCurrentSlideIndex(prev => (prev + 1) % carouselImages.length);
+      }, intervalSeconds * 1000);
     }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (slideTimerRef.current) clearInterval(slideTimerRef.current);
+    };
+  }, [carouselImages.length, isPaused, intervalSeconds]);
+
+  const handlePrevSlide = () => {
+    setCurrentSlideIndex(prev => (prev === 0 ? carouselImages.length - 1 : prev - 1));
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlideIndex(prev => (prev + 1) % carouselImages.length);
   };
 
   const heroTitle = welcomeConfig?.heroTitle || 'WELCOME TO MOSA';
   const slogan = welcomeConfig?.slogan || 'PROUDLY MANDELIAN';
   const subtitle = welcomeConfig?.subtitle || 'One family. One legacy. A lifetime of connection.';
-  const introMessage = welcomeConfig?.introMessage || 'Your journey with the Mandela Old Students Association starts here.';
-  const heroImage = welcomeConfig?.heroImageUrl || '/images/massh-flag-unveiling-ceremony.jpg';
+  const introMessage = welcomeConfig?.introMessage || 'Connecting generations of Mandela Secondary School Hoima alumni across Uganda and the world.';
 
-  const isVerifiedAlumnus = currentUser?.role === 'ALUMNI' || !!currentUser?.alumniNumber;
-  const isSuperAdminOrStaff = currentUser && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || (currentUser.role && currentUser.role !== 'USER' && currentUser.role !== 'ALUMNI'));
+  const activeSlide = carouselImages[currentSlideIndex] || carouselImages[0];
 
   return (
     <div style={{ minHeight: '100vh', background: '#05160F', color: '#FFFFFF', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
       {/* ============================================================== */}
-      {/* 1. TOP MOSA HEADER BAR                                         */}
+      {/* 1. TOP HEADER: MINIMAL & UNCLUTTERED                           */}
       {/* ============================================================== */}
       <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 40,
-          background: 'rgba(10, 39, 27, 0.92)',
+          background: 'rgba(10, 39, 27, 0.94)',
           backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           padding: '0.85rem 1.5rem',
         }}
       >
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           
           {/* Logo & Identity */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -137,6 +220,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 justifyContent: 'center',
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
                 border: '1.5px solid rgba(255, 255, 255, 0.3)',
+                flexShrink: 0
               }}
             >
               <GraduationCap size={22} color="#FFFFFF" />
@@ -151,112 +235,57 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             </div>
           </div>
 
-          {/* Quick Navigation Items */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button
-              onClick={scrollToExplore}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#CBD5E1',
-                fontSize: '0.86rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                padding: '0.4rem 0.75rem',
-                borderRadius: '6px',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#CBD5E1')}
-            >
-              Explore MOSA
-            </button>
-
-            <button
-              onClick={onOpenVerify}
-              style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                color: '#FDE68A',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                padding: '0.42rem 0.85rem',
-                borderRadius: '8px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-              }}
-            >
-              <ShieldCheck size={14} color="#FBBF24" />
-              <span>Verify Alumnus</span>
-            </button>
-
-            {/* Authenticated user vs Visitor options */}
+          {/* Header Action: Authenticated Portal vs Visitor Two Primary Actions */}
+          <div>
             {currentUser ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <button
-                  onClick={onGoToPortal}
-                  style={{
-                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    color: '#FFFFFF',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                    padding: '0.45rem 1rem',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)',
-                  }}
-                >
-                  <ArrowRight size={15} />
-                  <span>Enter Member Portal</span>
-                </button>
-
-                {isSuperAdminOrStaff && onGoToAdmin && (
-                  <button
-                    onClick={onGoToAdmin}
-                    style={{
-                      background: 'rgba(217, 119, 6, 0.25)',
-                      color: '#FDE68A',
-                      border: '1px solid rgba(245, 158, 11, 0.4)',
-                      padding: '0.45rem 0.85rem',
-                      borderRadius: '8px',
-                      fontWeight: 700,
-                      fontSize: '0.82rem',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                    }}
-                  >
-                    <Lock size={13} color="#FBBF24" />
-                    <span>Admin Panel</span>
-                  </button>
-                )}
-              </div>
+              <button
+                onClick={onGoToPortal}
+                style={{
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  color: '#FFFFFF',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  padding: '0.5rem 1.1rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.86rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  boxShadow: '0 2px 8px rgba(5, 150, 105, 0.3)',
+                }}
+              >
+                <span>Enter Member Portal</span>
+                <ArrowRight size={15} />
+              </button>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                 <button
                   onClick={onOpenLogin}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(255, 255, 255, 0.08)',
                     color: '#FFFFFF',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                    padding: '0.42rem 0.9rem',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    padding: '0.5rem 1rem',
                     borderRadius: '8px',
                     fontWeight: 600,
-                    fontSize: '0.84rem',
+                    fontSize: '0.86rem',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.22)';
                   }}
                 >
-                  <LogIn size={14} />
+                  <LogIn size={15} />
                   <span>Log In</span>
                 </button>
 
@@ -265,19 +294,28 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                   style={{
                     background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)',
                     color: '#FFFFFF',
-                    border: '1px solid rgba(244, 63, 94, 0.4)',
-                    padding: '0.42rem 0.95rem',
+                    border: '1px solid rgba(244, 63, 94, 0.45)',
+                    padding: '0.5rem 1.15rem',
                     borderRadius: '8px',
                     fontWeight: 700,
-                    fontSize: '0.84rem',
+                    fontSize: '0.86rem',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
                     boxShadow: '0 2px 8px rgba(190, 24, 93, 0.3)',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(190, 24, 93, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(190, 24, 93, 0.3)';
                   }}
                 >
-                  <UserPlus size={14} />
+                  <UserPlus size={15} />
                   <span>Create Account</span>
                 </button>
               </div>
@@ -287,7 +325,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
       </header>
 
       {/* ============================================================== */}
-      {/* 2. HERO SECTION WITH VIBRANT MOSA GREEN & PINK PALETTE         */}
+      {/* 2. HERO SECTION: TWO PRIMARY ACTIONS & DYNAMIC IMAGE CAROUSEL   */}
       {/* ============================================================== */}
       <section
         style={{
@@ -298,35 +336,23 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* Decorative background glow */}
+        {/* Subtle background glow */}
         <div
           style={{
             position: 'absolute',
-            top: '-10%',
+            top: '-15%',
             right: '-5%',
             width: '450px',
             height: '450px',
-            background: 'radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(10, 39, 27, 0) 70%)',
-            borderRadius: '50%',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '-10%',
-            left: '-5%',
-            width: '400px',
-            height: '400px',
-            background: 'radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(10, 39, 27, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(10, 39, 27, 0) 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
         />
 
-        <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3.5rem', alignItems: 'center' }}>
           
-          {/* Left Column: Heading & Calls to Action */}
+          {/* Left Column: Essential Identity & Only Two Primary Actions */}
           <div>
             {/* Proudly Mandelian Slogan Badge */}
             <div
@@ -336,13 +362,13 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 gap: '0.5rem',
                 background: 'linear-gradient(90deg, rgba(236, 72, 153, 0.22) 0%, rgba(190, 24, 93, 0.15) 100%)',
                 border: '1px solid rgba(244, 63, 94, 0.45)',
-                padding: '0.35rem 0.85rem',
+                padding: '0.4rem 0.9rem',
                 borderRadius: '999px',
                 marginBottom: '1.25rem',
               }}
             >
               <Sparkles size={14} color="#F43F5E" />
-              <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FDA4AF', fontWeight: 800 }}>
+              <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FDA4AF', fontWeight: 800 }}>
                 {slogan}
               </span>
             </div>
@@ -350,7 +376,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             {/* Main Welcome Heading */}
             <h1
               style={{
-                fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)',
+                fontSize: 'clamp(2.2rem, 4.4vw, 3.4rem)',
                 fontWeight: 900,
                 lineHeight: 1.12,
                 color: '#FFFFFF',
@@ -364,7 +390,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             {/* Subtitle */}
             <p
               style={{
-                fontSize: 'clamp(1.05rem, 1.8vw, 1.25rem)',
+                fontSize: 'clamp(1.1rem, 1.8vw, 1.3rem)',
                 fontWeight: 700,
                 color: '#FDE68A',
                 margin: '0 0 1rem 0',
@@ -374,115 +400,193 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               {subtitle}
             </p>
 
-            {/* Intro Supporting Message */}
+            {/* Concise Community Introduction */}
             <p
               style={{
-                fontSize: '0.98rem',
+                fontSize: '1rem',
                 color: '#CBD5E1',
                 lineHeight: 1.6,
-                margin: '0 0 2rem 0',
-                maxWidth: '540px',
+                margin: '0 0 2.25rem 0',
+                maxWidth: '520px',
               }}
             >
               {introMessage}
             </p>
 
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap' }}>
-              {/* Register as an Alumnus CTA */}
+            {/* ONLY TWO PRIMARY ACTIONS: Create Account & Log In */}
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <button
-                onClick={onOpenAlumniRegistration}
+                onClick={onOpenRegisterAccount}
                 style={{
                   background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)',
                   color: '#FFFFFF',
                   border: '1px solid rgba(244, 63, 94, 0.5)',
-                  padding: '0.85rem 1.6rem',
-                  borderRadius: '10px',
+                  padding: '0.95rem 1.85rem',
+                  borderRadius: '12px',
                   fontWeight: 800,
-                  fontSize: '0.95rem',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: '0 8px 24px rgba(190, 24, 93, 0.35)',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(190, 24, 93, 0.45)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(190, 24, 93, 0.35)';
+                }}
+              >
+                <UserPlus size={19} />
+                <span>Create Account</span>
+              </button>
+
+              <button
+                onClick={onOpenLogin}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#F8FAFC',
+                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                  padding: '0.95rem 1.75rem',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '1rem',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.55rem',
-                  boxShadow: '0 6px 18px rgba(190, 24, 93, 0.35)',
-                  transition: 'transform 0.15s ease',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.14)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <GraduationCap size={18} />
-                <span>Register as an Alumnus</span>
+                <LogIn size={18} />
+                <span>Log In</span>
               </button>
-
-              {/* Explore MOSA CTA */}
-              <button
-                onClick={scrollToExplore}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#F8FAFC',
-                  border: '1.5px solid rgba(255, 255, 255, 0.22)',
-                  padding: '0.85rem 1.4rem',
-                  borderRadius: '10px',
-                  fontWeight: 700,
-                  fontSize: '0.94rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-              >
-                <span>Explore MOSA</span>
-                <ChevronDown size={16} />
-              </button>
-
-              {/* Member area login if unauthenticated */}
-              {!currentUser && (
-                <button
-                  onClick={onOpenLogin}
-                  style={{
-                    background: 'transparent',
-                    color: '#94A3B8',
-                    border: '1px dashed rgba(255, 255, 255, 0.25)',
-                    padding: '0.85rem 1.25rem',
-                    borderRadius: '10px',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                  }}
-                >
-                  <LogIn size={15} />
-                  <span>Member Area Log In</span>
-                </button>
-              )}
             </div>
           </div>
 
-          {/* Right Column: Hero Image Showcase with Glassmorphism */}
-          <div style={{ position: 'relative' }}>
+          {/* Right Column: Dynamic Photo Carousel */}
+          <div 
+            style={{ position: 'relative' }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
             <div
               style={{
                 borderRadius: '20px',
                 overflow: 'hidden',
                 boxShadow: '0 20px 45px rgba(0, 0, 0, 0.55)',
                 border: '2px solid rgba(255, 255, 255, 0.15)',
-                background: 'rgba(10, 39, 27, 0.8)',
+                background: '#04120C',
                 position: 'relative',
+                height: '360px',
               }}
             >
-              <img
-                src={heroImage}
-                alt="MOSA Mandela Secondary School Hoima"
-                style={{
-                  width: '100%',
-                  height: '340px',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80';
-                }}
-              />
+              {/* Stacked Carousel Slides with Cross-Fade */}
+              {carouselImages.map((img, idx) => {
+                const isActive = idx === currentSlideIndex;
+                return (
+                  <div
+                    key={img.id || idx}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      opacity: isActive ? 1 : 0,
+                      transition: 'opacity 0.8s ease-in-out',
+                      pointerEvents: isActive ? 'auto' : 'none',
+                    }}
+                  >
+                    <img
+                      src={img.url}
+                      alt={img.title || 'MOSA Mandela Secondary School Hoima'}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80';
+                      }}
+                    />
+                  </div>
+                );
+              })}
+
+              {/* Prev / Next Manual Carousel Controls */}
+              {carouselImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevSlide}
+                    aria-label="Previous photograph"
+                    style={{
+                      position: 'absolute',
+                      left: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(10, 39, 27, 0.7)',
+                      backdropFilter: 'blur(6px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextSlide}
+                    aria-label="Next photograph"
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(10, 39, 27, 0.7)',
+                      backdropFilter: 'blur(6px)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      width: '34px',
+                      height: '34px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      zIndex: 10,
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </>
+              )}
 
               {/* Bottom Caption Overlay */}
               <div
@@ -491,44 +595,56 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  background: 'linear-gradient(to top, rgba(10, 39, 27, 0.95) 0%, rgba(10, 39, 27, 0.7) 60%, transparent 100%)',
-                  padding: '1.25rem 1.25rem 1rem 1.25rem',
+                  background: 'linear-gradient(to top, rgba(5, 22, 15, 0.95) 0%, rgba(5, 22, 15, 0.7) 65%, transparent 100%)',
+                  padding: '1.5rem 1.25rem 1rem 1.25rem',
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-end',
                   justifyContent: 'space-between',
+                  zIndex: 5,
                 }}
               >
                 <div>
                   <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#FCD34D', fontWeight: 800 }}>
-                    Official Alumni Portal
+                    {activeSlide.title || 'Official Alumni Archive'}
                   </div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFFFFF' }}>
-                    Mandela Secondary School Hoima
+                  <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#FFFFFF', marginTop: '0.15rem', maxWidth: '320px', lineHeight: 1.3 }}>
+                    {activeSlide.caption || 'Mandela Secondary School Hoima • Est. 1997'}
                   </div>
                 </div>
-                <div
-                  style={{
-                    background: 'rgba(236, 72, 153, 0.25)',
-                    border: '1px solid rgba(244, 63, 94, 0.4)',
-                    color: '#FDA4AF',
-                    padding: '0.25rem 0.6rem',
-                    borderRadius: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  Est. 1997
-                </div>
+
+                {/* Dot indicators */}
+                {carouselImages.length > 1 && (
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    {carouselImages.map((_, dotIdx) => (
+                      <button
+                        key={dotIdx}
+                        type="button"
+                        onClick={() => setCurrentSlideIndex(dotIdx)}
+                        aria-label={`View slide ${dotIdx + 1}`}
+                        style={{
+                          width: dotIdx === currentSlideIndex ? '20px' : '7px',
+                          height: '7px',
+                          borderRadius: '999px',
+                          background: dotIdx === currentSlideIndex ? '#FBBF24' : 'rgba(255, 255, 255, 0.35)',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Quick trust tag pill */}
+            {/* Quick Badge */}
             <div
               style={{
                 position: 'absolute',
                 top: '-12px',
                 right: '20px',
-                background: 'rgba(5, 150, 105, 0.9)',
+                background: 'rgba(5, 150, 105, 0.92)',
                 backdropFilter: 'blur(8px)',
                 border: '1px solid rgba(16, 185, 129, 0.5)',
                 color: '#FFFFFF',
@@ -540,32 +656,33 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 alignItems: 'center',
                 gap: '0.35rem',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                zIndex: 15,
               }}
             >
-              <CheckCircle2 size={13} color="#FFFFFF" />
-              <span>Registered MASSH Alumni Network</span>
+              <ShieldCheck size={13} color="#FFFFFF" />
+              <span>MASSH Alumni Network</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ============================================================== */}
-      {/* 3. LIVE DATABASE STATISTICS SECTION (Requirement Section 2)    */}
+      {/* 3. COMPACT LIVE COMMUNITY RECORDS & STATISTICS                */}
       {/* ============================================================== */}
       <section
         style={{
-          padding: '2.5rem 1.5rem',
+          padding: '2.25rem 1.5rem',
           background: 'linear-gradient(180deg, #0A271B 0%, #071E15 100%)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
         <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
           
-          <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#FDA4AF', fontWeight: 800 }}>
               Live Community Records
             </span>
-            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#FFFFFF', margin: '0.25rem 0 0 0' }}>
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFFFFF', margin: '0.2rem 0 0 0' }}>
               Mandela Old Students Association at a Glance
             </h2>
           </div>
@@ -574,7 +691,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1.25rem',
+              gap: '1rem',
             }}
           >
             {/* Stat 1: Registered Accounts */}
@@ -582,19 +699,19 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                padding: '1.25rem',
+                borderRadius: '12px',
+                padding: '1.15rem',
                 textAlign: 'center',
               }}
             >
-              <div style={{ color: '#FCD34D', marginBottom: '0.4rem', display: 'flex', justifyContent: 'center' }}>
-                <Users size={26} />
+              <div style={{ color: '#FCD34D', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
+                <Users size={24} />
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
                 {stats.totalAccounts.toLocaleString()}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.4rem', fontWeight: 600 }}>
-                Total MOSA Accounts
+              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.35rem', fontWeight: 600 }}>
+                Total Registered Members
               </div>
             </div>
 
@@ -603,19 +720,19 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                padding: '1.25rem',
+                borderRadius: '12px',
+                padding: '1.15rem',
                 textAlign: 'center',
               }}
             >
-              <div style={{ color: '#34D399', marginBottom: '0.4rem', display: 'flex', justifyContent: 'center' }}>
-                <ShieldCheck size={26} />
+              <div style={{ color: '#34D399', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
+                <ShieldCheck size={24} />
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
                 {stats.verifiedAlumni.toLocaleString()}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.4rem', fontWeight: 600 }}>
-                Verified Alumni Members
+              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.35rem', fontWeight: 600 }}>
+                Verified Alumni Standing
               </div>
             </div>
 
@@ -624,19 +741,19 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                padding: '1.25rem',
+                borderRadius: '12px',
+                padding: '1.15rem',
                 textAlign: 'center',
               }}
             >
-              <div style={{ color: '#FDA4AF', marginBottom: '0.4rem', display: 'flex', justifyContent: 'center' }}>
-                <GraduationCap size={26} />
+              <div style={{ color: '#FDA4AF', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
+                <GraduationCap size={24} />
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
                 {stats.cohortsCount}+
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.4rem', fontWeight: 600 }}>
-                Alumni Cohorts (1997–2026)
+              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.35rem', fontWeight: 600 }}>
+                Cohorts (1997 – Present)
               </div>
             </div>
 
@@ -645,40 +762,19 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                padding: '1.25rem',
+                borderRadius: '12px',
+                padding: '1.15rem',
                 textAlign: 'center',
               }}
             >
-              <div style={{ color: '#93C5FD', marginBottom: '0.4rem', display: 'flex', justifyContent: 'center' }}>
-                <Award size={26} />
+              <div style={{ color: '#93C5FD', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
+                <Award size={24} />
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
+              <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
                 {stats.allocatedMANumbers.toLocaleString()}
               </div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.4rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.35rem', fontWeight: 600 }}>
                 Allocated MA Numbers
-              </div>
-            </div>
-
-            {/* Stat 5: Events Held */}
-            <div
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                padding: '1.25rem',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ color: '#FBBF24', marginBottom: '0.4rem', display: 'flex', justifyContent: 'center' }}>
-                <Calendar size={26} />
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
-                {stats.eventsHeld}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#CBD5E1', marginTop: '0.4rem', fontWeight: 600 }}>
-                Reunions & Conventions
               </div>
             </div>
           </div>
@@ -686,240 +782,154 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
       </section>
 
       {/* ============================================================== */}
-      {/* 4. EXPLORE MOSA SECTION (About, Heritage, Verification)         */}
+      {/* 4. ESSENTIAL COMMUNITY FOUNDATION OVERVIEW                      */}
       {/* ============================================================== */}
       <section
-        id="explore-mosa-section"
         style={{
-          padding: '4rem 1.5rem',
+          padding: '3.5rem 1.5rem',
           maxWidth: '1160px',
           margin: '0 auto',
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FCD34D', fontWeight: 800 }}>
             Mandela Secondary School Hoima
           </span>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#FFFFFF', margin: '0.35rem 0 0.75rem 0' }}>
+          <h2 style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', margin: '0.35rem 0 0.5rem 0' }}>
             One Legacy of Academic & Leadership Distinction
           </h2>
-          <p style={{ color: '#94A3B8', maxWidth: '650px', margin: '0 auto', fontSize: '0.96rem', lineHeight: 1.6 }}>
+          <p style={{ color: '#94A3B8', maxWidth: '620px', margin: '0 auto', fontSize: '0.94rem', lineHeight: 1.6 }}>
             Founded in 1997, Mandela Secondary School Hoima has nurtured thousands of professionals across engineering, medicine, education, public service, and enterprise.
           </p>
         </div>
 
         {/* Feature Cards Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
           
           {/* Card 1: Official Membership Register */}
           <div
             style={{
               background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
               padding: '1.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
             }}
           >
-            <div>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'rgba(236, 72, 153, 0.18)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '1.25rem',
-                  border: '1px solid rgba(244, 63, 94, 0.35)',
-                }}
-              >
-                <Award size={24} color="#F43F5E" />
-              </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.5rem 0' }}>
-                Lifelong MA Membership Numbers
-              </h3>
-              <p style={{ color: '#CBD5E1', fontSize: '0.9rem', lineHeight: 1.55 }}>
-                Every verified Mandelian receives a permanent, unique membership credential (e.g. <code>MA. 0001</code>). Used for AGMs, secret balloting, and regional chapter coordination.
-              </p>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'rgba(236, 72, 153, 0.18)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                border: '1px solid rgba(244, 63, 94, 0.35)',
+              }}
+            >
+              <Award size={22} color="#F43F5E" />
             </div>
-
-            <div style={{ marginTop: '1.5rem' }}>
-              <button
-                onClick={onOpenAlumniRegistration}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#FDA4AF',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: 0,
-                }}
-              >
-                <span>Register to obtain your number</span>
-                <ArrowRight size={15} />
-              </button>
-            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.4rem 0' }}>
+              Lifelong MA Membership Numbers
+            </h3>
+            <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.55, margin: 0 }}>
+              Every verified Mandelian receives a permanent, non-reusable membership credential (e.g. <code>MA. 0001</code>) upon registration, securing democratic voting rights and official standing.
+            </p>
           </div>
 
           {/* Card 2: Public Alumnus Verification */}
           <div
             style={{
               background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
               padding: '1.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
             }}
           >
-            <div>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'rgba(5, 150, 105, 0.18)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '1.25rem',
-                  border: '1px solid rgba(16, 185, 129, 0.35)',
-                }}
-              >
-                <ShieldCheck size={24} color="#10B981" />
-              </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.5rem 0' }}>
-                Public Alumnus Verification
-              </h3>
-              <p style={{ color: '#CBD5E1', fontSize: '0.9rem', lineHeight: 1.55 }}>
-                Employers, institutions, and fellow alumni can independently verify the standing and graduation cohort of any registered member without exposing private contact info.
-              </p>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'rgba(5, 150, 105, 0.18)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+              }}
+            >
+              <ShieldCheck size={22} color="#10B981" />
             </div>
-
-            <div style={{ marginTop: '1.5rem' }}>
-              <button
-                onClick={onOpenVerify}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#34D399',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: 0,
-                }}
-              >
-                <span>Check verification status</span>
-                <ArrowRight size={15} />
-              </button>
-            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.4rem 0' }}>
+              Verified Alumni Credentials
+            </h3>
+            <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.55, margin: 0 }}>
+              Employers, academic institutions, and fellow Mandelians can independently verify completion cohorts and alumni standing with cryptographic integrity.
+            </p>
           </div>
 
           {/* Card 3: Regional & Institutional Chapters */}
           <div
             style={{
               background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
               padding: '1.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
             }}
           >
-            <div>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
-                  background: 'rgba(217, 119, 6, 0.18)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '1.25rem',
-                  border: '1px solid rgba(245, 158, 11, 0.35)',
-                }}
-              >
-                <Building size={24} color="#FBBF24" />
-              </div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.5rem 0' }}>
-                University & Diaspora Chapters
-              </h3>
-              <p style={{ color: '#CBD5E1', fontSize: '0.9rem', lineHeight: 1.55 }}>
-                Active chapters across Makerere University (MUMASA), Kyambogo, MUST, Gulu, and global diaspora networks coordinating welfare and student mentorship.
-              </p>
+            <div
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'rgba(217, 119, 6, 0.18)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+              }}
+            >
+              <Building size={22} color="#FBBF24" />
             </div>
-
-            <div style={{ marginTop: '1.5rem' }}>
-              <button
-                onClick={currentUser ? onGoToPortal : onOpenLogin}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#FCD34D',
-                  fontSize: '0.88rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  padding: 0,
-                }}
-              >
-                <span>{currentUser ? 'View chapters in portal' : 'Sign in to connect'}</span>
-                <ArrowRight size={15} />
-              </button>
-            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.4rem 0' }}>
+              University & Diaspora Chapters
+            </h3>
+            <p style={{ color: '#CBD5E1', fontSize: '0.88rem', lineHeight: 1.55, margin: 0 }}>
+              Active student and professional chapters across Makerere University (MUMASA), Kyambogo, MUST, Gulu, and international diaspora chapters.
+            </p>
           </div>
         </div>
       </section>
 
       {/* ============================================================== */}
-      {/* 5. FOOTER & SECRETARIAT INFORMATION                            */}
+      {/* 5. FOOTER & DISCREET LEGAL META                                */}
       {/* ============================================================== */}
       <footer
         style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
           background: '#04120C',
           padding: '2.5rem 1.5rem',
           color: '#94A3B8',
-          fontSize: '0.84rem',
+          fontSize: '0.82rem',
         }}
       >
-        <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
+        <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.25rem' }}>
           <div>
-            <div style={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.95rem' }}>
+            <div style={{ fontWeight: 800, color: '#FFFFFF', fontSize: '0.92rem' }}>
               Mandela Old Students Association (MOSA)
             </div>
             <div style={{ marginTop: '0.2rem' }}>
               Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda
             </div>
-            <div style={{ marginTop: '0.2rem', color: '#64748B', fontSize: '0.78rem' }}>
+            <div style={{ marginTop: '0.2rem', color: '#64748B', fontSize: '0.76rem' }}>
               Operating under Article 4 of the MOSA Constitution. Never SOSA.
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-            <button
-              onClick={onOpenVerify}
-              style={{ background: 'transparent', border: 'none', color: '#CBD5E1', cursor: 'pointer', padding: 0 }}
-            >
-              Public Verification
-            </button>
-            <span>•</span>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.82rem' }}>
             <button
               onClick={onOpenLogin}
               style={{ background: 'transparent', border: 'none', color: '#CBD5E1', cursor: 'pointer', padding: 0 }}
@@ -933,9 +943,71 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             >
               Create Account
             </button>
+            <span>•</span>
+            <button
+              onClick={onOpenVerify}
+              style={{ background: 'transparent', border: 'none', color: '#64748B', cursor: 'pointer', padding: 0 }}
+            >
+              Public Verification
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* ============================================================== */}
+      {/* 6. DISCREET BOTTOM-RIGHT ADMIN PORTAL ENTRY POINT (Phase 4)    */}
+      {/* ============================================================== */}
+      {onGoToAdmin && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '1.25rem',
+            right: '1.25rem',
+            zIndex: 50,
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingRight: 'env(safe-area-inset-right)',
+          }}
+        >
+          <button
+            onClick={onGoToAdmin}
+            aria-label="Discreet Administrator Portal Entry"
+            title="MOSA Secretariat & Administrator Gate"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.45rem 0.85rem',
+              background: 'rgba(10, 39, 27, 0.78)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(217, 119, 6, 0.35)',
+              borderRadius: '999px',
+              color: '#FDE68A',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
+              opacity: 0.85,
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.borderColor = '#F59E0B';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.85';
+              e.currentTarget.style.borderColor = 'rgba(217, 119, 6, 0.35)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <Lock size={12} color="#FBBF24" />
+            <span>Admin Portal</span>
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };
+
+export default MOSAWelcomeView;

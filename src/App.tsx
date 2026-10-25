@@ -266,6 +266,8 @@ export const App: React.FC = () => {
     if (showAuthGate) {
       return (
         <AuthenticationGate
+          portal={authPortal}
+          initialMode={authPortal === 'admin' ? 'admin-login' : 'login'}
           onLoginSuccess={(user) => {
             setShowAuthGate(false);
             handleLoginSuccess(user);
@@ -279,29 +281,17 @@ export const App: React.FC = () => {
       <>
         <MOSAWelcomeView
           currentUser={null}
-          onOpenLogin={() => setShowAuthGate(true)}
-          onOpenRegisterAccount={() => setShowAuthGate(true)}
-          onOpenAlumniRegistration={() => setIsRegisterOpen(true)}
+          onOpenLogin={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
+          onOpenRegisterAccount={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
           onOpenVerify={() => setIsVerifyOpen(true)}
-          onGoToPortal={() => setShowAuthGate(true)}
-          onGoToAdmin={() => setShowAuthGate(true)}
+          onGoToPortal={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
+          onGoToAdmin={() => { setAuthPortal('admin'); setShowAuthGate(true); }}
         />
         {isVerifyOpen && (
           <PublicVerifyAlumniModal
             isOpen={isVerifyOpen}
             onClose={() => setIsVerifyOpen(false)}
             initialQuery={verifyInitialQuery}
-          />
-        )}
-        {isRegisterOpen && (
-          <AlumniRegistrationWizard
-            isOpen={isRegisterOpen}
-            onClose={() => setIsRegisterOpen(false)}
-            onSuccess={() => {
-              setIsRegisterOpen(false);
-              setShowAuthGate(true);
-            }}
-            currentUser={null}
           />
         )}
       </>
@@ -481,7 +471,7 @@ export const App: React.FC = () => {
             onOpenAlumniRegistration={() => setIsRegisterOpen(true)}
             onOpenVerify={() => setIsVerifyOpen(true)}
             onGoToPortal={() => handleNavigate('home')}
-            onGoToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : undefined}
+            onGoToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : handleAdminGateClick}
           />
         )}
 

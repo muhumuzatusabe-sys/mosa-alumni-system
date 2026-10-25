@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthUser, ModuleSettings } from '../types';
 import { isStaffRole } from '../services/governanceService';
 import { 
@@ -22,6 +22,7 @@ import {
   X, 
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Sliders,
   ClipboardCheck,
   Briefcase,
@@ -59,23 +60,24 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSwitchToAdmin,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>('Registry & Membership');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Registry & Membership');
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
 
   // Logically grouped navigation categories for the clean Menu drawer
   const menuCategories = [
     {
       title: 'Registry & Membership',
+      icon: Users,
       items: [
         { key: 'home', label: 'Home Dashboard', icon: Home, enabled: moduleSettings.home, desc: 'Personalized identity, statements & live alerts' },
         { key: 'welcome', label: 'MOSA Welcome Page', icon: Sparkles, enabled: true, desc: 'Official welcome experience, heritage & statistics' },
         { key: 'directory', label: 'Alumni Registry', icon: Users, enabled: moduleSettings.directory, desc: 'Explore registered alumni of Mandela Secondary School Hoima' },
-        { key: 'verify', label: 'Verified Alumni Lookup', icon: ShieldCheck, enabled: true, isAction: true, desc: 'Instant official MA number authentication' },
         { key: 'membership', label: 'Official Membership Guide', icon: Award, enabled: moduleSettings.membership, desc: 'Permanent MA numbers & member rights' },
       ]
     },
     {
       title: 'Careers & Governance',
+      icon: Briefcase,
       items: [
         { key: 'opportunities', label: 'Opportunities & Mentorship Hub', icon: Briefcase, enabled: moduleSettings.opportunities ?? true, desc: 'Jobs, internships, scholarships & mentor network' },
         { key: 'elections', label: 'Elections & Digital Voting', icon: Vote, enabled: moduleSettings.elections ?? true, desc: 'NEC executive elections, manifestos & secret ballot' },
@@ -83,6 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       title: 'Philanthropy & Giving',
+      icon: Coins,
       items: [
         { key: 'payments', label: 'Donations & Giving', icon: Coins, enabled: moduleSettings.giving, desc: 'Voluntary donations, school projects & receipts' },
         { key: 'documents', label: 'Documents & Reports', icon: FileText, enabled: moduleSettings.documents, desc: 'Constitution, AGM minutes & audited records' },
@@ -90,6 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       title: 'Community & Programs',
+      icon: Calendar,
       items: [
         { key: 'attendance', label: 'Meeting Attendance Roll Call', icon: ClipboardCheck, enabled: moduleSettings.attendance, desc: 'Live assembly roll call & sign-in' },
         { key: 'events', label: 'Events & Reunions', icon: Calendar, enabled: moduleSettings.events, desc: 'Homecoming, sports gala & reunions' },
@@ -98,14 +102,25 @@ export const Navbar: React.FC<NavbarProps> = ({
       ]
     },
     {
-      title: 'Information & Secretariat',
+      title: 'Information & Heritage',
+      icon: Info,
       items: [
         { key: 'news', label: 'News & Announcements', icon: Megaphone, enabled: moduleSettings.news, desc: 'Official executive circulars & notices' },
         { key: 'about', label: 'About MASSH & MOSA', icon: Info, enabled: moduleSettings.about, desc: 'History of Mandela SS Hoima since 1997' },
-        { key: 'contact', label: 'Contact Secretariat', icon: Mail, enabled: moduleSettings.contact, desc: 'Executive committee & secretariat desk' },
       ]
     }
   ];
+
+  // Auto-synchronize selected category with active tab
+  useEffect(() => {
+    const match = menuCategories.find(cat => cat.items.some(i => i.key === currentTab));
+    if (match) {
+      setSelectedCategory(match.title);
+    }
+  }, [currentTab]);
+
+  const activeCategoryData = menuCategories.find(c => c.title === selectedCategory) || menuCategories[0];
+  const activeSubItems = activeCategoryData.items.filter(item => item.enabled);
 
   const handleTabClick = (tabKey: string) => {
     setCurrentTab(tabKey);
@@ -292,320 +307,326 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Far Right: Admin Panel Icon ONLY for Authorised Administrators */}
-          {isStaff && (
+          {/* Far Right: Admin Panel Button */}
+          {isStaff ? (
             <button
               onClick={handleAdminClick}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.75rem',
+                padding: '0.45rem 0.8rem',
                 borderRadius: '8px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
-                background: 'rgba(217, 119, 6, 0.25)',
-                border: '1px solid #D97706',
+                background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.45), rgba(180, 83, 9, 0.45))',
+                border: '1.5px solid #F59E0B',
                 color: '#FDE68A',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 marginLeft: '0.25rem',
+                boxShadow: '0 2px 8px rgba(217, 119, 6, 0.3)',
               }}
               title="Restricted Administrative Control Panel"
               aria-label="Restricted Administrative Control Panel"
             >
               <Sliders size={16} color="#FBBF24" />
-              <span className="hidden sm:inline">Admin Panel</span>
+              <span>Admin Panel</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                if (onOpenAdmin) onOpenAdmin();
+                else onOpenAuth();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.45rem 0.65rem',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+                color: '#FDE68A',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                marginLeft: '0.25rem',
+              }}
+              title="Secretariat & Administration Gate"
+              aria-label="Secretariat & Administration Gate"
+            >
+              <Sliders size={14} color="#FBBF24" />
+              <span className="hidden sm:inline">Admin Gate</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* COMPRESSED SECONDARY NAVIGATION OVERLAY / DRAWER */}
+      {/* REFINED COMPACT NAVIGATION OVERLAY & SEPARATE SUBMENU WINDOW */}
       {menuOpen && (
         <>
-          {/* Backdrop for click-outside dismissal */}
+          {/* Backdrop for click-outside dismissal (does not obscure the page entirely) */}
           <div 
+            className="mosa-menu-backdrop"
             onClick={() => setMenuOpen(false)}
-            style={{
-              position: 'fixed',
-              top: '64px',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(10, 39, 27, 0.65)',
-              backdropFilter: 'blur(3px)',
-              zIndex: 1050,
-            }}
+            aria-hidden="true"
           />
 
-          {/* Clean Menu Container */}
+          {/* Compact Menu Drawer: <= half screen width on desktop, compact on mobile */}
           <div 
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'linear-gradient(180deg, #113D2B 0%, #0A271B 100%)',
-              borderBottom: '3px solid #C68A24',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-              padding: '1.5rem 1.25rem 2rem 1.25rem',
-              zIndex: 1060,
-              maxHeight: 'calc(100vh - 70px)',
-              overflowY: 'auto',
-            }}
+            className="mosa-menu-drawer"
+            role="dialog"
+            aria-label="MOSA Portal Sections Menu"
           >
-            <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
-              
-              {/* Menu Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', marginBottom: '1.25rem' }}>
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
-                    Navigation Centre
-                  </div>
-                  <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#FFFFFF', fontWeight: 800 }}>
-                    MASSH ALUMNI PORTAL • MOSA Sections
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: 'none',
-                    color: '#CBD5E1',
-                    borderRadius: '8px',
-                    width: '32px',
-                    height: '32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                  }}
-                  aria-label="Close Menu"
-                >
-                  <X size={18} />
-                </button>
-              </div>              {/* Expandable Accordion Menu Sections (Phase 6 Redesign) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.5rem' }}>
-                {menuCategories.map(cat => {
-                  const visibleItems = cat.items.filter(item => item.enabled);
+            {/* Menu Header */}
+            <div className="mosa-menu-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span 
+                  style={{ 
+                    width: '8px', 
+                    height: '8px', 
+                    borderRadius: '50%', 
+                    background: '#06B6D4', 
+                    boxShadow: '0 0 10px #22D3EE' 
+                  }} 
+                />
+                <span style={{ fontSize: '0.78rem', color: '#E0F2FE', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  MOSA Portal Navigation
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: 'none',
+                  color: '#94A3B8',
+                  borderRadius: '6px',
+                  width: '26px',
+                  height: '26px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'color 0.15s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#94A3B8')}
+                aria-label="Close Navigation Menu"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Menu Body: Left parent list, Right submenu window */}
+            <div className="mosa-menu-body">
+              {/* Left Column: Parent Sections with Cyan Active State */}
+              <div className="mosa-parent-list" role="tablist" aria-label="Menu Sections">
+                {menuCategories.map((cat) => {
+                  const visibleItems = cat.items.filter((item) => item.enabled);
                   if (visibleItems.length === 0) return null;
 
-                  const isExpanded = expandedCategory === cat.title;
-                  const hasActiveChild = visibleItems.some(i => i.key === currentTab);
+                  const isSelected = selectedCategory === cat.title;
+                  const hasActiveRoute = visibleItems.some((item) => item.key === currentTab);
+                  const CatIcon = cat.icon;
 
                   return (
-                    <div 
-                      key={cat.title} 
-                      style={{ 
-                        borderRadius: '12px', 
-                        background: isExpanded ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-                        border: hasActiveChild ? '1.5px solid #D97706' : isExpanded ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.06)',
-                        overflow: 'hidden',
-                        transition: 'all 0.2s ease',
-                      }}
+                    <button
+                      key={cat.title}
+                      type="button"
+                      role="tab"
+                      aria-selected={isSelected}
+                      onClick={() => setSelectedCategory(cat.title)}
+                      className={`mosa-parent-btn ${isSelected ? 'active' : ''}`}
                     >
-                      {/* Parent Accordion Header */}
-                      <button
-                        type="button"
-                        onClick={() => setExpandedCategory(isExpanded ? null : cat.title)}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '0.85rem 1.15rem',
-                          background: isExpanded ? 'rgba(217, 119, 6, 0.15)' : 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: '#FFFFFF',
-                          textAlign: 'left',
-                          transition: 'background 0.2s',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                          <span style={{ 
-                            width: '10px', 
-                            height: '10px', 
-                            borderRadius: '50%', 
-                            background: hasActiveChild ? '#FBBF24' : '#D97706', 
-                            display: 'inline-block',
-                            boxShadow: hasActiveChild ? '0 0 8px #FBBF24' : 'none'
-                          }} />
-                          <span style={{ 
-                            fontSize: '0.9rem', 
-                            fontWeight: 700, 
-                            color: hasActiveChild ? '#FDE68A' : '#FFFFFF',
-                            letterSpacing: '0.01em',
-                          }}>
-                            {cat.title}
-                          </span>
-                          <span style={{
-                            fontSize: '0.72rem',
-                            padding: '0.15rem 0.5rem',
-                            borderRadius: '999px',
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            color: '#CBD5E1',
-                            fontWeight: 600,
-                          }}>
-                            {visibleItems.length} {visibleItems.length === 1 ? 'item' : 'items'}
-                          </span>
-                        </div>
+                      {/* Cyan indicator bar on active */}
+                      {isSelected && <span className="cyan-indicator" />}
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#FCD34D' }}>
-                          {hasActiveChild && (
-                            <span style={{ fontSize: '0.72rem', color: '#FCD34D', fontWeight: 600 }}>Active</span>
-                          )}
-                          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                        </div>
-                      </button>
-
-                      {/* Sub-items (hidden until parent expanded) */}
-                      {isExpanded && (
-                        <div 
-                          style={{ 
-                            padding: '0.75rem 1rem 1rem 1rem',
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                            gap: '0.65rem',
-                            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '6px',
+                            background: isSelected ? 'rgba(6, 182, 212, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            color: isSelected ? '#22D3EE' : '#94A3B8',
                           }}
                         >
-                          {visibleItems.map(item => {
-                            const Icon = item.icon;
-                            const isActive = currentTab === item.key;
-
-                            return (
-                              <div
-                                key={item.key}
-                                onClick={() => {
-                                  if (item.key === 'verify' && onOpenVerify) {
-                                    setMenuOpen(false);
-                                    onOpenVerify();
-                                  } else {
-                                    handleTabClick(item.key);
-                                  }
-                                }}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'flex-start',
-                                  gap: '0.85rem',
-                                  padding: '0.75rem 0.9rem',
-                                  borderRadius: '10px',
-                                  background: isActive ? 'rgba(217, 119, 6, 0.28)' : 'rgba(255, 255, 255, 0.04)',
-                                  border: isActive ? '1.5px solid #D97706' : '1px solid rgba(255, 255, 255, 0.06)',
-                                  cursor: 'pointer',
-                                  transition: 'all 0.15s ease',
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.38)' : 'rgba(255, 255, 255, 0.08)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.28)' : 'rgba(255, 255, 255, 0.04)';
-                                }}
-                              >
-                                <div 
-                                  style={{ 
-                                    width: '34px', 
-                                    height: '34px', 
-                                    borderRadius: '8px', 
-                                    background: isActive ? '#D97706' : 'rgba(255, 255, 255, 0.1)', 
-                                    color: '#FFFFFF', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center', 
-                                    flexShrink: 0 
-                                  }}
-                                >
-                                  <Icon size={17} color={isActive ? '#FFFFFF' : '#FBBF24'} />
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontWeight: 700, fontSize: '0.88rem', color: isActive ? '#FDE68A' : '#FFFFFF', marginBottom: '0.15rem' }}>
-                                    {item.label}
-                                  </div>
-                                  <div style={{ fontSize: '0.72rem', color: '#94A3B8', lineHeight: 1.3 }}>
-                                    {item.desc}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          <CatIcon size={14} />
                         </div>
-                      )}
-                    </div>
+                        <span style={{ 
+                          fontSize: '0.8rem', 
+                          fontWeight: isSelected ? 800 : 600, 
+                          color: isSelected ? '#22D3EE' : '#E2E8F0',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {cat.title}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                        {hasActiveRoute && (
+                          <span
+                            style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              background: '#FBBF24',
+                              boxShadow: '0 0 6px #FBBF24',
+                            }}
+                            title="Current Active View"
+                          />
+                        )}
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            padding: '0.1rem 0.4rem',
+                            borderRadius: '999px',
+                            background: isSelected ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                            color: isSelected ? '#67E8F9' : '#94A3B8',
+                            border: isSelected ? '1px solid rgba(6, 182, 212, 0.35)' : '1px solid transparent',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {visibleItems.length}
+                        </span>
+                      </div>
+                    </button>
                   );
                 })}
               </div>
 
-              {/* Utility Action Bar at bottom of menu */}
+              {/* Right Column: Clear, Separate Submenu Window */}
               <div 
-                style={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: '0.75rem', 
-                  paddingTop: '1rem', 
-                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
+                className="mosa-submenu-window" 
+                role="region" 
+                aria-label={`${activeCategoryData?.title || 'Section'} Submenu Window`}
               >
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  {onOpenVerify && (
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onOpenVerify();
-                      }}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.6rem 1rem',
-                        borderRadius: '8px',
-                        background: 'rgba(217, 119, 6, 0.15)',
-                        color: '#FCD34D',
-                        border: '1px solid #D97706',
-                        fontSize: '0.85rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <ShieldCheck size={16} />
-                      <span>Verify Alumni Number</span>
-                    </button>
-                  )}
-
-                  {(!currentUser || currentUser.role === 'USER' || !currentUser.alumniNumber) && (
-                    <button
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onOpenRegister();
-                      }}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.6rem 1rem',
-                        borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #D97706, #B45309)',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <UserPlus size={16} />
-                      <span>Register as Member</span>
-                    </button>
-                  )}
+                {/* Submenu Header establishing clear visual relationship */}
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    paddingBottom: '0.55rem', 
+                    borderBottom: '1px solid rgba(6, 182, 212, 0.25)', 
+                    marginBottom: '0.65rem' 
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <span 
+                      style={{ 
+                        width: '7px', 
+                        height: '7px', 
+                        borderRadius: '50%', 
+                        background: '#06B6D4', 
+                        boxShadow: '0 0 8px #22D3EE' 
+                      }} 
+                    />
+                    <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#22D3EE', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {activeCategoryData?.title} Submenu
+                    </span>
+                  </div>
+                  <span 
+                    style={{ 
+                      fontSize: '0.68rem', 
+                      color: '#67E8F9', 
+                      background: 'rgba(6, 182, 212, 0.15)', 
+                      padding: '0.1rem 0.45rem', 
+                      borderRadius: '999px', 
+                      border: '1px solid rgba(6, 182, 212, 0.3)', 
+                      fontWeight: 700 
+                    }}
+                  >
+                    {activeSubItems.length} destinations
+                  </span>
                 </div>
 
-                <div style={{ fontSize: '0.78rem', color: '#64748B' }}>
-                  Mandela Secondary School Hoima • Official Alumni System
+                {/* Submenu Destination Items */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>
+                  {activeSubItems.map((item) => {
+                    const ItemIcon = item.icon;
+                    const isCurrentTab = currentTab === item.key;
+
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => handleTabClick(item.key)}
+                        className={`mosa-submenu-item ${isCurrentTab ? 'active' : ''}`}
+                      >
+                        <div
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '8px',
+                            background: isCurrentTab ? 'rgba(6, 182, 212, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                            border: isCurrentTab ? '1px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            color: isCurrentTab ? '#22D3EE' : '#94A3B8',
+                          }}
+                        >
+                          <ItemIcon size={16} />
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                          <div style={{ 
+                            fontSize: '0.84rem', 
+                            fontWeight: 700, 
+                            color: isCurrentTab ? '#22D3EE' : '#FFFFFF', 
+                            lineHeight: 1.25,
+                            marginBottom: '0.15rem'
+                          }}>
+                            {item.label}
+                          </div>
+                          <div style={{ 
+                            fontSize: '0.7rem', 
+                            color: '#94A3B8', 
+                            lineHeight: 1.25, 
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis' 
+                          }}>
+                            {item.desc}
+                          </div>
+                        </div>
+
+                        <div style={{ flexShrink: 0, marginLeft: '0.35rem' }}>
+                          {isCurrentTab ? (
+                            <span 
+                              style={{ 
+                                fontSize: '0.62rem', 
+                                fontWeight: 800, 
+                                color: '#06B6D4', 
+                                background: 'rgba(6, 182, 212, 0.15)', 
+                                padding: '0.15rem 0.4rem', 
+                                borderRadius: '4px', 
+                                textTransform: 'uppercase',
+                                border: '1px solid rgba(6, 182, 212, 0.3)' 
+                              }}
+                            >
+                              Active
+                            </span>
+                          ) : (
+                            <ChevronRight size={14} color="#64748B" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-
             </div>
           </div>
         </>

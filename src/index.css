@@ -816,3 +816,201 @@ table tbody tr:hover {
   border-top: 1px solid var(--cream-border) !important;
 }
 
+/* ============================================================== */
+/* MOSA REFINED MENU — COMPACT, CYAN ACCENT & SEPARATE SUBMENU    */
+/* ============================================================== */
+.mosa-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 56px;
+  background: rgba(4, 18, 12, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+}
+
+.mosa-menu-drawer {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 1.25rem;
+  width: min(640px, 48vw);
+  max-width: 640px;
+  max-height: calc(100vh - 80px);
+  background: linear-gradient(180deg, #0A271B 0%, #05160F 100%);
+  border: 1.5px solid rgba(6, 182, 212, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 1px rgba(6, 182, 212, 0.5);
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: mosaMenuFadeIn 0.18s ease-out;
+}
+
+@keyframes mosaMenuFadeIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.mosa-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.mosa-menu-body {
+  display: grid;
+  grid-template-columns: 215px 1fr;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.mosa-parent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
+.mosa-parent-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: #CBD5E1;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.mosa-parent-btn:hover {
+  background: rgba(6, 182, 212, 0.09);
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #F0FDFA;
+}
+
+.mosa-parent-btn:focus-visible {
+  outline: 2px solid #06B6D4;
+  outline-offset: 1px;
+}
+
+.mosa-parent-btn.active {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.22) 0%, rgba(6, 182, 212, 0.08) 100%);
+  border: 1.5px solid #06B6D4;
+  color: #22D3EE;
+  font-weight: 800;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mosa-parent-btn.active .cyan-indicator {
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3.5px;
+  border-radius: 0 4px 4px 0;
+  background: #06B6D4;
+  box-shadow: 0 0 8px #22D3EE;
+}
+
+.mosa-submenu-window {
+  background: #04140D;
+  border: 1.5px solid rgba(6, 182, 212, 0.35);
+  border-radius: 12px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mosa-submenu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  margin-bottom: 0.45rem;
+}
+
+.mosa-submenu-item:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+.mosa-submenu-item:focus-visible {
+  outline: 2px solid #06B6D4;
+  outline-offset: 1px;
+}
+
+.mosa-submenu-item.active {
+  background: rgba(6, 182, 212, 0.18);
+  border: 1.5px solid #06B6D4;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.25);
+}
+
+/* Mobile Responsive */
+@media (max-width: 767px) {
+  .mosa-menu-drawer {
+    left: 0.5rem;
+    right: auto;
+    width: min(360px, 86vw);
+    max-width: 360px;
+    max-height: calc(100vh - 68px);
+  }
+
+  .mosa-menu-body {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 0.65rem;
+    overflow-y: auto;
+  }
+
+  .mosa-parent-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 0.35rem;
+    gap: 0.35rem;
+  }
+
+  .mosa-parent-btn {
+    white-space: nowrap;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.76rem;
+    flex-shrink: 0;
+  }
+
+  .mosa-parent-btn.active .cyan-indicator {
+    left: 15%;
+    right: 15%;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    height: 3px;
+    border-radius: 4px 4px 0 0;
+  }
+}
+

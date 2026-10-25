@@ -12,10 +12,18 @@ import {
   RotateCcw,
   Globe,
   Loader2,
-  Check
+  Check,
+  ArrowUp,
+  ArrowDown,
+  Plus,
+  Star,
+  Clock,
+  Layers,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
-import { AuthUser, WelcomePageConfig } from '../types';
-import { dataService } from '../services/dataService';
+import { AuthUser, WelcomePageConfig, CarouselImageItem } from '../types';
+import { dataService, defaultCarouselImages } from '../services/dataService';
 
 interface WelcomePageManagerProps {
   currentUser: AuthUser;
@@ -39,6 +47,8 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
   const [subtitle, setSubtitle] = useState('');
   const [introMessage, setIntroMessage] = useState('');
   const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [carouselImages, setCarouselImages] = useState<CarouselImageItem[]>([]);
+  const [carouselIntervalSeconds, setCarouselIntervalSeconds] = useState<number>(6);
 
   const loadConfig = async () => {
     setLoading(true);
@@ -50,6 +60,14 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setSubtitle(cfg.draftSubtitle || cfg.subtitle);
       setIntroMessage(cfg.draftIntroMessage || cfg.introMessage);
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
+      setCarouselImages(
+        cfg.draftCarouselImages && cfg.draftCarouselImages.length > 0
+          ? cfg.draftCarouselImages
+          : cfg.carouselImages && cfg.carouselImages.length > 0
+          ? cfg.carouselImages
+          : defaultCarouselImages
+      );
+      setCarouselIntervalSeconds(cfg.draftCarouselIntervalSeconds || cfg.carouselIntervalSeconds || 6);
     } catch (err: any) {
       setErrorMsg('Failed to load welcome page configuration.');
     } finally {
@@ -85,17 +103,101 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
     reader.readAsDataURL(file);
   };
 
+  // Carousel handlers
+  const handleCarouselUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Invalid file type. Please select a valid image file (JPG, PNG, WebP).');
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      setErrorMsg('Photograph exceeds 4MB limit. Please select a compressed image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      const newImg: CarouselImageItem = {
+        id: `img-${Date.now()}`,
+        url: dataUrl,
+        title: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
+        caption: 'Mandela Secondary School Hoima',
+        isFeatured: carouselImages.length === 0,
+        order: carouselImages.length + 1,
+      };
+      setCarouselImages((prev) => [...prev, newImg]);
+      setSuccessMsg('Photograph added to carousel draft. Remember to click "Save as Draft" or "Publish".');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleMoveCarouselImage = (index: number, direction: 'up' | 'down') => {
+    const newIdx = direction === 'up' ? index - 1 : index + 1;
+    if (newIdx < 0 || newIdx >= carouselImages.length) return;
+    const items = [...carouselImages];
+    const [moved] = items.splice(index, 1);
+    items.splice(newIdx, 0, moved);
+    const updated = items.map((img, idx) => ({ ...img, order: idx + 1 }));
+    setCarouselImages(updated);
+  };
+
+  const handleToggleFeatured = (id: string) => {
+    setCarouselImages((prev) =>
+      prev.map((img) => ({
+        ...img,
+        isFeatured: img.id === id ? !img.isFeatured : false,
+      }))
+    );
+  };
+
+  const handleRemoveCarouselImage = (id: string) => {
+    if (carouselImages.length <= 1) {
+      setErrorMsg('At least one hero carousel image must remain active.');
+      return;
+    }
+    const updated = carouselImages
+      .filter((img) => img.id !== id)
+      .map((img, idx) => ({ ...img, order: idx + 1 }));
+    setCarouselImages(updated);
+    setSuccessMsg('Photograph removed from carousel draft.');
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  const handleResetCarouselToDefaults = () => {
+    setCarouselImages(defaultCarouselImages);
+    setSuccessMsg('Restored authentic default MASSH photographs.');
+    setTimeout(() => setSuccessMsg(''), 3000);
+  };
+
+  const handleUpdateImageMetadata = (id: string, field: 'title' | 'caption', val: string) => {
+    setCarouselImages((prev) =>
+      prev.map((img) => (img.id === id ? { ...img, [field]: val } : img))
+    );
+  };
+
   const handleSaveDraft = async () => {
     setErrorMsg('');
     setSaving(true);
     try {
-      const res = await dataService.saveWelcomePageDraft({
-        draftHeroTitle: heroTitle,
-        draftSlogan: slogan,
-        draftSubtitle: subtitle,
-        draftIntroMessage: introMessage,
-        draftHeroImageUrl: heroImageUrl,
-      }, currentUser);
+      const res = await dataService.saveWelcomePageDraft(
+        {
+          draftHeroTitle: heroTitle,
+          draftSlogan: slogan,
+          draftSubtitle: subtitle,
+          draftIntroMessage: introMessage,
+          draftHeroImageUrl: heroImageUrl,
+          draftCarouselImages: carouselImages,
+          draftCarouselIntervalSeconds: carouselIntervalSeconds,
+        },
+        currentUser
+      );
 
       if (res.success) {
         setConfig(res.config);
@@ -115,13 +217,18 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
     setSaving(true);
     try {
       // First ensure current form state is drafted
-      await dataService.saveWelcomePageDraft({
-        draftHeroTitle: heroTitle,
-        draftSlogan: slogan,
-        draftSubtitle: subtitle,
-        draftIntroMessage: introMessage,
-        draftHeroImageUrl: heroImageUrl,
-      }, currentUser);
+      await dataService.saveWelcomePageDraft(
+        {
+          draftHeroTitle: heroTitle,
+          draftSlogan: slogan,
+          draftSubtitle: subtitle,
+          draftIntroMessage: introMessage,
+          draftHeroImageUrl: heroImageUrl,
+          draftCarouselImages: carouselImages,
+          draftCarouselIntervalSeconds: carouselIntervalSeconds,
+        },
+        currentUser
+      );
 
       const res = await dataService.publishWelcomePage(currentUser);
       if (res.success) {
@@ -148,6 +255,8 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setSubtitle(res.config.subtitle);
       setIntroMessage(res.config.introMessage);
       setHeroImageUrl(res.config.heroImageUrl || '');
+      setCarouselImages(res.config.carouselImages || defaultCarouselImages);
+      setCarouselIntervalSeconds(res.config.carouselIntervalSeconds || 6);
       setSuccessMsg('Restored official MOSA welcome page defaults.');
       setTimeout(() => setSuccessMsg(''), 4000);
       if (onRefreshPortal) onRefreshPortal();
@@ -466,6 +575,287 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
           </div>
         </div>
 
+        {/* Row 5: Dynamic Hero Carousel Management */}
+        <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <Layers size={17} color="#FCD34D" />
+                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                  Dynamic Hero Carousel Photographs ({carouselImages.length})
+                </h3>
+              </div>
+              <p style={{ color: '#94A3B8', fontSize: '0.8rem', margin: 0, maxWidth: '600px' }}>
+                Manage authentic Mandela Secondary School photographs that rotate smoothly in the welcome hero. Reorder slides, designate a featured photo, upload new memories, or configure transition speed.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* Transition Speed Select */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(0, 0, 0, 0.3)', padding: '0.4rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+                <Clock size={14} color="#94A3B8" />
+                <span style={{ fontSize: '0.75rem', color: '#CBD5E1', fontWeight: 600 }}>Interval:</span>
+                <select
+                  value={carouselIntervalSeconds}
+                  onChange={(e) => setCarouselIntervalSeconds(Number(e.target.value))}
+                  style={{
+                    background: '#04120C',
+                    color: '#FCD34D',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '4px',
+                    padding: '0.2rem 0.4rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value={4}>4 seconds</option>
+                  <option value={6}>6 seconds (Default)</option>
+                  <option value={8}>8 seconds</option>
+                  <option value={10}>10 seconds</option>
+                </select>
+              </div>
+
+              {/* Upload New Photo Button */}
+              <label
+                style={{
+                  background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)',
+                  border: '1px solid rgba(244, 63, 94, 0.4)',
+                  color: '#FFFFFF',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  boxShadow: '0 2px 8px rgba(190, 24, 93, 0.3)',
+                }}
+              >
+                <Plus size={14} />
+                <span>Add Photograph</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCarouselUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
+
+              {/* Reset to Defaults */}
+              <button
+                type="button"
+                onClick={handleResetCarouselToDefaults}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#CBD5E1',
+                  padding: '0.45rem 0.8rem',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  fontSize: '0.78rem',
+                  cursor: 'pointer',
+                }}
+              >
+                Restore MASSH Photos
+              </button>
+            </div>
+          </div>
+
+          {/* Carousel Image Items List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {carouselImages.map((img, idx) => (
+              <div
+                key={img.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '120px 1fr auto',
+                  gap: '1rem',
+                  alignItems: 'center',
+                  background: img.isFeatured ? 'rgba(190, 24, 93, 0.12)' : 'rgba(0, 0, 0, 0.25)',
+                  border: img.isFeatured ? '1.5px solid rgba(244, 63, 94, 0.45)' : '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {/* Image Thumbnail with Order badge */}
+                <div style={{ position: 'relative', width: '120px', height: '75px', borderRadius: '6px', overflow: 'hidden', background: '#020B07' }}>
+                  <img
+                    src={img.url}
+                    alt={img.title || `Slide ${idx + 1}`}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '4px',
+                      left: '4px',
+                      background: 'rgba(0, 0, 0, 0.75)',
+                      backdropFilter: 'blur(4px)',
+                      color: '#FCD34D',
+                      fontWeight: 800,
+                      fontSize: '0.68rem',
+                      padding: '0.1rem 0.4rem',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    #{idx + 1}
+                  </div>
+                  {img.isFeatured && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '4px',
+                        left: '4px',
+                        background: '#BE185D',
+                        color: '#FFFFFF',
+                        fontWeight: 800,
+                        fontSize: '0.62rem',
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      Featured
+                    </div>
+                  )}
+                </div>
+
+                {/* Metadata Fields */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem', textTransform: 'uppercase', fontWeight: 700 }}>
+                      Photo Title / Event
+                    </label>
+                    <input
+                      type="text"
+                      value={img.title || ''}
+                      onChange={(e) => handleUpdateImageMetadata(img.id, 'title', e.target.value)}
+                      placeholder="e.g. Flag Unveiling Ceremony"
+                      style={{
+                        width: '100%',
+                        padding: '0.45rem 0.65rem',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        background: 'rgba(0, 0, 0, 0.35)',
+                        color: '#FFFFFF',
+                        fontSize: '0.82rem',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem', textTransform: 'uppercase', fontWeight: 700 }}>
+                      Caption / Description
+                    </label>
+                    <input
+                      type="text"
+                      value={img.caption || ''}
+                      onChange={(e) => handleUpdateImageMetadata(img.id, 'caption', e.target.value)}
+                      placeholder="e.g. Mandela Secondary School Hoima campus"
+                      style={{
+                        width: '100%',
+                        padding: '0.45rem 0.65rem',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255, 255, 255, 0.18)',
+                        background: 'rgba(0, 0, 0, 0.35)',
+                        color: '#FFFFFF',
+                        fontSize: '0.82rem',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Actions: Move Up, Move Down, Toggle Featured, Delete */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFeatured(img.id)}
+                    title={img.isFeatured ? 'Featured Image' : 'Set as Featured Photo'}
+                    style={{
+                      background: img.isFeatured ? 'rgba(252, 211, 77, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                      border: img.isFeatured ? '1px solid #FCD34D' : '1px solid rgba(255, 255, 255, 0.15)',
+                      color: img.isFeatured ? '#FCD34D' : '#94A3B8',
+                      padding: '0.45rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Star size={15} fill={img.isFeatured ? '#FCD34D' : 'none'} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleMoveCarouselImage(idx, 'up')}
+                    disabled={idx === 0}
+                    title="Move Earlier in Carousel"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: idx === 0 ? '#475569' : '#CBD5E1',
+                      padding: '0.45rem',
+                      borderRadius: '6px',
+                      cursor: idx === 0 ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <ArrowUp size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleMoveCarouselImage(idx, 'down')}
+                    disabled={idx === carouselImages.length - 1}
+                    title="Move Later in Carousel"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      color: idx === carouselImages.length - 1 ? '#475569' : '#CBD5E1',
+                      padding: '0.45rem',
+                      borderRadius: '6px',
+                      cursor: idx === carouselImages.length - 1 ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <ArrowDown size={15} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveCarouselImage(img.id)}
+                    disabled={carouselImages.length <= 1}
+                    title="Remove from Carousel"
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: carouselImages.length <= 1 ? '#475569' : '#F87171',
+                      padding: '0.45rem',
+                      borderRadius: '6px',
+                      cursor: carouselImages.length <= 1 ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Footer actions: Revert */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1.25rem' }}>
           <button
@@ -586,10 +976,33 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
 
               <div>
                 <img
-                  src={heroImageUrl || '/images/massh-flag-unveiling-ceremony.jpg'}
+                  src={
+                    carouselImages.find(c => c.isFeatured)?.url ||
+                    carouselImages[0]?.url ||
+                    heroImageUrl ||
+                    '/images/massh-flag-unveiling-ceremony.jpg'
+                  }
                   alt="Hero Preview"
                   style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '12px', border: '1.5px solid rgba(255, 255, 255, 0.2)' }}
                 />
+                {carouselImages.length > 1 && (
+                  <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+                    {carouselImages.map((img, i) => (
+                      <img
+                        key={img.id || i}
+                        src={img.url}
+                        alt={img.title || `Thumbnail ${i + 1}`}
+                        style={{
+                          width: '50px',
+                          height: '32px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          border: img.isFeatured ? '2px solid #FCD34D' : '1px solid rgba(255, 255, 255, 0.2)'
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 

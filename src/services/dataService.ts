@@ -57,6 +57,7 @@ import {
   BroadcastStatus,
   LeadershipOffice,
   WelcomePageConfig,
+  CarouselImageItem,
   MemberExportFilter,
   SecretariatContact,
   LegacyAlumniRecord,
@@ -969,12 +970,65 @@ const defaultSeedOffices: LeadershipOffice[] = [
   }
 ];
 
+export const defaultCarouselImages: CarouselImageItem[] = [
+  {
+    id: 'img-flag',
+    url: '/images/massh-flag-unveiling-ceremony.jpg',
+    title: 'Flag Unveiling & Assembly',
+    caption: 'Mandela Secondary School Hoima official assembly ceremony',
+    isFeatured: true,
+    order: 1
+  },
+  {
+    id: 'img-gate',
+    url: '/images/massh-gate-welcoming.jpg',
+    title: 'Campus Main Gate',
+    caption: 'Welcoming generations of proud Mandelians since 1997',
+    isFeatured: false,
+    order: 2
+  },
+  {
+    id: 'img-courtyard',
+    url: '/images/massh-courtyard-briefing.jpg',
+    title: 'Alumni Gathering',
+    caption: 'Courtyard briefing and reunion networking',
+    isFeatured: false,
+    order: 3
+  },
+  {
+    id: 'img-handover',
+    url: '/images/massh-official-handover.jpg',
+    title: 'Secretariat Leadership',
+    caption: 'Official executive handover and leadership stewardship',
+    isFeatured: false,
+    order: 4
+  },
+  {
+    id: 'img-foundation',
+    url: '/images/massh-foundation-stone-unveiled.jpg',
+    title: 'School Heritage',
+    caption: 'Historic foundation stone commemorating MASSH founding',
+    isFeatured: false,
+    order: 5
+  },
+  {
+    id: 'img-lab',
+    url: '/images/massh-science-lab-inspection.jpg',
+    title: 'Academic Excellence',
+    caption: 'State-of-the-art science laboratories and student innovation',
+    isFeatured: false,
+    order: 6
+  }
+];
+
 const defaultWelcomePageConfig: WelcomePageConfig = {
   heroTitle: 'WELCOME TO MOSA',
   slogan: 'PROUDLY MANDELIAN',
   subtitle: 'One family. One legacy. A lifetime of connection.',
-  introMessage: 'Your journey with the Mandela Old Students Association starts here.',
+  introMessage: 'Connecting generations of Mandela Secondary School Hoima alumni across Uganda and the world.',
   heroImageUrl: '/images/massh-flag-unveiling-ceremony.jpg',
+  carouselImages: defaultCarouselImages,
+  carouselIntervalSeconds: 6,
   hasUnpublishedDraft: false,
   lastPublishedAt: '2026-10-01T00:00:00.000Z',
   lastPublishedBy: 'admin@massh.ac.ug'
@@ -1917,7 +1971,7 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
     id: 'leg-001',
     membershipNumber: 'MA. 0001',
     fullName: 'Dr. Muhammad Zatusave',
-    cohortYear: '2002',
+    cohortYear: 2002,
     phone: '+256 772 123 456',
     email: 'muhammad.z@alumni.massh.ac.ug',
     physicalRegisterPage: 'Book 1, Page 4, Entry 01',
@@ -1928,7 +1982,7 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
     id: 'leg-002',
     membershipNumber: 'MA. 0002',
     fullName: 'Ms. Joan Kemigisa',
-    cohortYear: '2008',
+    cohortYear: 2008,
     phone: '+256 701 234 567',
     email: 'joan.k@alumni.massh.ac.ug',
     physicalRegisterPage: 'Book 1, Page 6, Entry 14',
@@ -1939,7 +1993,7 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
     id: 'leg-003',
     membershipNumber: 'MA. 0003',
     fullName: 'Mr. Patrick Asaba',
-    cohortYear: '2005',
+    cohortYear: 2005,
     phone: '+256 782 345 678',
     email: 'patrick.a@alumni.massh.ac.ug',
     physicalRegisterPage: 'Book 1, Page 9, Entry 22',
@@ -1950,7 +2004,7 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
     id: 'leg-004',
     membershipNumber: 'MA. 0004',
     fullName: 'Hon. Grace Mugisa',
-    cohortYear: '1999',
+    cohortYear: 1999,
     phone: '+256 774 999 111',
     physicalRegisterPage: 'Book 1, Page 1, Entry 04',
     verifiedStatus: 'TRUSTED',
@@ -1960,7 +2014,7 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
     id: 'leg-005',
     membershipNumber: 'MA. 0005',
     fullName: 'Eng. Robert Tinkamanyire',
-    cohortYear: '2001',
+    cohortYear: 2001,
     phone: '+256 755 888 222',
     physicalRegisterPage: 'Book 1, Page 2, Entry 11',
     verifiedStatus: 'TRUSTED',
@@ -2088,6 +2142,15 @@ export const dataService = {
     error?: string 
   }> {
     try {
+      // Enforcement: Alumni registration requires authenticated user account
+      const activeUser = this.getCurrentUser();
+      if (!activeUser && !appData.registeredBy) {
+        return { 
+          success: false, 
+          error: 'Authentication required. Please create an account or log in before registering as an alumnus.' 
+        };
+      }
+
       const dupCheck = await this.checkDuplicate(appData.email, appData.phone);
       if (dupCheck.isDuplicate) {
         return { success: false, error: dupCheck.reason };
@@ -6208,6 +6271,8 @@ export const dataService = {
       draftSubtitle: draft.draftSubtitle ?? draft.subtitle ?? current.draftSubtitle ?? current.subtitle,
       draftIntroMessage: draft.draftIntroMessage ?? draft.introMessage ?? current.draftIntroMessage ?? current.introMessage,
       draftHeroImageUrl: draft.draftHeroImageUrl ?? draft.heroImageUrl ?? current.draftHeroImageUrl ?? current.heroImageUrl,
+      draftCarouselImages: draft.draftCarouselImages ?? draft.carouselImages ?? current.draftCarouselImages ?? current.carouselImages,
+      draftCarouselIntervalSeconds: draft.draftCarouselIntervalSeconds ?? draft.carouselIntervalSeconds ?? current.draftCarouselIntervalSeconds ?? current.carouselIntervalSeconds ?? 6,
       hasUnpublishedDraft: true,
     };
     safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(updated));
@@ -6233,6 +6298,8 @@ export const dataService = {
       subtitle: current.draftSubtitle || current.subtitle,
       introMessage: current.draftIntroMessage || current.introMessage,
       heroImageUrl: current.draftHeroImageUrl || current.heroImageUrl,
+      carouselImages: current.draftCarouselImages || current.carouselImages,
+      carouselIntervalSeconds: current.draftCarouselIntervalSeconds || current.carouselIntervalSeconds || 6,
       hasUnpublishedDraft: false,
       lastPublishedAt: new Date().toISOString(),
       lastPublishedBy: actor.email,
@@ -6885,7 +6952,7 @@ export const dataService = {
     if (onlyActive) {
       list = list.filter(c => c.status === 'ACTIVE');
     }
-    return list.sort((a, b) => a.displayOrder - b.displayOrder);
+    return list.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   },
 
   async saveSecretariatContact(contact: SecretariatContact, actorEmail = 'admin@massh.ac.ug'): Promise<SecretariatContact> {

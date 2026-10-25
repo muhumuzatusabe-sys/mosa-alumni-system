@@ -20,11 +20,20 @@ import { AuthUser } from '../types';
 interface AuthenticationGateProps {
   onLoginSuccess: (user: AuthUser) => void;
   onCancel?: () => void;
+  initialMode?: 'create-account' | 'login' | 'reset-password' | 'admin-login';
+  portal?: 'alumni' | 'admin';
 }
 
-export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({ onLoginSuccess, onCancel }) => {
+export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({ 
+  onLoginSuccess, 
+  onCancel,
+  initialMode,
+  portal
+}) => {
   // Tabs: 'create-account' | 'login' | 'reset-password' | 'admin-login'
-  const [authMode, setAuthMode] = useState<'create-account' | 'login' | 'reset-password' | 'admin-login'>('create-account');
+  const [authMode, setAuthMode] = useState<'create-account' | 'login' | 'reset-password' | 'admin-login'>(
+    initialMode || (portal === 'admin' ? 'admin-login' : 'login')
+  );
 
   // Form Fields
   const [email, setEmail] = useState('');
@@ -936,6 +945,53 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({ onLoginS
                   <div style={{ fontSize: '0.78rem', color: '#B45309', marginTop: '0.15rem' }}>
                     Restricted to authorized MASSH executive officers and system administrators.
                   </div>
+                </div>
+              </div>
+
+              {/* Quick Fill Credentials for Testing */}
+              <div style={{ marginBottom: '1.25rem', padding: '0.65rem 0.85rem', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '0.4rem' }}>
+                  Quick Access Demo Credentials:
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@massh.ac.ug');
+                      setPassword('admin123');
+                    }}
+                    style={{
+                      background: '#0B203E',
+                      color: '#FCD34D',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.35rem 0.65rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Super Admin (admin@massh.ac.ug)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('secretary@massh.ac.ug');
+                      setPassword('admin123');
+                    }}
+                    style={{
+                      background: '#113D2B',
+                      color: '#FDE68A',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.35rem 0.65rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Secretary (secretary@massh.ac.ug)
+                  </button>
                 </div>
               </div>
 
