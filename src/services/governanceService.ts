@@ -137,10 +137,11 @@ const DEFAULT_MATRIX: RolePermissionMatrix = {
     COMMUNICATIONS: ['VIEW'],
   },
   ALUMNI: {},
+  USER: {},
 };
 
 export const isStaffRole = (role?: UserRole | null): boolean =>
-  !!role && role !== 'ALUMNI';
+  !!role && role !== 'ALUMNI' && role !== 'USER';
 
 // ==========================================
 // ATTENDANCE LABELS
@@ -201,12 +202,20 @@ export const governanceService = {
 
   can(user: AuthUser | null | undefined, module: PermissionModule, action: PermissionAction = 'VIEW'): boolean {
     if (!user) return false;
-    // Legacy ADMIN accounts are treated as Super Admin for backward compatibility
+    // Super Admin has unrestricted authority across all modules
     if (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') return true;
+
+    // Check granular permissions assigned directly to this user or office
+    if (user.granularPermissions?.[module]) {
+      const actions = user.granularPermissions[module] || [];
+      if (actions.includes(action) || actions.includes('MANAGE') || (action === 'VIEW' && actions.length > 0)) {
+        return true;
+      }
+    }
 
     // Check custom assignedPermissions if user has explicit modular overrides
     if (user.assignedPermissions && user.assignedPermissions.includes(module)) {
-      return true;
+      if (action === 'VIEW') return true;
     }
 
     const perms = this.getRoleMatrix()[user.role]?.[module] || [];

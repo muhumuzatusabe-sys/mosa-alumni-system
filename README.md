@@ -105,6 +105,21 @@ npm run build
 npm run preview
 ```
 
+### Deployment (Firebase Hosting & GitHub)
+```bash
+# Automated 1-step deployment script (Windows PowerShell):
+.\deploy.ps1
+
+# Or double-click deploy.bat in Windows Explorer
+
+# Manual step-by-step commands:
+npm run build
+firebase deploy
+git add .
+git commit -m "feat: deploy latest MOSA portal updates"
+git push origin main
+```
+
 ---
 
 ## 4. Evaluation Credentials & Quick Test Roles

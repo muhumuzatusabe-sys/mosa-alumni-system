@@ -1,0 +1,21 @@
+
+> mosa-alumni-system@0.0.0 build
+> tsc -b && vite build
+
+src/components/AdminApplicationReview.tsx(275,11): error TS2741: Property 'alumniNumber' is missing in type '{ id: string; membershipNumber: string; fullName: string; cohortYear: number | undefined; physicalRegisterPage: string; verifiedStatus: "VERIFIED"; }' but required in type 'LegacyAlumniRecord'.
+src/components/AdminApplicationReview.tsx(1366,30): error TS2304: Cannot find name 'Trash2'.
+src/components/AdminApplicationReview.tsx(2865,63): error TS2304: Cannot find name 'Trash2'.
+src/components/AdminApplicationReview.tsx(3213,16): error TS2367: This comparison appears to be unintentional because the types '"number" | "status" | "history" | "profile"' and '"delete"' have no overlap.
+src/components/AdminApplicationReview.tsx(3216,22): error TS2304: Cannot find name 'Trash2'.
+src/components/AdminApplicationReview.tsx(3227,22): error TS2304: Cannot find name 'Trash2'.
+src/services/dataService.ts(1920,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/services/dataService.ts(1931,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/services/dataService.ts(1942,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/services/dataService.ts(1953,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/services/dataService.ts(1963,5): error TS2322: Type 'string' is not assignable to type 'number'.
+src/services/dataService.ts(6888,32): error TS18048: 'a.displayOrder' is possibly 'undefined'.
+src/services/dataService.ts(6888,49): error TS18048: 'b.displayOrder' is possibly 'undefined'.
+src/types/index.ts(555,3): error TS2687: All declarations of 'displayOrder' must have identical modifiers.
+src/types/index.ts(1237,3): error TS2687: All declarations of 'displayOrder' must have identical modifiers.
+src/types/index.ts(1237,3): error TS2717: Subsequent property declarations must have the same type.  Property 'displayOrder' must be of type 'number | undefined', but here has type 'number'.
+src/types/index.ts(1249,3): error TS2717: Subsequent property declarations must have the same type.  Property 'cohortYear' must be of type 'number | undefined', but here has type 'string | number | undefined'.

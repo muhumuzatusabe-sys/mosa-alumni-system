@@ -13,7 +13,7 @@ import {
   ChevronUp,
   ArrowLeft
 } from 'lucide-react';
-import { AuthUser, ContactContent, FaqItem } from '../types';
+import { AuthUser, ContactContent, FaqItem, SecretariatContact } from '../types';
 import { dataService } from '../services/dataService';
 
 interface ContactViewProps {
@@ -23,6 +23,7 @@ interface ContactViewProps {
 
 export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack }) => {
   const [content, setContent] = useState<ContactContent | null>(null);
+  const [secretariatContacts, setSecretariatContacts] = useState<SecretariatContact[]>([]);
 
   const [formData, setFormData] = useState({
     name: currentUser?.displayName || '',
@@ -39,8 +40,12 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
   useEffect(() => {
     const loadContent = async () => {
       try {
-        const websiteContent = await dataService.getWebsiteContent();
+        const [websiteContent, contacts] = await Promise.all([
+          dataService.getWebsiteContent(),
+          dataService.getSecretariatContacts(true)
+        ]);
         setContent(websiteContent.contact);
+        setSecretariatContacts(contacts);
       } catch (err) {
         console.error('Failed to load contact content:', err);
       }
@@ -118,6 +123,96 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
           {content?.subtitle || 'Reach out to the Mandela Old Students Association Secretariat, executive committee, or campus coordinators in Hoima.'}
         </p>
       </div>
+
+      {/* Approved Secretariat Officials & Direct WhatsApp Directory (Phase 7) */}
+      {secretariatContacts.length > 0 && (
+        <div style={{ marginBottom: '3rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0B203E', margin: 0 }}>
+              MOSA National Secretariat Officials &amp; Direct WhatsApp Desk
+            </h2>
+          </div>
+          <p style={{ fontSize: '0.88rem', color: '#64748B', marginBottom: '1.25rem' }}>
+            Approved contact directory for executive leadership and registry inquiries. Click below to start an official WhatsApp conversation.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+            {secretariatContacts.map(contact => (
+              <div
+                key={contact.id}
+                style={{
+                  background: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: '1.5px solid #E2E8F0',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '0.85rem',
+                  boxShadow: '0 4px 12px rgba(11, 32, 62, 0.05)',
+                }}
+              >
+                <div>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#B45309',
+                    background: '#FEF3C7',
+                    padding: '0.15rem 0.55rem',
+                    borderRadius: '6px',
+                    display: 'inline-block',
+                    marginBottom: '0.35rem'
+                  }}>
+                    {contact.title}
+                  </span>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0B203E', margin: '0 0 0.35rem 0' }}>
+                    {contact.name}
+                  </h3>
+                  <div style={{ fontSize: '0.85rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <Phone size={14} color="#D97706" />
+                    <a href={`tel:${contact.publishedPhone.replace(/\s+/g, '')}`} style={{ color: '#0B203E', textDecoration: 'none', fontWeight: 600 }}>
+                      {contact.publishedPhone}
+                    </a>
+                  </div>
+                  {contact.notes && (
+                    <div style={{ fontSize: '0.76rem', color: '#64748B', marginTop: '0.35rem' }}>
+                      {contact.notes}
+                    </div>
+                  )}
+                </div>
+
+                {contact.whatsAppNumber && (
+                  <a
+                    href={`https://wa.me/${contact.whatsAppNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${contact.title} (${contact.name}), I am contacting the MOSA Secretariat regarding `)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.45rem',
+                      background: '#16A34A',
+                      color: '#FFFFFF',
+                      padding: '0.55rem 1rem',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      fontSize: '0.84rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 2px 8px rgba(22, 163, 74, 0.25)',
+                    }}
+                  >
+                    <MessageSquare size={16} />
+                    <span>Chat on WhatsApp</span>
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', marginBottom: '3.5rem' }}>
         {/* Contact Info Card */}

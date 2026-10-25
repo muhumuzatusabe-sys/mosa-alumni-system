@@ -53,6 +53,13 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedNum, setCopiedNum] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ id: string; referenceId: string; name: string; alumniNumber?: string } | null>(null);
+  const wizardBodyRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (wizardBodyRef.current) {
+      wizardBodyRef.current.scrollTop = 0;
+    }
+  }, [step, isOpen]);
 
   // Assisted Registration & Flexible Phone/Credentials Support
   const [registrationMode, setRegistrationMode] = useState<'SELF' | 'ASSISTED'>('SELF');
@@ -71,6 +78,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
     middleName: '',
     lastName: '',
     nickname: '', // Nickname at School
+    existingAlumniNumber: '', // Optional existing permanent number from physical register
     gender: 'Male' as 'Male' | 'Female' | 'Other',
     dateOfBirth: '',
     photoUrl: '',
@@ -130,6 +138,19 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
       dataService.getChapters('ACTIVE').then(list => setChapters(list)).catch(console.error);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (currentUser?.email) {
+      setFormData(prev => ({
+        ...prev,
+        accountEmail: prev.accountEmail || currentUser.email,
+        email: prev.email || currentUser.email,
+        firstName: prev.firstName || (currentUser.displayName ? currentUser.displayName.split(' ')[0] : ''),
+        lastName: prev.lastName || (currentUser.displayName && currentUser.displayName.split(' ').length > 1 ? currentUser.displayName.split(' ').slice(1).join(' ') : ''),
+        phone: prev.phone || currentUser.phone || '',
+      }));
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -195,6 +216,9 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
   const validateStep = (currentStep: number): boolean => {
     setErrorMsg('');
     if (currentStep === 1) {
+      if (registrationMode === 'SELF' && currentUser?.email) {
+        return true;
+      }
       if (hasInitialCredentials) {
         if (!formData.accountEmail.trim() && !formData.accountPhone.trim()) {
           setErrorMsg('Please enter either an email address or mobile phone number for verification.');
@@ -307,6 +331,8 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
         middleName: formData.middleName.trim() || undefined,
         lastName: formData.lastName.trim(),
         nickname: formData.nickname.trim() || undefined,
+        existingAlumniNumber: formData.existingAlumniNumber.trim() || undefined,
+        cohortYear: String(formData.aYearCompleted || formData.oYearCompleted),
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
         photoUrl: formData.photoUrl.trim() || undefined,
@@ -562,7 +588,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
         )}
 
         {/* Modal Scrollable Body */}
-        <div className="wizard-body" style={{ flex: 1, overflowY: 'auto', padding: '1.75rem 2rem' }}>
+        <div ref={wizardBodyRef} className="wizard-body" style={{ flex: 1, overflowY: 'auto', padding: '1.75rem 2rem' }}>
           {errorMsg && (
             <div style={{
               background: '#FEE2E2',
@@ -588,8 +614,8 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                 width: '72px',
                 height: '72px',
                 borderRadius: '50%',
-                background: '#D1FAE5',
-                color: '#059669',
+                background: successInfo.alumniNumber ? '#D1FAE5' : '#FEF3C7',
+                color: successInfo.alumniNumber ? '#059669' : '#D97706',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -597,14 +623,29 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
               }}>
                 <CheckCircle2 size={44} />
               </div>
-              <div style={{ display: 'inline-block', background: '#D1FAE5', color: '#065F46', padding: '0.25rem 0.85rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Instant Approval Confirmed
+              <div style={{
+                display: 'inline-block',
+                background: successInfo.alumniNumber ? '#D1FAE5' : '#FEF3C7',
+                color: successInfo.alumniNumber ? '#065F46' : '#92400E',
+                padding: '0.25rem 0.85rem',
+                borderRadius: '999px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                marginBottom: '0.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {successInfo.alumniNumber ? 'Instant Approval Confirmed' : 'Application Submitted • Pending Verification'}
               </div>
               <h2 style={{ fontSize: '1.6rem', color: '#0B203E', marginBottom: '0.5rem' }}>
-                Registration &amp; Membership Approved!
+                {successInfo.alumniNumber ? 'Registration & Membership Approved!' : 'Registration Submitted for Verification'}
               </h2>
               <p style={{ color: '#475569', fontSize: '0.95rem', maxWidth: '520px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
-                Welcome, <strong>{successInfo.name}</strong>. Your alumni record has been registered and verified by default.
+                {successInfo.alumniNumber ? (
+                  <>Welcome, <strong>{successInfo.name}</strong>. Your alumni record has been registered and verified.</>
+                ) : (
+                  <>Thank you, <strong>{successInfo.name}</strong>. Your MASSH alumni registration has been received and submitted to the MOSA Secretariat for credential verification.</>
+                )}
               </p>
 
               {/* Number & Reference Card */}
@@ -619,7 +660,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                 boxShadow: '0 12px 24px -6px rgba(10, 39, 27, 0.35)',
                 border: '1.5px solid #C68A24'
               }}>
-                {successInfo.alumniNumber && (
+                {successInfo.alumniNumber ? (
                   <div style={{ marginBottom: '1.25rem' }}>
                     <div style={{ fontSize: '0.75rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '0.35rem' }}>
                       Official MOSA Membership Number
@@ -655,6 +696,24 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                       {copiedNum ? 'Number Copied!' : 'Copy Membership Number'}
                     </button>
                   </div>
+                ) : (
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, marginBottom: '0.35rem' }}>
+                      Alumni Number Allocation
+                    </div>
+                    <div style={{
+                      fontSize: '1.3rem',
+                      fontFamily: 'sans-serif',
+                      fontWeight: 700,
+                      color: '#E2E8F0',
+                      padding: '0.4rem 0'
+                    }}>
+                      Allocated upon Secretariat Verification
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#CBD5E1', opacity: 0.9 }}>
+                      Official sequential MA number will be assigned once approved.
+                    </div>
+                  </div>
                 )}
 
                 <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.15)', paddingTop: '0.85rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -684,33 +743,44 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
               <div style={{
                 maxWidth: '520px',
                 margin: '0 auto 2rem auto',
-                background: '#EFF6FF',
-                border: '1px solid #BFDBFE',
+                background: successInfo.alumniNumber ? '#EFF6FF' : '#FFFBEB',
+                border: successInfo.alumniNumber ? '1px solid #BFDBFE' : '1px solid #FDE68A',
                 borderRadius: '10px',
                 padding: '1rem 1.25rem',
                 textAlign: 'left',
                 fontSize: '0.85rem',
-                color: '#1E3A8A',
+                color: successInfo.alumniNumber ? '#1E3A8A' : '#92400E',
                 lineHeight: '1.6'
               }}>
-                <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem', color: '#1E40AF' }}>
-                  <ShieldCheck size={16} /> Instant Active Privileges
+                <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem', color: successInfo.alumniNumber ? '#1E40AF' : '#B45309' }}>
+                  <ShieldCheck size={16} /> {successInfo.alumniNumber ? 'Instant Active Privileges' : 'Verification Process & Next Steps'}
                 </div>
                 <ul style={{ paddingLeft: '1.25rem', margin: 0 }}>
-                  <li>Your status is officially <strong>ACTIVE</strong> in the MOSA Alumni Registry.</li>
-                  <li>Your membership can be publicly verified anytime at the <strong>Verify Alumni</strong> desk.</li>
-                  <li>Log in with your email and password to view and flip your 3D Digital Membership Pass.</li>
+                  {successInfo.alumniNumber ? (
+                    <>
+                      <li>Your status is officially <strong>ACTIVE</strong> in the MOSA Alumni Registry.</li>
+                      <li>Your membership can be publicly verified anytime at the <strong>Verify Alumni</strong> desk.</li>
+                      <li>Log in with your email and password to view and flip your 3D Digital Membership Pass.</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>Your application is safely in the Secretariat review queue.</li>
+                      <li>Your dashboard membership panel will reflect <strong>Pending Verification</strong>.</li>
+                      <li>You can browse the MASSH Alumni Portal while verification proceeds.</li>
+                    </>
+                  )}
                 </ul>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
                 <button
                   type="button"
+                  id="btn-registration-complete-close"
                   className="btn btn-primary"
                   onClick={onClose}
                   style={{ minWidth: '160px', padding: '0.75rem 1.5rem' }}
                 >
-                  Go to Dashboard &amp; View Pass
+                  {successInfo.alumniNumber ? 'Go to Dashboard & View Pass' : 'Enter Alumni Portal'}
                 </button>
               </div>
             </div>
@@ -758,94 +828,133 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                     </div>
                   )}
 
-                  {/* Flexible Credentials Toggle */}
-                  <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', padding: '0.85rem 1rem', borderRadius: '10px' }}>
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.85rem', cursor: 'pointer', color: '#92400E' }}>
-                      <input
-                        type="checkbox"
-                        checked={hasInitialCredentials}
-                        onChange={e => setHasInitialCredentials(e.target.checked)}
-                        style={{ marginTop: '2px' }}
-                      />
-                      <div>
-                        <strong>Create member login credentials now</strong>
-                        <div style={{ fontSize: '0.78rem', color: '#B45309', marginTop: '0.15rem' }}>
-                          Uncheck if the member does not own a smartphone or active email right now. Their registry record will still be created, permanent MA number assigned, and login can be activated at a later date.
+                  {registrationMode === 'SELF' && currentUser?.email ? (
+                    <div style={{
+                      background: '#F0FDF4',
+                      border: '1.5px solid #86EFAC',
+                      borderRadius: '12px',
+                      padding: '1.25rem',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '1rem',
+                    }}>
+                      <div style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '50%',
+                        background: '#DCFCE7',
+                        color: '#16A34A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <ShieldCheck size={22} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#166534', marginBottom: '0.25rem' }}>
+                          Authenticated Account Linked
+                        </div>
+                        <div style={{ fontSize: '0.86rem', color: '#15803D', lineHeight: 1.5, marginBottom: '0.6rem' }}>
+                          You are signed in as <strong>{currentUser.email}</strong>. Your alumni record will be permanently linked to this account upon submission.
+                        </div>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#166534', background: '#DCFCE7', padding: '0.25rem 0.65rem', borderRadius: '6px', fontWeight: 600 }}>
+                          <Check size={14} /> Active Session Verified • No password recreation required
                         </div>
                       </div>
-                    </label>
-                  </div>
-
-                  {hasInitialCredentials ? (
-                    <>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <div className="form-group">
-                          <label className="form-label" style={{ fontWeight: 600 }}>
-                            Account Email Address
-                          </label>
-                          <input
-                            type="email"
-                            name="accountEmail"
-                            value={formData.accountEmail}
-                            onChange={handleChange}
-                            className="form-control"
-                            placeholder="yourname@domain.com"
-                          />
-                          <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Optional if phone is provided.</span>
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label" style={{ fontWeight: 600 }}>
-                            Mobile Phone Number
-                          </label>
-                          <input
-                            type="tel"
-                            name="accountPhone"
-                            value={formData.accountPhone}
-                            onChange={handleChange}
-                            className="form-control"
-                            placeholder="e.g. +256 772 123 456"
-                          />
-                          <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Optional if email is provided.</span>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <div className="form-group">
-                          <label className="form-label" style={{ fontWeight: 600 }}>
-                            Create Password <span style={{ color: '#EF4444' }}>*</span>
-                          </label>
-                          <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="form-control"
-                            placeholder="Minimum 6 characters"
-                            required={hasInitialCredentials}
-                          />
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label" style={{ fontWeight: 600 }}>
-                            Confirm Password <span style={{ color: '#EF4444' }}>*</span>
-                          </label>
-                          <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            className="form-control"
-                            placeholder="Re-enter password"
-                            required={hasInitialCredentials}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div style={{ background: '#F1F5F9', padding: '1rem', borderRadius: '8px', color: '#475569', fontSize: '0.85rem' }}>
-                      Credentials skipped. Proceed to Personal Identification.
                     </div>
+                  ) : (
+                    <>
+                      {/* Flexible Credentials Toggle */}
+                      <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', padding: '0.85rem 1rem', borderRadius: '10px' }}>
+                        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.85rem', cursor: 'pointer', color: '#92400E' }}>
+                          <input
+                            type="checkbox"
+                            checked={hasInitialCredentials}
+                            onChange={e => setHasInitialCredentials(e.target.checked)}
+                            style={{ marginTop: '2px' }}
+                          />
+                          <div>
+                            <strong>Create member login credentials now</strong>
+                            <div style={{ fontSize: '0.78rem', color: '#B45309', marginTop: '0.15rem' }}>
+                              Uncheck if the member does not own a smartphone or active email right now. Their registry record will still be created, permanent MA number assigned, and login can be activated at a later date.
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      {hasInitialCredentials ? (
+                        <>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontWeight: 600 }}>
+                                Account Email Address
+                              </label>
+                              <input
+                                type="email"
+                                name="accountEmail"
+                                value={formData.accountEmail}
+                                onChange={handleChange}
+                                className="form-control"
+                                placeholder="yourname@domain.com"
+                              />
+                              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Optional if phone is provided.</span>
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontWeight: 600 }}>
+                                Mobile Phone Number
+                              </label>
+                              <input
+                                type="tel"
+                                name="accountPhone"
+                                value={formData.accountPhone}
+                                onChange={handleChange}
+                                className="form-control"
+                                placeholder="e.g. +256 772 123 456"
+                              />
+                              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Optional if email is provided.</span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontWeight: 600 }}>
+                                Create Password <span style={{ color: '#EF4444' }}>*</span>
+                              </label>
+                              <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="form-control"
+                                placeholder="Minimum 6 characters"
+                                required={hasInitialCredentials}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label" style={{ fontWeight: 600 }}>
+                                Confirm Password <span style={{ color: '#EF4444' }}>*</span>
+                              </label>
+                              <input
+                                type="password"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className="form-control"
+                                placeholder="Re-enter password"
+                                required={hasInitialCredentials}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ background: '#F1F5F9', padding: '1rem', borderRadius: '8px', color: '#475569', fontSize: '0.85rem' }}>
+                          Credentials skipped. Proceed to Personal Identification.
+                        </div>
+                      )}
+                    </>
                   )}
 
                   <div style={{
@@ -913,6 +1022,33 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                         placeholder="e.g. Ayesiga"
                         required
                       />
+                    </div>
+                  </div>
+
+                  {/* Optional Existing Alumni Number from Physical Registers */}
+                  <div style={{
+                    background: '#FFFBEB',
+                    border: '1.5px solid #FDE68A',
+                    borderRadius: '10px',
+                    padding: '0.9rem 1.15rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.35rem',
+                  }}>
+                    <label className="form-label" style={{ fontWeight: 700, color: '#92400E', margin: 0, fontSize: '0.88rem' }}>
+                      Existing Alumni Membership Number (if already allocated)
+                    </label>
+                    <input
+                      type="text"
+                      name="existingAlumniNumber"
+                      value={formData.existingAlumniNumber}
+                      onChange={handleChange}
+                      className="form-control"
+                      placeholder="e.g. MA. 0001 (Found on physical register or certificate)"
+                      style={{ background: '#FFFFFF', borderColor: '#F59E0B', fontSize: '0.9rem', padding: '0.55rem 0.8rem' }}
+                    />
+                    <div style={{ fontSize: '0.78rem', color: '#78350F', lineHeight: 1.4 }}>
+                      Example format: <strong>MA. 0001</strong>. If you were already allocated a permanent number in previous physical register books, enter it here. Leave this blank if you do not have one; a unique permanent number will be generated for you automatically.
                     </div>
                   </div>
 

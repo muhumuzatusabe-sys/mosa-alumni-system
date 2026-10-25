@@ -37,7 +37,12 @@ import {
   Vote,
   XCircle,
   ExternalLink,
-  CreditCard
+  CreditCard,
+  LayoutDashboard,
+  Download,
+  Key,
+  Phone,
+  BookOpen
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -52,7 +57,8 @@ import {
   OpportunityItem,
   MentorProfile,
   ElectionCycle,
-  Candidate
+  Candidate,
+  AlumniApplication
 } from '../types';
 import { dataService } from '../services/dataService';
 import { governanceService, ADMIN_ROLES, PERMISSION_MODULES } from '../services/governanceService';
@@ -60,6 +66,10 @@ import { AdminApplicationReview } from './AdminApplicationReview';
 import { AttendanceManager } from './AttendanceManager';
 import { CMSManager } from './CMSManager';
 import { MembershipCardAdmin } from './MembershipCardAdmin';
+import { WelcomePageManager } from './WelcomePageManager';
+import { LeadershipOfficesManager } from './LeadershipOfficesManager';
+import { MemberDataExportManager } from './MemberDataExportManager';
+import { SecretariatManager } from './SecretariatManager';
 
 const DEFAULT_MODULES_BY_ROLE: Record<string, PermissionModule[]> = {
   SUPER_ADMIN: ['REGISTRY', 'FINANCE', 'ATTENDANCE', 'EVENTS', 'COMMUNICATIONS', 'CHAPTERS', 'DOCUMENTS', 'USERS', 'REPORTS', 'SETTINGS', 'AUDIT', 'OPPORTUNITIES', 'ELECTIONS'],
@@ -99,14 +109,31 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   onReturnToMemberPortal,
   onRefreshData,
 }) => {
-  // Consolidated two-tier navigation structure:
-  // 1. "Members Registry" (Members, MA Numbers, Applications, Verification, Assisted)
-  // 2. "Members & Approvals" (Attendance, Feature Controls, Staff, Documents, Audit, CMS)
-  const [activeSection, setActiveSection] = useState<'registry' | 'approvals'>('registry');
-  const [registrySubTab, setRegistrySubTab] = useState<'members' | 'ma_numbers' | 'applications' | 'verification' | 'assisted'>('members');
+  // Consolidated navigation structure:
+  const [activeSection, setActiveSection] = useState<'overview' | 'registry' | 'leadership' | 'secretariat' | 'welcome_page' | 'exports' | 'approvals' | 'security'>('overview');
+  const [registrySubTab, setRegistrySubTab] = useState<'members' | 'ma_numbers' | 'legacy' | 'applications' | 'verification' | 'assisted'>('members');
   const [approvalsSubTab, setApprovalsSubTab] = useState<'cards' | 'attendance' | 'opportunities' | 'elections' | 'modules' | 'staff' | 'documents' | 'audit' | 'cms'>('cards');
   const [registryDropdownOpen, setRegistryDropdownOpen] = useState(false);
   const [approvalsDropdownOpen, setApprovalsDropdownOpen] = useState(false);
+
+  // Executive Overview State
+  const [overviewStats, setOverviewStats] = useState({
+    totalAccounts: 0,
+    verifiedAlumni: 0,
+    pendingApplications: 0,
+    unregisteredAccounts: 0,
+    withMANumbers: 0,
+    registeredLeaders: 0,
+    totalOffices: 0,
+  });
+  const [recentApplications, setRecentApplications] = useState<AlumniApplication[]>([]);
+
+  // Super Admin Security state
+  const [securityCurrentPass, setSecurityCurrentPass] = useState('');
+  const [securityNewPass, setSecurityNewPass] = useState('');
+  const [securityConfirmPass, setSecurityConfirmPass] = useState('');
+  const [securityMsg, setSecurityMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [securityLoading, setSecurityLoading] = useState(false);
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
   const [moduleSettings, setModuleSettings] = useState<ModuleSettings>({
@@ -196,18 +223,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const canAccessDocs = governanceService.can(currentUser, 'DOCUMENTS', 'VIEW');
   const canAccessAudit = governanceService.can(currentUser, 'AUDIT', 'VIEW');
   const canAccessCMS = governanceService.can(currentUser, 'SETTINGS', 'EDIT') || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role === 'PUBLICITY';
+  const canAccessLeadership = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'USERS', 'VIEW');
+  const canAccessSecretariat = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role === 'SECRETARY' || governanceService.can(currentUser, 'COMMUNICATIONS', 'EDIT');
+  const canAccessWelcomePage = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'SETTINGS', 'EDIT');
+  const canAccessExports = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'REPORTS', 'EXPORT');
+  const canAccessSecurity = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN';
 
   useEffect(() => {
     loadAllAdminData();
-    // Auto-select first accessible tab if default 'registry' is forbidden
-    if (!canAccessRegistry) {
-      setActiveSection('approvals');
-      if (canAccessAttendance) setApprovalsSubTab('attendance');
-      else if (canAccessOpportunities) setApprovalsSubTab('opportunities');
-      else if (canAccessElections) setApprovalsSubTab('elections');
-      else if (canAccessDocs) setApprovalsSubTab('documents');
-      else if (canAccessSettings) setApprovalsSubTab('modules');
-    }
   }, []);
 
   const loadAllAdminData = async () => {
@@ -250,6 +273,33 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         const cands = await dataService.getCandidates(elecs[0].id);
         setAdminCandidates(cands);
       }
+
+      // Compute Live Executive Overview Statistics
+      const [exportMembers, applicationsList, officesList] = await Promise.all([
+        dataService.getMembersForExport(),
+        dataService.getApplications(),
+        dataService.getLeadershipOffices(),
+      ]);
+
+      const usersRaw = JSON.parse(localStorage.getItem('mosa_users') || '[]');
+      const totalAcc = Math.max(usersRaw.length, exportMembers.length);
+      const verifiedCount = exportMembers.filter(mb => (mb as any).verificationStatus === 'VERIFIED' || mb.status === 'VERIFIED_ALUMNUS').length;
+      const pendingCount = applicationsList.filter(a => a.status === 'PENDING').length;
+      const maCount = exportMembers.filter(mb => !!mb.alumniNumber && mb.alumniNumber !== 'NOT ASSIGNED').length;
+      const unregCount = exportMembers.filter(mb => (mb as any).alumniRegistrationStatus === 'NOT_STARTED' || mb.status === 'UNREGISTERED_ACCOUNT').length;
+      const activeOffices = officesList.length;
+      const leadersCount = officesList.filter(o => !!o.assignedAlumniId || !!o.assignedAlumniNumber).length;
+
+      setOverviewStats({
+        totalAccounts: totalAcc,
+        verifiedAlumni: verifiedCount,
+        pendingApplications: pendingCount,
+        unregisteredAccounts: unregCount,
+        withMANumbers: maCount,
+        registeredLeaders: leadersCount,
+        totalOffices: activeOffices,
+      });
+      setRecentApplications(applicationsList.slice(0, 6));
     } catch (err) {
       console.error('Failed to load admin data:', err);
     }
@@ -598,6 +648,33 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             
+            {/* 0. OVERVIEW BUTTON */}
+            <button
+              onClick={() => {
+                setActiveSection('overview');
+                setRegistryDropdownOpen(false);
+                setApprovalsDropdownOpen(false);
+              }}
+              style={{
+                padding: '0.65rem 1.15rem',
+                borderRadius: '10px',
+                border: activeSection === 'overview' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                background: activeSection === 'overview' ? '#0B203E' : '#FFFFFF',
+                color: activeSection === 'overview' ? '#FFFFFF' : '#334155',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                boxShadow: activeSection === 'overview' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <LayoutDashboard size={17} color={activeSection === 'overview' ? '#FBBF24' : '#D97706'} />
+              <span>Overview</span>
+            </button>
+
             {/* 1. EXPANDABLE "Members Registry" BUTTON */}
             {canAccessRegistry && (
               <div style={{ position: 'relative' }}>
@@ -655,6 +732,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       {[
                         { key: 'members', label: 'Members Registry', icon: Users, desc: 'Search & browse active registry' },
                         { key: 'ma_numbers', label: 'MA Number Management', icon: Award, desc: 'Sequential prefixes & auto rules' },
+                        { key: 'legacy', label: 'Legacy Physical Register', icon: BookOpen, desc: 'Physical book records & auto-verify' },
                         { key: 'applications', label: 'Applications Queue', icon: Clock, desc: 'Review & approve new signups' },
                         { key: 'verification', label: 'Verification Desk', icon: ShieldCheck, desc: 'Credential search & validation' },
                         { key: 'assisted', label: 'Assisted Registration', icon: UserPlus, desc: 'In-person desk for device-free alumni' },
@@ -699,7 +777,123 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               </div>
             )}
 
-            {/* 2. EXPANDABLE "Members & Approvals" BUTTON */}
+            {/* 2. LEADERSHIP & OFFICES */}
+            {canAccessLeadership && (
+              <button
+                onClick={() => {
+                  setActiveSection('leadership');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'leadership' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'leadership' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'leadership' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'leadership' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Award size={17} color={activeSection === 'leadership' ? '#FBBF24' : '#D97706'} />
+                <span>Leadership & Offices</span>
+              </button>
+            )}
+
+            {/* SECRETARIAT & WHATSAPP COMMUNICATIONS */}
+            {canAccessSecretariat && (
+              <button
+                onClick={() => {
+                  setActiveSection('secretariat');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'secretariat' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'secretariat' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'secretariat' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'secretariat' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Phone size={17} color={activeSection === 'secretariat' ? '#FBBF24' : '#D97706'} />
+                <span>Secretariat & WhatsApp</span>
+              </button>
+            )}
+
+            {/* 3. WELCOME PAGE MANAGEMENT */}
+            {canAccessWelcomePage && (
+              <button
+                onClick={() => {
+                  setActiveSection('welcome_page');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'welcome_page' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'welcome_page' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'welcome_page' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'welcome_page' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Sparkles size={17} color={activeSection === 'welcome_page' ? '#FBBF24' : '#D97706'} />
+                <span>Welcome Page</span>
+              </button>
+            )}
+
+            {/* 4. MEMBER DATA EXPORTS */}
+            {canAccessExports && (
+              <button
+                onClick={() => {
+                  setActiveSection('exports');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'exports' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'exports' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'exports' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'exports' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Download size={17} color={activeSection === 'exports' ? '#FBBF24' : '#D97706'} />
+                <span>Data Exports</span>
+              </button>
+            )}
+
+            {/* 5. EXPANDABLE "Members & Approvals" BUTTON */}
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => {
@@ -802,16 +996,56 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               )}
             </div>
 
+            {/* 6. SUPER ADMIN SECURITY */}
+            {canAccessSecurity && (
+              <button
+                onClick={() => {
+                  setActiveSection('security');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'security' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'security' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'security' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'security' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Lock size={17} color={activeSection === 'security' ? '#FBBF24' : '#D97706'} />
+                <span>Security</span>
+              </button>
+            )}
+
           </div>
 
           {/* Active Breadcrumb Indicator */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#F1F5F9', padding: '0.4rem 0.85rem', borderRadius: '8px', fontSize: '0.82rem', color: '#475569' }}>
             <span style={{ fontWeight: 600, color: '#0B203E' }}>
-              {activeSection === 'registry' ? 'Members Registry' : 'Members & Approvals'}
+              {activeSection === 'overview' ? 'Executive Overview' :
+               activeSection === 'registry' ? 'Members Registry' :
+               activeSection === 'leadership' ? 'Leadership & Offices' :
+               activeSection === 'welcome_page' ? 'Welcome Page' :
+               activeSection === 'exports' ? 'Data Exports' :
+               activeSection === 'security' ? 'Super Admin Security' :
+               'Members & Approvals'}
             </span>
             <span>&rsaquo;</span>
             <span style={{ fontWeight: 700, color: '#D97706' }}>
-              {activeSection === 'registry' 
+              {activeSection === 'overview' ? 'KPI Summary & Live Metrics' :
+               activeSection === 'leadership' ? 'Offices & Delegated Permissions' :
+               activeSection === 'welcome_page' ? 'Hero Content & Public Theme' :
+               activeSection === 'exports' ? 'Excel, CSV & PDF Reports' :
+               activeSection === 'security' ? 'Password & Authorization Controls' :
+               activeSection === 'registry' 
                 ? (registrySubTab === 'members' ? 'Members Registry Table' : registrySubTab === 'ma_numbers' ? 'MA Number Management' : registrySubTab === 'applications' ? 'Applications Queue' : registrySubTab === 'verification' ? 'Verification Desk' : 'Assisted Registration')
                 : (approvalsSubTab === 'cards' ? 'Membership ID Cards' : approvalsSubTab === 'attendance' ? 'Meeting Attendance' : approvalsSubTab === 'opportunities' ? 'Opportunities & Mentorship' : approvalsSubTab === 'elections' ? 'Elections & Secret Ballot' : approvalsSubTab === 'modules' ? 'System & Feature Controls' : approvalsSubTab === 'staff' ? 'Staff Roles' : approvalsSubTab === 'documents' ? 'Documents Manager' : approvalsSubTab === 'audit' ? 'System Audit Trail' : 'Website CMS')
               }
@@ -819,6 +1053,559 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           </div>
 
         </div>
+
+        {/* SECTION 0: EXECUTIVE OVERVIEW */}
+        {activeSection === 'overview' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            {/* Header Greeting Banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)',
+              borderRadius: '16px',
+              padding: '1.75rem 2rem',
+              color: '#FFFFFF',
+              boxShadow: '0 8px 24px rgba(10, 39, 27, 0.25)',
+              border: '1px solid rgba(251, 191, 36, 0.2)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1.25rem',
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+                  <ShieldCheck size={22} color="#FBBF24" />
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#FCD34D' }}>
+                    Executive Governance & Administration
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '1.65rem', fontWeight: 900, margin: '0 0 0.35rem 0', color: '#FFFFFF' }}>
+                  Welcome, {currentUser.displayName}
+                </h2>
+                <p style={{ color: '#E2E8F0', fontSize: '0.9rem', margin: 0, maxWidth: '640px' }}>
+                  Centralized command console for Mandela Old Students Association (MOSA). Monitor live alumni metrics, verify applicants, delegate office portfolios, and publish welcome page content.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
+                  style={{
+                    background: '#FBBF24',
+                    color: '#0A271B',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.65rem 1.1rem',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <Clock size={16} />
+                  <span>Review Applications ({overviewStats.pendingApplications})</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection('exports')}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '8px',
+                    padding: '0.65rem 1.1rem',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <Download size={16} />
+                  <span>Export Data</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Live KPI Metric Cards Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.25rem',
+            }}>
+              {/* 1. Total User Accounts */}
+              <div className="mosa-card" style={{ padding: '1.25rem', borderLeft: '4px solid #3B82F6' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Total Registered Accounts</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Users size={18} color="#3B82F6" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0B203E' }}>
+                  {overviewStats.totalAccounts}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.25rem' }}>
+                  Authenticated portal user accounts
+                </div>
+              </div>
+
+              {/* 2. Total Verified Alumni */}
+              <div className="mosa-card" style={{ padding: '1.25rem', borderLeft: '4px solid #10B981' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Verified Alumni</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle2 size={18} color="#10B981" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#065F46' }}>
+                  {overviewStats.verifiedAlumni}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#047857', marginTop: '0.25rem' }}>
+                  Officially verified MASSH Mandelians
+                </div>
+              </div>
+
+              {/* 3. Pending Alumni Applications */}
+              <div 
+                className="mosa-card" 
+                onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
+                style={{ padding: '1.25rem', borderLeft: '4px solid #F59E0B', cursor: 'pointer' }}
+                title="Click to view queue"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Pending Applications</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Clock size={18} color="#F59E0B" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#B45309' }}>
+                  {overviewStats.pendingApplications}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#D97706', marginTop: '0.25rem' }}>
+                  Awaiting secretariat verification &rsaquo;
+                </div>
+              </div>
+
+              {/* 4. Accounts Without Completed Registration */}
+              <div className="mosa-card" style={{ padding: '1.25rem', borderLeft: '4px solid #8B5CF6' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Unregistered Passes</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#F5F3FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <AlertCircle size={18} color="#8B5CF6" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#6D28D9' }}>
+                  {overviewStats.unregisteredAccounts}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.25rem' }}>
+                  Accounts that skipped or deferred onboarding
+                </div>
+              </div>
+
+              {/* 5. Members with MA Numbers */}
+              <div className="mosa-card" style={{ padding: '1.25rem', borderLeft: '4px solid #D97706' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Assigned MA Numbers</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Award size={18} color="#D97706" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0B203E' }}>
+                  {overviewStats.withMANumbers}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.25rem' }}>
+                  Official credentials generated
+                </div>
+              </div>
+
+              {/* 6. Leadership & Office Appointments */}
+              <div 
+                className="mosa-card" 
+                onClick={() => setActiveSection('leadership')}
+                style={{ padding: '1.25rem', borderLeft: '4px solid #EC4899', cursor: 'pointer' }}
+                title="Manage leadership offices"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Leadership Offices</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#FDF2F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Briefcase size={18} color="#EC4899" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#9D174D' }}>
+                  {overviewStats.registeredLeaders} <span style={{ fontSize: '1rem', color: '#64748B', fontWeight: 500 }}>/ {overviewStats.totalOffices}</span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#BE185D', marginTop: '0.25rem' }}>
+                  Active office portfolios &rsaquo;
+                </div>
+              </div>
+
+              {/* 7. Audit & Accountability Trail */}
+              <div 
+                className="mosa-card" 
+                onClick={() => { setActiveSection('approvals'); setApprovalsSubTab('audit'); }}
+                style={{ padding: '1.25rem', borderLeft: '4px solid #64748B', cursor: 'pointer' }}
+                title="View audit logs"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Audit Logs</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <History size={18} color="#64748B" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#1E293B' }}>
+                  {auditLogs.length}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.25rem' }}>
+                  Immutable system event entries &rsaquo;
+                </div>
+              </div>
+
+              {/* 8. Super Admin Security */}
+              <div 
+                className="mosa-card" 
+                onClick={() => setActiveSection('security')}
+                style={{ padding: '1.25rem', borderLeft: '4px solid #059669', cursor: 'pointer' }}
+                title="Manage security controls"
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Security State</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Lock size={18} color="#059669" />
+                  </div>
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#065F46', marginTop: '0.35rem' }}>
+                  Enforced
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#047857', marginTop: '0.25rem' }}>
+                  Rate limiting & password hashing active &rsaquo;
+                </div>
+              </div>
+            </div>
+
+            {/* Split Panel: Recent Applications Queue & Audit Stream */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(460px, 1fr))', gap: '1.5rem' }}>
+              {/* Panel 1: Recent Applications */}
+              <div className="mosa-card" style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Clock size={18} color="#D97706" />
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0B203E', margin: 0 }}>
+                      Recent Alumni Applications
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
+                    style={{ background: 'none', border: 'none', color: '#1D4ED8', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    View All ({overviewStats.pendingApplications}) &rsaquo;
+                  </button>
+                </div>
+
+                {recentApplications.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#64748B' }}>
+                    <CheckCircle2 size={32} color="#10B981" style={{ margin: '0 auto 0.5rem' }} />
+                    <p style={{ margin: 0, fontWeight: 600 }}>Queue is clear. No pending applications.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {recentApplications.map(app => (
+                      <div
+                        key={app.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.85rem 1rem',
+                          background: '#F8FAFC',
+                          borderRadius: '10px',
+                          border: '1px solid #E2E8F0',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 800, color: '#0B203E', fontSize: '0.9rem' }}>
+                            {app.firstName} {app.lastName}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.15rem' }}>
+                            Cohort: {app.cohortYear || app.exitYear || app.schoolHistory?.aLevel?.yearCompleted || app.schoolHistory?.oLevel?.yearCompleted || 'Not Specified'} • {app.email}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <span style={{
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            background: app.status === 'APPROVED' ? '#ECFDF5' : app.status === 'PENDING' ? '#FFFBEB' : '#FEF2F2',
+                            color: app.status === 'APPROVED' ? '#065F46' : app.status === 'PENDING' ? '#92400E' : '#991B1B',
+                          }}>
+                            {app.status}
+                          </span>
+                          <button
+                            onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
+                            style={{
+                              background: '#EFF6FF',
+                              border: '1px solid #BFDBFE',
+                              color: '#1D4ED8',
+                              borderRadius: '6px',
+                              padding: '0.35rem 0.65rem',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Review
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Panel 2: Recent Audit Activity */}
+              <div className="mosa-card" style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <History size={18} color="#D97706" />
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0B203E', margin: 0 }}>
+                      Administrative Audit Trail
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => { setActiveSection('approvals'); setApprovalsSubTab('audit'); }}
+                    style={{ background: 'none', border: 'none', color: '#1D4ED8', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Full Log ({auditLogs.length}) &rsaquo;
+                  </button>
+                </div>
+
+                {auditLogs.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#64748B' }}>
+                    <p style={{ margin: 0 }}>No audit logs recorded yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {auditLogs.slice(0, 5).map(log => (
+                      <div
+                        key={log.id}
+                        style={{
+                          padding: '0.75rem 0.95rem',
+                          background: '#F8FAFC',
+                          borderRadius: '10px',
+                          border: '1px solid #E2E8F0',
+                          fontSize: '0.82rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
+                          <span style={{ fontWeight: 700, color: '#0B203E' }}>{log.action}</span>
+                          <span style={{ color: '#94A3B8', fontSize: '0.72rem' }}>
+                            {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div style={{ color: '#64748B', fontSize: '0.78rem' }}>
+                          By: <strong style={{ color: '#334155' }}>{log.performedBy}</strong> • {log.details || log.affectedRecord || 'Audit Action'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: LEADERSHIP & OFFICES */}
+        {activeSection === 'leadership' && canAccessLeadership && (
+          <LeadershipOfficesManager
+            currentUser={currentUser}
+            onRefreshData={loadAllAdminData}
+          />
+        )}
+
+        {/* SECTION: WELCOME PAGE MANAGEMENT */}
+        {activeSection === 'welcome_page' && canAccessWelcomePage && (
+          <WelcomePageManager
+            currentUser={currentUser}
+            onRefreshPortal={onRefreshData}
+          />
+        )}
+
+        {/* SECTION: MEMBER DATA EXPORTS */}
+        {activeSection === 'exports' && canAccessExports && (
+          <MemberDataExportManager
+            currentUser={currentUser}
+          />
+        )}
+
+        {/* SECTION: SECRETARIAT & WHATSAPP COMMUNICATIONS */}
+        {activeSection === 'secretariat' && canAccessSecretariat && (
+          <SecretariatManager
+            currentUser={currentUser}
+          />
+        )}
+
+        {/* SECTION: SUPER ADMIN SECURITY */}
+        {activeSection === 'security' && canAccessSecurity && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            <div className="mosa-card" style={{ padding: '1.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
+                <Lock size={22} color="#D97706" />
+                <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                  Super Admin Account & Credential Security
+                </h2>
+              </div>
+              <p style={{ color: '#64748B', fontSize: '0.88rem', margin: '0 0 1.5rem 0' }}>
+                Manage administrator credentials, verify active security controls, and protect governance authorization.
+              </p>
+
+              {securityMsg && (
+                <div style={{
+                  padding: '0.85rem 1.15rem',
+                  borderRadius: '10px',
+                  marginBottom: '1.5rem',
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  background: securityMsg.type === 'success' ? '#ECFDF5' : '#FEF2F2',
+                  color: securityMsg.type === 'success' ? '#065F46' : '#991B1B',
+                  border: `1px solid ${securityMsg.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
+                }}>
+                  {securityMsg.text}
+                </div>
+              )}
+
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setSecurityMsg(null);
+                  if (!securityCurrentPass) {
+                    setSecurityMsg({ text: 'Please enter your current password.', type: 'error' });
+                    return;
+                  }
+                  if (securityNewPass.length < 8) {
+                    setSecurityMsg({ text: 'New password must be at least 8 characters long.', type: 'error' });
+                    return;
+                  }
+                  if (securityNewPass !== securityConfirmPass) {
+                    setSecurityMsg({ text: 'New password and confirmation do not match.', type: 'error' });
+                    return;
+                  }
+                  setSecurityLoading(true);
+                  try {
+                    const res = await dataService.changeSuperAdminPassword(
+                      securityNewPass,
+                      securityCurrentPass,
+                      currentUser.email
+                    );
+                    if (res.success) {
+                      setSecurityMsg({ text: 'Password successfully changed and updated in secure storage.', type: 'success' });
+                      setSecurityCurrentPass('');
+                      setSecurityNewPass('');
+                      setSecurityConfirmPass('');
+                    } else {
+                      setSecurityMsg({ text: res.error || 'Failed to update password.', type: 'error' });
+                    }
+                  } catch (err: any) {
+                    setSecurityMsg({ text: err.message || 'Error updating password.', type: 'error' });
+                  } finally {
+                    setSecurityLoading(false);
+                  }
+                }}
+                style={{ maxWidth: '520px', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}
+              >
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    Current Administrator Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={securityCurrentPass}
+                    onChange={e => setSecurityCurrentPass(e.target.value)}
+                    className="input-field"
+                    placeholder="Enter current password"
+                    style={{ width: '100%', padding: '0.65rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    New Super Admin Password (min 8 characters)
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={securityNewPass}
+                    onChange={e => setSecurityNewPass(e.target.value)}
+                    className="input-field"
+                    placeholder="Enter new strong password"
+                    style={{ width: '100%', padding: '0.65rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={securityConfirmPass}
+                    onChange={e => setSecurityConfirmPass(e.target.value)}
+                    className="input-field"
+                    placeholder="Confirm new password"
+                    style={{ width: '100%', padding: '0.65rem' }}
+                  />
+                </div>
+
+                <div style={{ marginTop: '0.5rem' }}>
+                  <button
+                    type="submit"
+                    disabled={securityLoading}
+                    style={{
+                      background: '#0B203E',
+                      color: '#FCD34D',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '0.75rem 1.4rem',
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      cursor: securityLoading ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
+                  >
+                    <Lock size={16} />
+                    <span>{securityLoading ? 'Updating Password...' : 'Save New Administrator Password'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Security Protections Summary */}
+            <div className="mosa-card" style={{ padding: '1.75rem' }}>
+              <h3 style={{ fontSize: '1.1rem', color: '#0B203E', margin: '0 0 1rem 0', fontWeight: 800 }}>
+                Active Security & Audit Protections
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                <div style={{ padding: '1rem', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontWeight: 700, color: '#0B203E', marginBottom: '0.25rem' }}>Login Rate Limiting</div>
+                  <div style={{ fontSize: '0.82rem', color: '#64748B' }}>5 consecutive failed admin logins temporarily lock the account for 5 minutes.</div>
+                </div>
+                <div style={{ padding: '1rem', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontWeight: 700, color: '#0B203E', marginBottom: '0.25rem' }}>Credential Hashing</div>
+                  <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Salted SHA-256 cryptographic hashes protect stored administrative passwords.</div>
+                </div>
+                <div style={{ padding: '1rem', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontWeight: 700, color: '#0B203E', marginBottom: '0.25rem' }}>Role-Based Access Enforcement</div>
+                  <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Granular permissions verified on each action; ordinary users cannot elevate privileges.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* SECTION 1: MEMBERS REGISTRY & SUB-FUNCTIONS */}
         {activeSection === 'registry' && canAccessRegistry && (

@@ -21,10 +21,12 @@ import {
   Menu, 
   X, 
   ChevronDown,
+  ChevronUp,
   Sliders,
   ClipboardCheck,
   Briefcase,
-  Vote
+  Vote,
+  Sparkles
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -57,6 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSwitchToAdmin,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>('Registry & Membership');
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
 
   // Logically grouped navigation categories for the clean Menu drawer
@@ -65,6 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Registry & Membership',
       items: [
         { key: 'home', label: 'Home Dashboard', icon: Home, enabled: moduleSettings.home, desc: 'Personalized identity, statements & live alerts' },
+        { key: 'welcome', label: 'MOSA Welcome Page', icon: Sparkles, enabled: true, desc: 'Official welcome experience, heritage & statistics' },
         { key: 'directory', label: 'Alumni Registry', icon: Users, enabled: moduleSettings.directory, desc: 'Explore registered alumni of Mandela Secondary School Hoima' },
         { key: 'verify', label: 'Verified Alumni Lookup', icon: ShieldCheck, enabled: true, isAction: true, desc: 'Instant official MA number authentication' },
         { key: 'membership', label: 'Official Membership Guide', icon: Award, enabled: moduleSettings.membership, desc: 'Permanent MA numbers & member rights' },
@@ -381,96 +385,153 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <X size={18} />
                 </button>
-              </div>              {/* Logically Grouped Menu Sections */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', marginBottom: '1.5rem' }}>
+              </div>              {/* Expandable Accordion Menu Sections (Phase 6 Redesign) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.5rem' }}>
                 {menuCategories.map(cat => {
                   const visibleItems = cat.items.filter(item => item.enabled);
                   if (visibleItems.length === 0) return null;
 
-                  return (
-                    <div key={cat.title}>
-                      <div style={{ 
-                        fontSize: '0.78rem', 
-                        fontWeight: 800, 
-                        color: '#FCD34D', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.07em', 
-                        marginBottom: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D97706', display: 'inline-block' }} />
-                        <span>{cat.title}</span>
-                      </div>
+                  const isExpanded = expandedCategory === cat.title;
+                  const hasActiveChild = visibleItems.some(i => i.key === currentTab);
 
-                      <div 
-                        style={{ 
-                          display: 'grid', 
-                          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-                          gap: '0.75rem',
+                  return (
+                    <div 
+                      key={cat.title} 
+                      style={{ 
+                        borderRadius: '12px', 
+                        background: isExpanded ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                        border: hasActiveChild ? '1.5px solid #D97706' : isExpanded ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.06)',
+                        overflow: 'hidden',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {/* Parent Accordion Header */}
+                      <button
+                        type="button"
+                        onClick={() => setExpandedCategory(isExpanded ? null : cat.title)}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.85rem 1.15rem',
+                          background: isExpanded ? 'rgba(217, 119, 6, 0.15)' : 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#FFFFFF',
+                          textAlign: 'left',
+                          transition: 'background 0.2s',
                         }}
                       >
-                        {visibleItems.map(item => {
-                          const Icon = item.icon;
-                          const isActive = currentTab === item.key;
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                          <span style={{ 
+                            width: '10px', 
+                            height: '10px', 
+                            borderRadius: '50%', 
+                            background: hasActiveChild ? '#FBBF24' : '#D97706', 
+                            display: 'inline-block',
+                            boxShadow: hasActiveChild ? '0 0 8px #FBBF24' : 'none'
+                          }} />
+                          <span style={{ 
+                            fontSize: '0.9rem', 
+                            fontWeight: 700, 
+                            color: hasActiveChild ? '#FDE68A' : '#FFFFFF',
+                            letterSpacing: '0.01em',
+                          }}>
+                            {cat.title}
+                          </span>
+                          <span style={{
+                            fontSize: '0.72rem',
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '999px',
+                            background: 'rgba(255, 255, 255, 0.1)',
+                            color: '#CBD5E1',
+                            fontWeight: 600,
+                          }}>
+                            {visibleItems.length} {visibleItems.length === 1 ? 'item' : 'items'}
+                          </span>
+                        </div>
 
-                          return (
-                            <div
-                              key={item.key}
-                              onClick={() => {
-                                if (item.key === 'verify' && onOpenVerify) {
-                                  setMenuOpen(false);
-                                  onOpenVerify();
-                                } else {
-                                  handleTabClick(item.key);
-                                }
-                              }}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                gap: '0.85rem',
-                                padding: '0.85rem 1rem',
-                                borderRadius: '10px',
-                                background: isActive ? 'rgba(217, 119, 6, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                                border: isActive ? '1px solid #D97706' : '1px solid rgba(255, 255, 255, 0.08)',
-                                cursor: 'pointer',
-                                transition: 'all 0.15s ease',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.35)' : 'rgba(255, 255, 255, 0.08)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.25)' : 'rgba(255, 255, 255, 0.04)';
-                              }}
-                            >
-                              <div 
-                                style={{ 
-                                  width: '36px', 
-                                  height: '36px', 
-                                  borderRadius: '8px', 
-                                  background: isActive ? '#D97706' : 'rgba(255, 255, 255, 0.1)', 
-                                  color: '#FFFFFF', 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  justifyContent: 'center', 
-                                  flexShrink: 0 
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#FCD34D' }}>
+                          {hasActiveChild && (
+                            <span style={{ fontSize: '0.72rem', color: '#FCD34D', fontWeight: 600 }}>Active</span>
+                          )}
+                          {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                        </div>
+                      </button>
+
+                      {/* Sub-items (hidden until parent expanded) */}
+                      {isExpanded && (
+                        <div 
+                          style={{ 
+                            padding: '0.75rem 1rem 1rem 1rem',
+                            display: 'grid', 
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+                            gap: '0.65rem',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                          }}
+                        >
+                          {visibleItems.map(item => {
+                            const Icon = item.icon;
+                            const isActive = currentTab === item.key;
+
+                            return (
+                              <div
+                                key={item.key}
+                                onClick={() => {
+                                  if (item.key === 'verify' && onOpenVerify) {
+                                    setMenuOpen(false);
+                                    onOpenVerify();
+                                  } else {
+                                    handleTabClick(item.key);
+                                  }
+                                }}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  gap: '0.85rem',
+                                  padding: '0.75rem 0.9rem',
+                                  borderRadius: '10px',
+                                  background: isActive ? 'rgba(217, 119, 6, 0.28)' : 'rgba(255, 255, 255, 0.04)',
+                                  border: isActive ? '1.5px solid #D97706' : '1px solid rgba(255, 255, 255, 0.06)',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.38)' : 'rgba(255, 255, 255, 0.08)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = isActive ? 'rgba(217, 119, 6, 0.28)' : 'rgba(255, 255, 255, 0.04)';
                                 }}
                               >
-                                <Icon size={18} color={isActive ? '#FFFFFF' : '#FBBF24'} />
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 700, fontSize: '0.92rem', color: isActive ? '#FDE68A' : '#FFFFFF', marginBottom: '0.15rem' }}>
-                                  {item.label}
+                                <div 
+                                  style={{ 
+                                    width: '34px', 
+                                    height: '34px', 
+                                    borderRadius: '8px', 
+                                    background: isActive ? '#D97706' : 'rgba(255, 255, 255, 0.1)', 
+                                    color: '#FFFFFF', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    flexShrink: 0 
+                                  }}
+                                >
+                                  <Icon size={17} color={isActive ? '#FFFFFF' : '#FBBF24'} />
                                 </div>
-                                <div style={{ fontSize: '0.74rem', color: '#94A3B8', lineHeight: 1.3 }}>
-                                  {item.desc}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.88rem', color: isActive ? '#FDE68A' : '#FFFFFF', marginBottom: '0.15rem' }}>
+                                    {item.label}
+                                  </div>
+                                  <div style={{ fontSize: '0.72rem', color: '#94A3B8', lineHeight: 1.3 }}>
+                                    {item.desc}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -514,7 +575,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   )}
 
-                  {!currentUser && (
+                  {(!currentUser || currentUser.role === 'USER' || !currentUser.alumniNumber) && (
                     <button
                       onClick={() => {
                         setMenuOpen(false);

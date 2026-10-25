@@ -55,8 +55,19 @@ import {
   BroadcastAudienceFilter,
   BroadcastRecipientLog,
   BroadcastStatus,
+  LeadershipOffice,
+  WelcomePageConfig,
+  MemberExportFilter,
+  SecretariatContact,
+  LegacyAlumniRecord,
 } from '../types';
-import { db, isFirebaseConfigured } from './firebase';
+import { jsPDF } from 'jspdf';
+import { db, auth, isFirebaseConfigured } from './firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 import {
   collection,
   doc,
@@ -100,6 +111,11 @@ const STORAGE_KEYS = {
   BROADCASTS: 'mosa_broadcasts',
   BROADCAST_LOGS: 'mosa_broadcast_logs',
   CREDENTIALS: 'mosa_user_credentials',
+  WELCOME_PAGE: 'mosa_welcome_page',
+  LEADERSHIP_OFFICES: 'mosa_leadership_offices',
+  ADMIN_LOCKOUTS: 'mosa_admin_lockouts',
+  SECRETARIAT_CONTACTS: 'mosa_secretariat_contacts',
+  LEGACY_ALUMNI: 'mosa_legacy_alumni',
 };
 
 const memoryStore: Record<string, string> = {};
@@ -128,21 +144,21 @@ const safeStorage = {
 const defaultSettings: SystemSettings = {
   nextAlumniNumber: 3, // Since 0001 and 0002 are seeded
   nextApplicationNumber: 125,
-  prefix: 'MA.-',
+  prefix: 'MA. ',
   padDigits: 4,
   systemName: 'MOSA Alumni Management System',
   schoolName: 'Mandela Secondary School Hoima (MASSH)',
   establishedYear: 1997,
-  usedMANumbersRegistry: ['MA. 0001', 'MA. 0002', 'MA.-0001', 'MA.-0002'],
+  usedMANumbersRegistry: ['MA. 0001', 'MA. 0002'],
   mobileMoneySettings: {
     mtnNumber: '0782 123456',
     mtnName: 'Mandela Old Students Association',
     airtelNumber: '0701 654321',
     airtelName: 'MOSA National Treasury',
-    instructions: 'Enter your Alumni Number (e.g. MA.-0001) or Application Reference (e.g. MOSA-2026-00125) as the transaction reason.',
+    instructions: 'Enter your Alumni Number (e.g. MA. 0001) or Application Reference (e.g. MOSA-2026-00125) as the transaction reason.',
   },
   allowManualMANumberAssignment: true,
-  autoApproveRegistrations: true,
+  autoApproveRegistrations: false,
   moduleSettings: {
     home: true,
     about: true,
@@ -837,10 +853,18 @@ const defaultSeedUsers: AuthUser[] = [
     email: 'admin@massh.ac.ug',
     role: 'SUPER_ADMIN',
     displayName: 'Head of ICT / MOSA Admin',
+    mustChangePassword: true,
   },
-  { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true },
-  { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true },
-  { uid: 'staff-publicity-01', email: 'publicity@massh.ac.ug', role: 'PUBLICITY', displayName: 'MOSA Publicity Secretary', active: true },
+  {
+    uid: 'admin-super-02',
+    email: 'superadmin@mosa.org',
+    role: 'SUPER_ADMIN',
+    displayName: 'Executive Super Admin',
+    mustChangePassword: true,
+  },
+  { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true, officeId: 'off-registry', officeTitle: 'Membership, Registry & Verification' },
+  { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true, officeId: 'off-treasury', officeTitle: 'Honorary Treasury & Finance' },
+  { uid: 'staff-publicity-01', email: 'publicity@massh.ac.ug', role: 'PUBLICITY', displayName: 'MOSA Publicity Secretary', active: true, officeId: 'off-comms', officeTitle: 'Communications, Media & Heritage' },
   {
     uid: 'alumni-user-0001',
     email: 'muhammad.z@alumni.massh.ac.ug',
@@ -850,6 +874,111 @@ const defaultSeedUsers: AuthUser[] = [
     alumniNumber: 'MA. 0001',
   },
 ];
+
+const defaultSeedOffices: LeadershipOffice[] = [
+  {
+    id: 'off-treasury',
+    title: 'Honorary Treasury & Finance',
+    description: 'Management of voluntary alumni contributions, audited accounts, verified receipts, and financial reporting.',
+    category: 'EXECUTIVE',
+    assignedAlumniId: 'alumni-0002',
+    assignedAlumniNumber: 'MA. 0002',
+    assignedAlumniName: 'Grace Mary Akiiki',
+    assignedEmail: 'treasurer@massh.ac.ug',
+    appointmentStartDate: '2026-01-01',
+    appointmentEndDate: '2028-12-31',
+    status: 'ACTIVE',
+    modules: ['FINANCE', 'REPORTS', 'DOCUMENTS'],
+    granularPermissions: {
+      FINANCE: ['VIEW', 'ADD', 'EDIT', 'VERIFY', 'EXPORT', 'MANAGE'],
+      REPORTS: ['VIEW', 'EXPORT'],
+      DOCUMENTS: ['VIEW', 'ADD']
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    updatedBy: 'admin@massh.ac.ug'
+  },
+  {
+    id: 'off-registry',
+    title: 'Membership, Registry & Verification',
+    description: 'Custodian of the alumni register, membership application verification, and MA sequence integrity.',
+    category: 'SECRETARIAT',
+    assignedAlumniId: 'alumni-0001',
+    assignedAlumniNumber: 'MA. 0001',
+    assignedAlumniName: 'Muhammad Zatusave',
+    assignedEmail: 'secretary@massh.ac.ug',
+    appointmentStartDate: '2026-01-01',
+    appointmentEndDate: '2028-12-31',
+    status: 'ACTIVE',
+    modules: ['REGISTRY', 'VERIFICATION', 'NUMBERS', 'DOCUMENTS', 'REPORTS'],
+    granularPermissions: {
+      REGISTRY: ['VIEW', 'ADD', 'EDIT', 'APPROVE', 'VERIFY', 'EXPORT'],
+      VERIFICATION: ['VIEW', 'APPROVE', 'REJECT', 'VERIFY'],
+      NUMBERS: ['VIEW', 'ADD', 'EDIT', 'VERIFY'],
+      DOCUMENTS: ['VIEW', 'ADD']
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    updatedBy: 'admin@massh.ac.ug'
+  },
+  {
+    id: 'off-events',
+    title: 'Events, Conventions & Meeting Attendance',
+    description: 'Planning reunions, annual conventions, roll calls, and meeting quorum management.',
+    category: 'COMMITTEE',
+    status: 'VACANT',
+    modules: ['EVENTS', 'ATTENDANCE', 'REPORTS'],
+    granularPermissions: {
+      EVENTS: ['VIEW', 'ADD', 'EDIT', 'PUBLISH', 'MANAGE'],
+      ATTENDANCE: ['VIEW', 'ADD', 'EDIT', 'VERIFY', 'EXPORT', 'MANAGE']
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    updatedBy: 'admin@massh.ac.ug'
+  },
+  {
+    id: 'off-comms',
+    title: 'Communications, Media & Heritage',
+    description: 'Official circulars, newsletters, press briefings, and digital heritage archive.',
+    category: 'COMMITTEE',
+    status: 'VACANT',
+    modules: ['COMMUNICATIONS', 'WELCOME_PAGE', 'DOCUMENTS'],
+    granularPermissions: {
+      COMMUNICATIONS: ['VIEW', 'ADD', 'EDIT', 'PUBLISH', 'MANAGE'],
+      WELCOME_PAGE: ['VIEW', 'EDIT', 'PUBLISH']
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    updatedBy: 'admin@massh.ac.ug'
+  },
+  {
+    id: 'off-alumni-relations',
+    title: 'Alumni Relations & Chapter Networks',
+    description: 'Coordination between regional, diaspora, and university chapters across Uganda and worldwide.',
+    category: 'REGIONAL',
+    status: 'VACANT',
+    modules: ['CHAPTERS', 'REGISTRY', 'OPPORTUNITIES'],
+    granularPermissions: {
+      CHAPTERS: ['VIEW', 'ADD', 'EDIT', 'MANAGE'],
+      REGISTRY: ['VIEW'],
+      OPPORTUNITIES: ['VIEW', 'ADD', 'APPROVE']
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    updatedBy: 'admin@massh.ac.ug'
+  }
+];
+
+const defaultWelcomePageConfig: WelcomePageConfig = {
+  heroTitle: 'WELCOME TO MOSA',
+  slogan: 'PROUDLY MANDELIAN',
+  subtitle: 'One family. One legacy. A lifetime of connection.',
+  introMessage: 'Your journey with the Mandela Old Students Association starts here.',
+  heroImageUrl: '/images/massh-flag-unveiling-ceremony.jpg',
+  hasUnpublishedDraft: false,
+  lastPublishedAt: '2026-10-01T00:00:00.000Z',
+  lastPublishedBy: 'admin@massh.ac.ug'
+};
 
 const defaultSeedAlumni: AlumniProfile[] = [
   {
@@ -1718,7 +1847,126 @@ function initLocalStore() {
   if (!safeStorage.getItem(STORAGE_KEYS.BROADCASTS)) {
     safeStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify(defaultSeedBroadcasts));
   }
+  if (!safeStorage.getItem(STORAGE_KEYS.WELCOME_PAGE)) {
+    safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(defaultWelcomePageConfig));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.LEADERSHIP_OFFICES)) {
+    safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(defaultSeedOffices));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.SECRETARIAT_CONTACTS)) {
+    safeStorage.setItem(STORAGE_KEYS.SECRETARIAT_CONTACTS, JSON.stringify(defaultSeedSecretariatContacts));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.LEGACY_ALUMNI)) {
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(defaultSeedLegacyAlumni));
+  }
 }
+
+const defaultSeedSecretariatContacts: SecretariatContact[] = [
+  {
+    id: 'sec-01',
+    name: 'Dr. Muhammad Zatusave',
+    title: 'MOSA National President',
+    publishedPhone: '+256 772 123 456',
+    whatsAppNumber: '256772123456',
+    email: 'president@massh.ac.ug',
+    officeCategory: 'EXECUTIVE',
+    status: 'ACTIVE',
+    displayOrder: 1,
+    notes: 'Head of National Executive Committee'
+  },
+  {
+    id: 'sec-02',
+    name: 'Ms. Joan Kemigisa',
+    title: 'Secretary General',
+    publishedPhone: '+256 701 234 567',
+    whatsAppNumber: '256701234567',
+    email: 'secretary@massh.ac.ug',
+    officeCategory: 'SECRETARIAT',
+    status: 'ACTIVE',
+    displayOrder: 2,
+    notes: 'Official correspondence and general registry'
+  },
+  {
+    id: 'sec-03',
+    name: 'Mr. Patrick Asaba',
+    title: 'Honorary Treasurer',
+    publishedPhone: '+256 782 345 678',
+    whatsAppNumber: '256782345678',
+    email: 'treasurer@massh.ac.ug',
+    officeCategory: 'EXECUTIVE',
+    status: 'ACTIVE',
+    displayOrder: 3,
+    notes: 'National treasury, contributions and projects'
+  },
+  {
+    id: 'sec-04',
+    name: 'Mr. David Bright',
+    title: 'Publicity & Mobilisation Secretary',
+    publishedPhone: '+256 752 456 789',
+    whatsAppNumber: '256752456789',
+    email: 'publicity@massh.ac.ug',
+    officeCategory: 'SECRETARIAT',
+    status: 'ACTIVE',
+    displayOrder: 4,
+    notes: 'Media relations, public communications and cohort mobilisation'
+  }
+];
+
+const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
+  {
+    id: 'leg-001',
+    membershipNumber: 'MA. 0001',
+    fullName: 'Dr. Muhammad Zatusave',
+    cohortYear: '2002',
+    phone: '+256 772 123 456',
+    email: 'muhammad.z@alumni.massh.ac.ug',
+    physicalRegisterPage: 'Book 1, Page 4, Entry 01',
+    verifiedStatus: 'LINKED',
+    importedAt: '2026-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'leg-002',
+    membershipNumber: 'MA. 0002',
+    fullName: 'Ms. Joan Kemigisa',
+    cohortYear: '2008',
+    phone: '+256 701 234 567',
+    email: 'joan.k@alumni.massh.ac.ug',
+    physicalRegisterPage: 'Book 1, Page 6, Entry 14',
+    verifiedStatus: 'LINKED',
+    importedAt: '2026-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'leg-003',
+    membershipNumber: 'MA. 0003',
+    fullName: 'Mr. Patrick Asaba',
+    cohortYear: '2005',
+    phone: '+256 782 345 678',
+    email: 'patrick.a@alumni.massh.ac.ug',
+    physicalRegisterPage: 'Book 1, Page 9, Entry 22',
+    verifiedStatus: 'TRUSTED',
+    importedAt: '2026-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'leg-004',
+    membershipNumber: 'MA. 0004',
+    fullName: 'Hon. Grace Mugisa',
+    cohortYear: '1999',
+    phone: '+256 774 999 111',
+    physicalRegisterPage: 'Book 1, Page 1, Entry 04',
+    verifiedStatus: 'TRUSTED',
+    importedAt: '2026-01-10T10:00:00.000Z'
+  },
+  {
+    id: 'leg-005',
+    membershipNumber: 'MA. 0005',
+    fullName: 'Eng. Robert Tinkamanyire',
+    cohortYear: '2001',
+    phone: '+256 755 888 222',
+    physicalRegisterPage: 'Book 1, Page 2, Entry 11',
+    verifiedStatus: 'TRUSTED',
+    importedAt: '2026-01-10T10:00:00.000Z'
+  }
+];
 
 const defaultSeedBroadcasts: BroadcastMessage[] = [
   {
@@ -1780,8 +2028,18 @@ const defaultSeedBroadcasts: BroadcastMessage[] = [
 initLocalStore();
 
 export const dataService = {
-  // Format membership number, e.g. MA.-0001
-  formatAlumniNumber(num: number, prefix = 'MA.-', pad = 4): string {
+  // Format membership number, e.g. MA. 0001
+  formatAlumniNumber(num: number, prefix = 'MA. ', pad = 4): string {
+    return `${prefix}${String(num).padStart(pad, '0')}`;
+  },
+
+  // Normalize acceptable formatting consistently (e.g. ma.0001, MA-0001, 0001 -> MA. 0001)
+  normalizeAlumniNumber(input: string, prefix = 'MA. ', pad = 4): string {
+    if (!input) return '';
+    const trimmed = input.trim();
+    const digitMatch = trimmed.match(/\d+/);
+    if (!digitMatch) return trimmed.toUpperCase();
+    const num = parseInt(digitMatch[0], 10);
     return `${prefix}${String(num).padStart(pad, '0')}`;
   },
 
@@ -1851,24 +2109,67 @@ export const dataService = {
       let newProfile: AlumniProfile | undefined;
 
       if (isAutoApprove) {
-        const prefix = settings.prefix || 'MA.-';
+        const prefix = settings.prefix || 'MA. ';
         const pad = settings.padDigits || 4;
-        let currentCounter = settings.nextAlumniNumber || 3;
 
-        // Anti-collision set
-        const usedRegistry = new Set<string>((settings.usedMANumbersRegistry || []).map(s => s.trim().toUpperCase()));
+        // Anti-collision set from permanent ledger & active directory
+        const usedRegistry = new Set<string>((settings.usedMANumbersRegistry || []).map(s => this.normalizeAlumniNumber(s)));
         const existingAlumni = await this.getAlumniList();
-        existingAlumni.forEach(a => usedRegistry.add(a.alumniNumber.trim().toUpperCase()));
+        existingAlumni.forEach(a => usedRegistry.add(this.normalizeAlumniNumber(a.alumniNumber)));
 
-        generatedNumber = this.formatAlumniNumber(currentCounter, prefix, pad);
-        while (usedRegistry.has(generatedNumber.toUpperCase())) {
-          currentCounter += 1;
-          generatedNumber = this.formatAlumniNumber(currentCounter, prefix, pad);
+        // Phase 3: Check if applicant has an existing legacy number from physical register
+        if (appData.existingAlumniNumber && appData.existingAlumniNumber.trim()) {
+          const normExisting = this.normalizeAlumniNumber(appData.existingAlumniNumber, prefix, pad);
+          // Check if already claimed by another active registered alumnus
+          const alreadyLinked = existingAlumni.find(a => this.normalizeAlumniNumber(a.alumniNumber) === normExisting);
+          if (alreadyLinked) {
+            return {
+              success: false,
+              error: `The existing membership number "${normExisting}" is already linked to another registered alumnus account. Please contact the MOSA Secretariat if this number belongs to you.`
+            };
+          }
+
+          // Check authoritative physical legacy register
+          const legacyList = await this.getLegacyAlumni();
+          const legacyMatch = legacyList.find(l => this.normalizeAlumniNumber(l.membershipNumber) === normExisting);
+          if (legacyMatch) {
+            const submittedName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ').toLowerCase();
+            const legacyName = legacyMatch.fullName.toLowerCase();
+            const nameWords = submittedName.split(/\s+/).filter(w => w.length > 2);
+            const matchesName = nameWords.some(w => legacyName.includes(w));
+            
+            if (matchesName || !legacyMatch.fullName) {
+              generatedNumber = normExisting;
+              legacyMatch.verifiedStatus = 'LINKED';
+              legacyMatch.linkedDate = now;
+              await this.saveLegacyAlumniRecord(legacyMatch);
+            } else {
+              return {
+                success: false,
+                error: `The existing number "${normExisting}" is recorded under a different name in the physical register. Please verify your details or leave the field blank to receive a new permanent number.`
+              };
+            }
+          } else {
+            // Not in imported physical register book, but verified unique
+            generatedNumber = normExisting;
+          }
         }
 
-        settings.nextAlumniNumber = currentCounter + 1;
+        // If no existing number, generate unique sequential number
+        if (!generatedNumber) {
+          let currentCounter = settings.nextAlumniNumber || 3;
+          generatedNumber = this.formatAlumniNumber(currentCounter, prefix, pad);
+          while (usedRegistry.has(this.normalizeAlumniNumber(generatedNumber))) {
+            currentCounter += 1;
+            generatedNumber = this.formatAlumniNumber(currentCounter, prefix, pad);
+          }
+          settings.nextAlumniNumber = currentCounter + 1;
+        }
+
         if (!settings.usedMANumbersRegistry) settings.usedMANumbersRegistry = [];
-        settings.usedMANumbersRegistry.push(generatedNumber);
+        if (!settings.usedMANumbersRegistry.some(r => this.normalizeAlumniNumber(r) === this.normalizeAlumniNumber(generatedNumber!))) {
+          settings.usedMANumbersRegistry.push(generatedNumber);
+        }
 
         const alumniId = `alumni-${Date.now()}`;
         const fullName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ');
@@ -1929,22 +2230,47 @@ export const dataService = {
           safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify(alumniList));
         }
 
-        // Save AuthUser so they can immediately login (only when a credential exists;
-        // the account is never tied to the assisting person's login).
+        // Update or create AuthUser
         const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-        const hasCredential = !!(appData.email || appData.phone);
-        if (hasCredential && !users.some(u => !!appData.email && u.email.toLowerCase() === appData.email.toLowerCase())) {
+        const userIdx = users.findIndex(u => !!appData.email && u.email.toLowerCase() === appData.email.toLowerCase());
+        if (userIdx !== -1) {
+          users[userIdx].role = 'ALUMNI';
+          users[userIdx].alumniId = alumniId;
+          users[userIdx].alumniNumber = generatedNumber;
+          users[userIdx].displayName = fullName;
+          users[userIdx].phone = appData.phone || users[userIdx].phone;
+          users[userIdx].photoUrl = appData.photoUrl || users[userIdx].photoUrl;
+          users[userIdx].alumniOnboardingDecision = 'COMPLETED';
+          safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        } else if (appData.email || appData.phone) {
           users.push({
             uid: `user-${alumniId}`,
             email: appData.email,
-            displayName: [appData.firstName, appData.lastName].filter(Boolean).join(' '),
+            displayName: fullName,
             role: 'ALUMNI',
             alumniId,
             alumniNumber: generatedNumber,
             photoUrl: appData.photoUrl,
             phone: appData.phone,
+            alumniOnboardingDecision: 'COMPLETED',
           });
           safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+        }
+
+        // Synchronize active logged in session
+        const currentAuthRaw = safeStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+        if (currentAuthRaw) {
+          try {
+            const curr = JSON.parse(currentAuthRaw);
+            if (curr.email && appData.email && curr.email.toLowerCase() === appData.email.toLowerCase()) {
+              curr.role = 'ALUMNI';
+              curr.alumniId = alumniId;
+              curr.alumniNumber = generatedNumber;
+              curr.displayName = fullName;
+              curr.alumniOnboardingDecision = 'COMPLETED';
+              safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(curr));
+            }
+          } catch {}
         }
       }
 
@@ -1969,6 +2295,31 @@ export const dataService = {
         const apps = JSON.parse(safeStorage.getItem(STORAGE_KEYS.APPLICATIONS) || '[]');
         apps.unshift(newApp);
         safeStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(apps));
+      }
+
+      // Update logged-in AuthUser's onboarding decision so they don't get prompted repeatedly
+      const activeUser = this.getCurrentUser();
+      const applicantEmail = (appData.email || '').toLowerCase().trim();
+      if (activeUser && (activeUser.email.toLowerCase() === applicantEmail || appData.registrationMode === 'SELF')) {
+        activeUser.alumniOnboardingDecision = 'COMPLETED';
+        if (newProfile?.internalId) {
+          activeUser.alumniId = newProfile.internalId;
+          activeUser.alumniNumber = generatedNumber;
+          activeUser.role = 'ALUMNI';
+        }
+        safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(activeUser));
+      }
+
+      const storedUsers: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const userIdx = storedUsers.findIndex(u => !!applicantEmail && u.email.toLowerCase() === applicantEmail);
+      if (userIdx !== -1) {
+        storedUsers[userIdx].alumniOnboardingDecision = 'COMPLETED';
+        if (newProfile?.internalId) {
+          storedUsers[userIdx].alumniId = newProfile.internalId;
+          storedUsers[userIdx].alumniNumber = generatedNumber;
+          storedUsers[userIdx].role = 'ALUMNI';
+        }
+        safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(storedUsers));
       }
 
       // Record audit log
@@ -2561,12 +2912,9 @@ export const dataService = {
         }
       }
 
-      // Register new number in used numbers registry and clean up vacated previous number
+      // Register new number in permanent used numbers registry ledger (previous numbers remain permanently reserved)
       const usedSet = new Set((settings.usedMANumbersRegistry || []).map(n => n.trim().toUpperCase()));
-      const otherUsingPrev = localList.some(a => a.internalId !== alumnus.internalId && normalize(a.alumniNumber) === normalize(previousNumber));
-      if (!otherUsingPrev) {
-        usedSet.delete(previousNumber.trim().toUpperCase());
-      }
+      usedSet.add(previousNumber.trim().toUpperCase());
       usedSet.add(formattedNew.toUpperCase());
       settings.usedMANumbersRegistry = Array.from(usedSet);
       await this.updateSystemSettings({ usedMANumbersRegistry: settings.usedMANumbersRegistry });
@@ -2832,6 +3180,32 @@ export const dataService = {
   async updateSystemSettings(updates: Partial<SystemSettings>): Promise<{ success: boolean; settings?: SystemSettings; error?: string }> {
     try {
       const current = await this.getSystemSettings();
+
+      // Validate nextAlumniNumber if specified
+      if (updates.nextAlumniNumber !== undefined) {
+        const nextNum = Number(updates.nextAlumniNumber);
+        if (isNaN(nextNum) || nextNum < 1) {
+          return { success: false, error: 'Next allocation sequence number must be a valid positive integer.' };
+        }
+
+        const prefix = updates.prefix || current.prefix || 'MA. ';
+        const pad = updates.padDigits || current.padDigits || 4;
+        const candidateFormatted = this.formatAlumniNumber(nextNum, prefix, pad);
+        
+        // Check collision against permanent ledger
+        const usedRegistry = (current.usedMANumbersRegistry || []).map(n => this.normalizeAlumniNumber(n));
+        const alumniList = await this.getAlumniList();
+        const activeNumbers = alumniList.map(a => this.normalizeAlumniNumber(a.alumniNumber));
+        
+        const normCandidate = this.normalizeAlumniNumber(candidateFormatted);
+        if (usedRegistry.includes(normCandidate) || activeNumbers.includes(normCandidate)) {
+          return {
+            success: false,
+            error: `Starting number "${candidateFormatted}" has already been allocated in this sequence. Please choose a starting number that does not conflict with existing records.`
+          };
+        }
+      }
+
       const updated: SystemSettings = { ...current, ...updates };
       if (isFirebaseConfigured() && db) {
         try {
@@ -3016,7 +3390,152 @@ export const dataService = {
     return { success: true, user: alumniUser };
   },
 
-  // Enhanced Login with separate Admin & Alumni Password protection
+  // Account Creation (Phase 2 Auth Gate)
+  async createAccount(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+    if (!password || password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long.' };
+    }
+
+    const creds = this.getUserCredentials();
+    if (creds[cleanEmail]) {
+      return { success: false, error: 'An account with this email address already exists. Please log in.' };
+    }
+
+    // Try Firebase Authentication if configured
+    let firebaseUid = '';
+    if (isFirebaseConfigured() && auth) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+        firebaseUid = userCredential.user?.uid || '';
+      } catch (err: any) {
+        if (err.code === 'auth/email-already-in-use') {
+          return { success: false, error: 'An account with this email address already exists. Please log in.' };
+        }
+        if (err.code === 'auth/weak-password') {
+          return { success: false, error: 'Password is too weak. Please choose a stronger password.' };
+        }
+        console.warn('Firebase user creation failed, fallback to local:', err);
+      }
+    }
+
+    // Check if email matches an existing alumnus record in the registry
+    const alumniList = await this.getAlumniList();
+    const existingAlumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
+
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+
+    const newUser: AuthUser = {
+      uid: firebaseUid || `usr-${Date.now()}`,
+      email: cleanEmail,
+      role: existingAlumnus ? 'ALUMNI' : 'USER',
+      displayName: existingAlumnus ? (existingAlumnus.fullName || `${existingAlumnus.firstName} ${existingAlumnus.lastName}`.trim()) : '',
+      alumniId: existingAlumnus?.internalId,
+      alumniNumber: existingAlumnus?.alumniNumber,
+      photoUrl: existingAlumnus?.photoUrl,
+      phone: existingAlumnus?.phone,
+      alumniOnboardingDecision: existingAlumnus ? 'COMPLETED' : 'PENDING',
+    };
+
+    // Save to users list
+    const existingIdx = users.findIndex(u => u.email.toLowerCase() === cleanEmail);
+    if (existingIdx !== -1) {
+      users[existingIdx] = { ...users[existingIdx], ...newUser };
+    } else {
+      users.push(newUser);
+    }
+    safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    // Save credentials (secured store)
+    this.saveUserCredential({
+      email: cleanEmail,
+      password: password,
+      role: newUser.role,
+      displayName: newUser.displayName,
+      alumniId: newUser.alumniId,
+      alumniNumber: newUser.alumniNumber,
+    });
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
+
+    await this.logAudit({
+      action: 'USER_REGISTERED',
+      performedBy: cleanEmail,
+      affectedRecord: newUser.uid,
+      metadata: { role: newUser.role, onboardingDecision: newUser.alumniOnboardingDecision },
+    });
+
+    return { success: true, user: newUser };
+  },
+
+  async skipAlumniOnboarding(userId: string): Promise<void> {
+    const user = this.getCurrentUser();
+    if (user && (user.uid === userId || !userId)) {
+      user.alumniOnboardingDecision = 'SKIPPED';
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+
+      const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const idx = users.findIndex(u => u.uid === user.uid || u.email.toLowerCase() === user.email.toLowerCase());
+      if (idx !== -1) {
+        users[idx].alumniOnboardingDecision = 'SKIPPED';
+        safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+      }
+    }
+  },
+
+  async completeAlumniOnboarding(userId: string, alumniId?: string, alumniNumber?: string): Promise<void> {
+    const user = this.getCurrentUser();
+    if (user && (user.uid === userId || !userId)) {
+      user.alumniOnboardingDecision = 'COMPLETED';
+      if (alumniId) user.alumniId = alumniId;
+      if (alumniNumber) {
+        user.alumniNumber = alumniNumber;
+        user.role = 'ALUMNI';
+      }
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+
+      const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const idx = users.findIndex(u => u.uid === user.uid || u.email.toLowerCase() === user.email.toLowerCase());
+      if (idx !== -1) {
+        users[idx].alumniOnboardingDecision = 'COMPLETED';
+        if (alumniId) users[idx].alumniId = alumniId;
+        if (alumniNumber) {
+          users[idx].alumniNumber = alumniNumber;
+          users[idx].role = 'ALUMNI';
+        }
+        safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+      }
+    }
+  },
+
+  async resetPassword(email: string): Promise<{ success: boolean; message: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (isFirebaseConfigured() && auth && cleanEmail) {
+      try {
+        await sendPasswordResetEmail(auth, cleanEmail);
+      } catch (err) {
+        console.warn('Firebase sendPasswordResetEmail error:', err);
+      }
+    }
+    return {
+      success: true,
+      message: 'If an account exists for this email address, password reset instructions have been dispatched.'
+    };
+  },
+
+  async getApplicationByEmail(email: string): Promise<AlumniApplication | null> {
+    const cleanEmail = email.trim().toLowerCase();
+    const apps = await this.getApplications();
+    return apps.find(a => a.email.toLowerCase() === cleanEmail) || null;
+  },
+
+  // Enhanced Login with separate Admin & Member Password protection
   async login(
     email: string, 
     password?: string, 
@@ -3041,14 +3560,28 @@ export const dataService = {
     // PORTAL 1: ADMINISTRATIVE SIGN IN
     // ----------------------------------------------------
     if (portal === 'admin') {
+      // Check lockout status
+      const lockouts: Record<string, { failedAttempts: number; lockedUntil?: number }> = 
+        JSON.parse(safeStorage.getItem(STORAGE_KEYS.ADMIN_LOCKOUTS) || '{}');
+      const accountLockout = lockouts[cleanEmail];
+      const now = Date.now();
+
+      if (accountLockout?.lockedUntil && accountLockout.lockedUntil > now) {
+        const remainingMinutes = Math.ceil((accountLockout.lockedUntil - now) / 60000);
+        return { 
+          success: false, 
+          error: `Administrative account temporarily locked due to excessive failed attempts. Please wait ${remainingMinutes} minute(s) before retrying.` 
+        };
+      }
+
       const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
       const matchedAdmin = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
 
-      const isRecognizedAdmin = matchedAdmin || cleanEmail === 'admin@massh.ac.ug';
+      const isRecognizedAdmin = matchedAdmin || cleanEmail === 'admin@massh.ac.ug' || cleanEmail === 'superadmin@mosa.org';
       if (!isRecognizedAdmin) {
         return { 
           success: false, 
-          error: 'This email is not authorized for administrative access. Please use Alumni Sign In.' 
+          error: 'This email is not authorized for administrative access. Please use Member Sign In.' 
         };
       }
 
@@ -3059,14 +3592,42 @@ export const dataService = {
       // Check Admin Password
       const expectedPassword = userCred?.password || 'admin123';
       if (!password || password !== expectedPassword) {
-        return { success: false, error: 'Incorrect administrator password. Please check your credentials.' };
+        const failedAttempts = (accountLockout?.failedAttempts || 0) + 1;
+        const isLocked = failedAttempts >= 5;
+        lockouts[cleanEmail] = {
+          failedAttempts,
+          lockedUntil: isLocked ? now + 5 * 60 * 1000 : undefined,
+        };
+        safeStorage.setItem(STORAGE_KEYS.ADMIN_LOCKOUTS, JSON.stringify(lockouts));
+
+        if (isLocked) {
+          return {
+            success: false,
+            error: 'Administrative account locked for 5 minutes due to 5 consecutive failed login attempts.'
+          };
+        }
+
+        return { 
+          success: false, 
+          error: `Incorrect administrator password. (Attempt ${failedAttempts} of 5 before security lockout)` 
+        };
       }
 
-      const adminUser: AuthUser = matchedAdmin || {
-        uid: 'admin-super-01',
-        email: cleanEmail,
-        role: 'SUPER_ADMIN',
-        displayName: 'Head of ICT / MOSA Admin',
+      // Successful login clears failed attempt counters
+      if (lockouts[cleanEmail]) {
+        delete lockouts[cleanEmail];
+        safeStorage.setItem(STORAGE_KEYS.ADMIN_LOCKOUTS, JSON.stringify(lockouts));
+      }
+
+      const isInitialPassword = !userCred?.password || userCred.password === 'admin123';
+      const adminUser: AuthUser = {
+        ...(matchedAdmin || {
+          uid: cleanEmail === 'superadmin@mosa.org' ? 'admin-super-02' : 'admin-super-01',
+          email: cleanEmail,
+          role: 'SUPER_ADMIN',
+          displayName: cleanEmail === 'superadmin@mosa.org' ? 'Executive Super Admin' : 'Head of ICT / MOSA Admin',
+        }),
+        mustChangePassword: matchedAdmin?.mustChangePassword ?? isInitialPassword
       };
 
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(adminUser));
@@ -3074,33 +3635,31 @@ export const dataService = {
         action: 'ADMIN_LOGIN',
         performedBy: adminUser.email,
         affectedRecord: adminUser.uid,
-        metadata: { role: adminUser.role },
+        metadata: { role: adminUser.role, mustChangePassword: adminUser.mustChangePassword },
       });
 
       return { success: true, user: adminUser };
     }
 
     // ----------------------------------------------------
-    // PORTAL 2: ALUMNI MEMBER SIGN IN
+    // PORTAL 2: ALUMNI & REGISTERED USERS SIGN IN
     // ----------------------------------------------------
-    const alumniList = await this.getAlumniList();
-    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
-
-    if (!alumnus) {
-      if (cleanEmail === 'admin@massh.ac.ug' || cleanEmail.includes('@massh.ac.ug')) {
-        return {
-          success: false,
-          error: 'This appears to be an administrator email. Please switch to the "Administrator Sign In" tab.'
-        };
+    // Try Firebase Authentication if configured
+    if (isFirebaseConfigured() && auth && password) {
+      try {
+        await signInWithEmailAndPassword(auth, cleanEmail, password);
+      } catch (err: any) {
+        console.warn('Firebase login attempt fallback:', err?.code);
       }
-      return {
-        success: false,
-        error: `No alumni account found for "${cleanEmail}". Please check the spelling or register first.`
-      };
     }
 
-    // Check if alumnus has already created a password
-    if (!userCred || !userCred.password) {
+    const alumniList = await this.getAlumniList();
+    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+    const matchedUser = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+
+    // If an alumnus exists in the database but hasn't activated password yet
+    if (alumnus && (!userCred || !userCred.password)) {
       return {
         success: false,
         needsPasswordCreation: true,
@@ -3110,34 +3669,45 @@ export const dataService = {
       };
     }
 
-    // Verify Password
-    if (!password || password !== userCred.password) {
+    // Verify Password safely
+    if (!userCred || !userCred.password || password !== userCred.password) {
       return {
         success: false,
-        error: 'Incorrect password. Please verify and try again, or create/reset your password.'
+        error: 'Invalid email or password. Please verify your credentials and try again.'
       };
     }
 
-    const alumniUser: AuthUser = {
-      uid: `user-${alumnus.internalId}`,
-      email: alumnus.email,
-      role: 'ALUMNI',
-      displayName: `${alumnus.firstName} ${alumnus.lastName}`,
-      alumniId: alumnus.internalId,
-      alumniNumber: alumnus.alumniNumber,
-      photoUrl: alumnus.photoUrl,
-      phone: alumnus.phone,
+    // Build or restore AuthUser record
+    const authenticatedUser: AuthUser = matchedUser || {
+      uid: alumnus ? `user-${alumnus.internalId}` : `usr-${Date.now()}`,
+      email: cleanEmail,
+      role: alumnus ? 'ALUMNI' : 'USER',
+      displayName: alumnus ? (alumnus.fullName || `${alumnus.firstName} ${alumnus.lastName}`.trim()) : '',
+      alumniId: alumnus?.internalId,
+      alumniNumber: alumnus?.alumniNumber,
+      photoUrl: alumnus?.photoUrl,
+      phone: alumnus?.phone,
+      alumniOnboardingDecision: alumnus ? 'COMPLETED' : 'SKIPPED',
     };
 
-    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(alumniUser));
+    // If an alumnus record is found, ensure linked
+    if (alumnus && !authenticatedUser.alumniId) {
+      authenticatedUser.alumniId = alumnus.internalId;
+      authenticatedUser.alumniNumber = alumnus.alumniNumber;
+      authenticatedUser.role = 'ALUMNI';
+      authenticatedUser.photoUrl = alumnus.photoUrl;
+      authenticatedUser.alumniOnboardingDecision = 'COMPLETED';
+    }
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(authenticatedUser));
     await this.logAudit({
       action: 'USER_LOGIN',
-      performedBy: alumniUser.email,
-      affectedRecord: alumniUser.uid,
-      metadata: { role: 'ALUMNI', alumniNumber: alumnus.alumniNumber },
+      performedBy: authenticatedUser.email,
+      affectedRecord: authenticatedUser.uid,
+      metadata: { role: authenticatedUser.role, alumniNumber: authenticatedUser.alumniNumber },
     });
 
-    return { success: true, user: alumniUser };
+    return { success: true, user: authenticatedUser };
   },
 
   async setAdminPassword(newPassword: string, adminEmail = 'admin@massh.ac.ug'): Promise<{ success: boolean; error?: string }> {
@@ -5557,6 +6127,925 @@ export const dataService = {
     });
 
     return b;
+  },
+
+  // ==========================================
+  // SUPER ADMIN PASSWORD MANAGEMENT
+  // ==========================================
+  async changeSuperAdminPassword(
+    newPassword: string, 
+    currentPassword: string, 
+    actorEmail = 'admin@massh.ac.ug'
+  ): Promise<{ success: boolean; error?: string }> {
+    const cleanEmail = actorEmail.trim().toLowerCase();
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, error: 'New administrator password must be at least 8 characters long.' };
+    }
+    
+    const creds = this.getUserCredentials();
+    const existing = creds[cleanEmail];
+    const expectedCurrent = existing?.password || 'admin123';
+    if (currentPassword !== expectedCurrent) {
+      return { success: false, error: 'Current administrator password is incorrect.' };
+    }
+
+    creds[cleanEmail] = {
+      ...(existing || {}),
+      email: cleanEmail,
+      password: newPassword,
+      role: 'SUPER_ADMIN',
+      updatedAt: new Date().toISOString()
+    };
+    safeStorage.setItem(STORAGE_KEYS.CREDENTIALS, JSON.stringify(creds));
+
+    // Update users store
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+    const userIdx = users.findIndex(u => u.email.toLowerCase() === cleanEmail);
+    if (userIdx !== -1) {
+      users[userIdx].mustChangePassword = false;
+      safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    }
+
+    // Update current user session
+    const current = this.getCurrentUser();
+    if (current && current.email.toLowerCase() === cleanEmail) {
+      current.mustChangePassword = false;
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(current));
+    }
+
+    await this.logAudit({
+      action: 'SUPER_ADMIN_PASSWORD_CHANGED',
+      performedBy: cleanEmail,
+      affectedRecord: cleanEmail,
+      metadata: { action: 'Initial administrator credentials replaced with secured password' }
+    });
+
+    return { success: true };
+  },
+
+  // ==========================================
+  // WELCOME PAGE CONTENT MANAGEMENT
+  // ==========================================
+  async getWelcomePageConfig(): Promise<WelcomePageConfig> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.WELCOME_PAGE);
+    if (!raw) return defaultWelcomePageConfig;
+    try {
+      return { ...defaultWelcomePageConfig, ...JSON.parse(raw) };
+    } catch {
+      return defaultWelcomePageConfig;
+    }
+  },
+
+  async saveWelcomePageDraft(
+    draft: Partial<WelcomePageConfig>, 
+    actor: AuthUser
+  ): Promise<{ success: boolean; config: WelcomePageConfig }> {
+    const current = await this.getWelcomePageConfig();
+    const updated: WelcomePageConfig = {
+      ...current,
+      draftHeroTitle: draft.draftHeroTitle ?? draft.heroTitle ?? current.draftHeroTitle ?? current.heroTitle,
+      draftSlogan: draft.draftSlogan ?? draft.slogan ?? current.draftSlogan ?? current.slogan,
+      draftSubtitle: draft.draftSubtitle ?? draft.subtitle ?? current.draftSubtitle ?? current.subtitle,
+      draftIntroMessage: draft.draftIntroMessage ?? draft.introMessage ?? current.draftIntroMessage ?? current.introMessage,
+      draftHeroImageUrl: draft.draftHeroImageUrl ?? draft.heroImageUrl ?? current.draftHeroImageUrl ?? current.heroImageUrl,
+      hasUnpublishedDraft: true,
+    };
+    safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(updated));
+
+    await this.logAudit({
+      action: 'WELCOME_PAGE_DRAFT_SAVED',
+      performedBy: actor.email,
+      affectedRecord: 'welcome-page-config',
+      metadata: { draftTitle: updated.draftHeroTitle }
+    });
+
+    return { success: true, config: updated };
+  },
+
+  async publishWelcomePage(
+    actor: AuthUser
+  ): Promise<{ success: boolean; config: WelcomePageConfig }> {
+    const current = await this.getWelcomePageConfig();
+    const published: WelcomePageConfig = {
+      ...current,
+      heroTitle: current.draftHeroTitle || current.heroTitle,
+      slogan: current.draftSlogan || current.slogan,
+      subtitle: current.draftSubtitle || current.subtitle,
+      introMessage: current.draftIntroMessage || current.introMessage,
+      heroImageUrl: current.draftHeroImageUrl || current.heroImageUrl,
+      hasUnpublishedDraft: false,
+      lastPublishedAt: new Date().toISOString(),
+      lastPublishedBy: actor.email,
+    };
+    safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(published));
+
+    await this.logAudit({
+      action: 'WELCOME_PAGE_PUBLISHED',
+      performedBy: actor.email,
+      affectedRecord: 'welcome-page-config',
+      metadata: { publishedTitle: published.heroTitle, publishedAt: published.lastPublishedAt }
+    });
+
+    return { success: true, config: published };
+  },
+
+  async revertWelcomePageToDefault(
+    actor: AuthUser
+  ): Promise<{ success: boolean; config: WelcomePageConfig }> {
+    safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(defaultWelcomePageConfig));
+
+    await this.logAudit({
+      action: 'WELCOME_PAGE_REVERTED_DEFAULT',
+      performedBy: actor.email,
+      affectedRecord: 'welcome-page-config',
+      metadata: { note: 'Welcome page configuration restored to official approved defaults' }
+    });
+
+    return { success: true, config: defaultWelcomePageConfig };
+  },
+
+  // ==========================================
+  // LEADERSHIP OFFICES & GRANULAR PERMISSIONS
+  // ==========================================
+  async getLeadershipOffices(): Promise<LeadershipOffice[]> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.LEADERSHIP_OFFICES);
+    if (!raw) return defaultSeedOffices;
+    try {
+      return JSON.parse(raw) as LeadershipOffice[];
+    } catch {
+      return defaultSeedOffices;
+    }
+  },
+
+  async saveLeadershipOffice(
+    officeData: Partial<LeadershipOffice>, 
+    actor: AuthUser
+  ): Promise<{ success: boolean; office: LeadershipOffice }> {
+    const offices = await this.getLeadershipOffices();
+    let savedOffice: LeadershipOffice;
+
+    if (officeData.id) {
+      const idx = offices.findIndex(o => o.id === officeData.id);
+      if (idx !== -1) {
+        offices[idx] = {
+          ...offices[idx],
+          ...officeData,
+          updatedAt: new Date().toISOString(),
+          updatedBy: actor.email,
+        } as LeadershipOffice;
+        savedOffice = offices[idx];
+      } else {
+        savedOffice = {
+          ...officeData,
+          id: officeData.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          updatedBy: actor.email,
+        } as LeadershipOffice;
+        offices.push(savedOffice);
+      }
+    } else {
+      savedOffice = {
+        id: `off-${Date.now()}`,
+        title: officeData.title || 'Untitled Office',
+        description: officeData.description || '',
+        category: officeData.category || 'COMMITTEE',
+        status: 'VACANT',
+        modules: officeData.modules || ['REGISTRY'],
+        granularPermissions: officeData.granularPermissions || { REGISTRY: ['VIEW'] },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        updatedBy: actor.email,
+      };
+      offices.push(savedOffice);
+    }
+
+    safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(offices));
+
+    await this.logAudit({
+      action: 'LEADERSHIP_OFFICE_SAVED',
+      performedBy: actor.email,
+      affectedRecord: savedOffice.id,
+      metadata: { title: savedOffice.title, category: savedOffice.category }
+    });
+
+    return { success: true, office: savedOffice };
+  },
+
+  async deleteLeadershipOffice(
+    officeId: string, 
+    actor: AuthUser
+  ): Promise<{ success: boolean; error?: string }> {
+    const offices = await this.getLeadershipOffices();
+    const idx = offices.findIndex(o => o.id === officeId);
+    if (idx === -1) return { success: false, error: 'Office not found' };
+
+    const removed = offices.splice(idx, 1)[0];
+    safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(offices));
+
+    // Clear office links from any user assigned
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    let usersUpdated = false;
+    users.forEach(u => {
+      if (u.officeId === officeId) {
+        delete u.officeId;
+        delete u.officeTitle;
+        delete u.assignedPermissions;
+        delete u.granularPermissions;
+        usersUpdated = true;
+      }
+    });
+    if (usersUpdated) {
+      safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    }
+
+    await this.logAudit({
+      action: 'LEADERSHIP_OFFICE_DELETED',
+      performedBy: actor.email,
+      affectedRecord: officeId,
+      metadata: { title: removed.title }
+    });
+
+    return { success: true };
+  },
+
+  async assignAlumnusToOffice(
+    params: {
+      officeId: string;
+      alumniNumber: string;
+      startDate?: string;
+      endDate?: string;
+    },
+    actor: AuthUser
+  ): Promise<{ success: boolean; error?: string; office?: LeadershipOffice }> {
+    const offices = await this.getLeadershipOffices();
+    const office = offices.find(o => o.id === params.officeId);
+    if (!office) return { success: false, error: 'Leadership office does not exist.' };
+
+    const cleanNum = params.alumniNumber.trim().toUpperCase();
+    const alumniList = await this.getAlumniList();
+    const targetAlumnus = alumniList.find(a => a.alumniNumber.toUpperCase() === cleanNum);
+
+    if (!targetAlumnus) {
+      return { success: false, error: `Alumnus with number "${cleanNum}" was not found in the verified registry.` };
+    }
+
+    // Eligibility verification (Section 7)
+    if (targetAlumnus.membershipStatus !== 'ACTIVE' && targetAlumnus.membershipStatus !== 'APPROVED') {
+      return { 
+        success: false, 
+        error: `Alumnus ${targetAlumnus.fullName || targetAlumnus.firstName} is not in good verified standing (${targetAlumnus.membershipStatus}). Verification is required before assigning leadership offices.` 
+      };
+    }
+
+    // Update office assignment
+    office.assignedAlumniId = targetAlumnus.internalId;
+    office.assignedAlumniNumber = targetAlumnus.alumniNumber;
+    office.assignedAlumniName = targetAlumnus.fullName || `${targetAlumnus.firstName} ${targetAlumnus.lastName}`;
+    office.assignedEmail = targetAlumnus.email;
+    office.appointmentStartDate = params.startDate || new Date().toISOString().split('T')[0];
+    office.appointmentEndDate = params.endDate;
+    office.status = 'ACTIVE';
+    office.updatedAt = new Date().toISOString();
+    office.updatedBy = actor.email;
+
+    safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(offices));
+
+    // Update user record with role and granular permissions
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
+    const targetEmail = targetAlumnus.email.toLowerCase();
+    const userIdx = users.findIndex(u => u.email.toLowerCase() === targetEmail);
+
+    if (userIdx !== -1) {
+      users[userIdx].officeId = office.id;
+      users[userIdx].officeTitle = office.title;
+      users[userIdx].assignedPermissions = office.modules;
+      users[userIdx].granularPermissions = office.granularPermissions;
+      users[userIdx].appointmentStatus = 'ACTIVE';
+      users[userIdx].appointmentStartDate = office.appointmentStartDate;
+      users[userIdx].appointmentEndDate = office.appointmentEndDate;
+      safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    } else {
+      // Create user record for this leader so they can log in and receive permissions
+      const newLeaderUser: AuthUser = {
+        uid: `usr-leader-${targetAlumnus.internalId}`,
+        email: targetAlumnus.email,
+        displayName: office.assignedAlumniName,
+        role: 'CUSTOM_STAFF',
+        alumniId: targetAlumnus.internalId,
+        alumniNumber: targetAlumnus.alumniNumber,
+        officeId: office.id,
+        officeTitle: office.title,
+        assignedPermissions: office.modules,
+        granularPermissions: office.granularPermissions,
+        appointmentStatus: 'ACTIVE',
+        appointmentStartDate: office.appointmentStartDate,
+        appointmentEndDate: office.appointmentEndDate,
+        active: true,
+      };
+      users.push(newLeaderUser);
+      safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    }
+
+    await this.logAudit({
+      action: 'LEADERSHIP_OFFICER_ASSIGNED',
+      performedBy: actor.email,
+      affectedRecord: office.id,
+      metadata: { 
+        office: office.title, 
+        alumnus: office.assignedAlumniName, 
+        alumniNumber: office.assignedAlumniNumber,
+        modules: office.modules
+      }
+    });
+
+    return { success: true, office };
+  },
+
+  async revokeOfficeAppointment(
+    officeId: string, 
+    actor: AuthUser
+  ): Promise<{ success: boolean; error?: string }> {
+    const offices = await this.getLeadershipOffices();
+    const office = offices.find(o => o.id === officeId);
+    if (!office) return { success: false, error: 'Office not found' };
+
+    const priorLeader = office.assignedAlumniName;
+    const priorEmail = office.assignedEmail?.toLowerCase();
+
+    office.assignedAlumniId = undefined;
+    office.assignedAlumniNumber = undefined;
+    office.assignedAlumniName = undefined;
+    office.assignedEmail = undefined;
+    office.appointmentStartDate = undefined;
+    office.appointmentEndDate = undefined;
+    office.status = 'VACANT';
+    office.updatedAt = new Date().toISOString();
+    office.updatedBy = actor.email;
+
+    safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(offices));
+
+    // Clear user permissions
+    if (priorEmail) {
+      const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const userIdx = users.findIndex(u => u.email.toLowerCase() === priorEmail);
+      if (userIdx !== -1) {
+        delete users[userIdx].officeId;
+        delete users[userIdx].officeTitle;
+        delete users[userIdx].assignedPermissions;
+        delete users[userIdx].granularPermissions;
+        users[userIdx].appointmentStatus = 'EXPIRED';
+        safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+      }
+    }
+
+    await this.logAudit({
+      action: 'LEADERSHIP_OFFICE_REVOKED',
+      performedBy: actor.email,
+      affectedRecord: officeId,
+      metadata: { office: office.title, priorLeader }
+    });
+
+    return { success: true };
+  },
+
+  // ==========================================
+  // MEMBER DATA EXPORTS (CSV, EXCEL, PDF)
+  // ==========================================
+  async getMembersForExport(filter?: MemberExportFilter): Promise<Array<{
+    alumniNumber: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    cohortYear: string;
+    status: string;
+    leadershipOffice: string;
+    joinedDate: string;
+    profession: string;
+    chapter: string;
+    verificationStatus?: string;
+    alumniRegistrationStatus?: string;
+    rawStatus?: string;
+  }>> {
+    const [alumniList, applications, users, offices] = await Promise.all([
+      this.getAlumniList(),
+      this.getApplications(),
+      Promise.resolve(JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]') as AuthUser[]),
+      this.getLeadershipOffices()
+    ]);
+
+    const results: Array<any> = [];
+
+    // Map verified alumni
+    alumniList.forEach(a => {
+      const assignedOffice = offices.find(o => o.assignedAlumniNumber === a.alumniNumber && o.status === 'ACTIVE');
+      const cohort = a.schoolHistory?.aLevel?.yearCompleted || a.schoolHistory?.oLevel?.yearCompleted || '';
+      
+      results.push({
+        alumniNumber: a.alumniNumber || 'N/A',
+        fullName: a.fullName || `${a.firstName} ${a.lastName}`,
+        email: a.email || 'N/A',
+        phone: a.phone || 'N/A',
+        cohortYear: String(cohort || 'Unknown'),
+        status: 'VERIFIED_ALUMNUS',
+        verificationStatus: 'VERIFIED',
+        alumniRegistrationStatus: 'COMPLETED',
+        leadershipOffice: assignedOffice ? assignedOffice.title : 'None',
+        joinedDate: a.createdAt ? new Date(a.createdAt).toLocaleDateString() : 'N/A',
+        profession: a.occupation || a.programme || 'Alumnus',
+        chapter: a.city ? `${a.city} Chapter` : 'National',
+        rawStatus: 'VERIFIED',
+        cohortNum: cohort ? Number(cohort) : 0,
+        officeId: assignedOffice?.id || 'NONE',
+      });
+    });
+
+    // Map pending applicants
+    applications.forEach(app => {
+      if (app.status === 'PENDING' || app.status === 'UNDER_REVIEW') {
+        const cohort = app.schoolHistory?.aLevel?.yearCompleted || app.schoolHistory?.oLevel?.yearCompleted || '';
+        results.push({
+          alumniNumber: 'Pending Allocation',
+          fullName: `${app.firstName} ${app.lastName}`,
+          email: app.email || 'N/A',
+          phone: app.phone || 'N/A',
+          cohortYear: String(cohort || 'Unknown'),
+          status: 'PENDING_VERIFICATION',
+          verificationStatus: 'PENDING',
+          alumniRegistrationStatus: 'SUBMITTED',
+          leadershipOffice: 'None',
+          joinedDate: app.submittedAt ? new Date(app.submittedAt).toLocaleDateString() : 'N/A',
+          profession: app.occupation || app.programme || 'Applicant',
+          chapter: app.city ? `${app.city} Chapter` : 'National',
+          rawStatus: 'PENDING',
+          cohortNum: cohort ? Number(cohort) : 0,
+          officeId: 'NONE',
+        });
+      }
+    });
+
+    // Map registered users who haven't completed alumni application
+    users.forEach(u => {
+      if (!u.alumniNumber && u.role !== 'SUPER_ADMIN') {
+        const alreadyInApps = applications.some(a => a.email.toLowerCase() === u.email.toLowerCase());
+        if (!alreadyInApps) {
+          results.push({
+            alumniNumber: 'Unregistered',
+            fullName: u.displayName || u.email.split('@')[0],
+            email: u.email,
+            phone: u.phone || 'N/A',
+            cohortYear: 'N/A',
+            status: 'UNREGISTERED_ACCOUNT',
+            verificationStatus: 'UNREGISTERED',
+            alumniRegistrationStatus: 'NOT_STARTED',
+            leadershipOffice: 'None',
+            joinedDate: 'Registered',
+            profession: 'User Account',
+            chapter: 'General',
+            rawStatus: 'UNREGISTERED',
+            cohortNum: 0,
+            officeId: 'NONE',
+          });
+        }
+      }
+    });
+
+    // Apply Filters if provided
+    if (!filter) {
+      return results;
+    }
+
+    return results.filter(item => {
+      if (filter.statusScope === 'VERIFIED' && item.rawStatus !== 'VERIFIED') return false;
+      if (filter.statusScope === 'PENDING' && item.rawStatus !== 'PENDING') return false;
+      if (filter.statusScope === 'UNREGISTERED' && item.rawStatus !== 'UNREGISTERED') return false;
+
+      if (filter.cohortYear && filter.cohortYear !== 'ALL') {
+        if (Number(item.cohortNum) !== Number(filter.cohortYear)) return false;
+      }
+
+      if (filter.officeId && filter.officeId !== 'ALL') {
+        if (item.officeId !== filter.officeId) return false;
+      }
+
+      if (filter.searchTerm && filter.searchTerm.trim()) {
+        const q = filter.searchTerm.trim().toLowerCase();
+        const matches = 
+          item.fullName.toLowerCase().includes(q) ||
+          item.email.toLowerCase().includes(q) ||
+          item.alumniNumber.toLowerCase().includes(q) ||
+          item.cohortYear.toLowerCase().includes(q) ||
+          item.leadershipOffice.toLowerCase().includes(q);
+        if (!matches) return false;
+      }
+
+      return true;
+    });
+  },
+
+  // Protect against Spreadsheet Formula Injection (CWE-1236)
+  sanitizeSpreadsheetCell(val: any): string {
+    if (val === null || val === undefined) return '';
+    const s = String(val).trim();
+    if (s.startsWith('=') || s.startsWith('+') || s.startsWith('-') || s.startsWith('@') || s.startsWith('\t') || s.startsWith('\r')) {
+      return `'${s}`;
+    }
+    return s;
+  },
+
+  async exportMembersToCsv(
+    filter: MemberExportFilter, 
+    actor: AuthUser
+  ): Promise<{ filename: string; content: string }> {
+    const data = await this.getMembersForExport(filter);
+    const headers = [
+      'Alumni Number',
+      'Full Name',
+      'Email Address',
+      'Phone Number',
+      'Cohort (Exit Year)',
+      'Verification Status',
+      'Leadership Office',
+      'Date Registered',
+      'Profession / Qualification',
+      'Chapter Affiliation'
+    ];
+
+    const rows = data.map(m => [
+      this.sanitizeSpreadsheetCell(m.alumniNumber),
+      this.sanitizeSpreadsheetCell(m.fullName),
+      this.sanitizeSpreadsheetCell(m.email),
+      this.sanitizeSpreadsheetCell(m.phone),
+      this.sanitizeSpreadsheetCell(m.cohortYear),
+      this.sanitizeSpreadsheetCell(m.status),
+      this.sanitizeSpreadsheetCell(m.leadershipOffice),
+      this.sanitizeSpreadsheetCell(m.joinedDate),
+      this.sanitizeSpreadsheetCell(m.profession),
+      this.sanitizeSpreadsheetCell(m.chapter),
+    ].map(cell => `"${cell.replace(/"/g, '""')}"`).join(','));
+
+    const csvContent = [headers.join(','), ...rows].join('\r\n');
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `MOSA_Member_Register_${dateStr}.csv`;
+
+    await this.logAudit({
+      action: 'MEMBER_DATA_EXPORT_CSV',
+      performedBy: actor.email,
+      affectedRecord: filename,
+      metadata: { filter, count: data.length }
+    });
+
+    return { filename, content: csvContent };
+  },
+
+  async exportMembersToXlsx(
+    filter: MemberExportFilter, 
+    actor: AuthUser
+  ): Promise<{ filename: string; content: string }> {
+    const data = await this.getMembersForExport(filter);
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `MOSA_Member_Register_${dateStr}.xlsx`;
+
+    // Standard XML Spreadsheet 2003 which Excel opens natively without external libraries
+    let xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="Header">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#0A271B"/>
+   </Borders>
+   <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#0A271B" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="RowEven">
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="MOSA Members">
+  <Table ss:DefaultColumnWidth="140">
+   <Row ss:Height="24">
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Alumni Number</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Full Name</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Email Address</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Phone Number</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Cohort Year</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Verification Status</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Leadership Office</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Registration Date</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Profession</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Chapter</Data></Cell>
+   </Row>`;
+
+    data.forEach((m, idx) => {
+      const styleId = idx % 2 === 1 ? ' ss:StyleID="RowEven"' : '';
+      xml += `
+   <Row${styleId}>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.alumniNumber)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.fullName)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.email)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.phone)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.cohortYear)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.status)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.leadershipOffice)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.joinedDate)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.profession)}</Data></Cell>
+    <Cell><Data ss:Type="String">${this.sanitizeSpreadsheetCell(m.chapter)}</Data></Cell>
+   </Row>`;
+    });
+
+    xml += `
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    await this.logAudit({
+      action: 'MEMBER_DATA_EXPORT_EXCEL',
+      performedBy: actor.email,
+      affectedRecord: filename,
+      metadata: { filter, count: data.length }
+    });
+
+    return { filename, content: xml };
+  },
+
+  async exportMembersToPdf(
+    filter: MemberExportFilter, 
+    actor: AuthUser
+  ): Promise<{ filename: string; doc: jsPDF }> {
+    const data = await this.getMembersForExport(filter);
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `MOSA_Member_Report_${dateStr}.pdf`;
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    // Brand Header banner
+    doc.setFillColor(10, 39, 27); // #0A271B
+    doc.rect(0, 0, 297, 26, 'F');
+
+    // Title
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.text('MANDELA OLD STUDENTS ASSOCIATION (MOSA)', 14, 11);
+
+    doc.setFontSize(9);
+    doc.setTextColor(252, 211, 77); // Gold
+    doc.text('OFFICIAL MEMBER REGISTER & LEADERSHIP AUDIT REPORT', 14, 18);
+
+    doc.setFontSize(8);
+    doc.setTextColor(203, 213, 225);
+    doc.text(`Generated: ${new Date().toLocaleString()} | Exported by: ${actor.email}`, 14, 23);
+
+    // Filter Summary Badge
+    doc.setFillColor(241, 245, 249);
+    doc.rect(14, 30, 269, 10, 'F');
+    doc.setFontSize(8);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`Scope: ${filter.statusScope}  |  Cohort: ${filter.cohortYear || 'ALL'}  |  Total Records: ${data.length}`, 18, 36);
+
+    // Table Header
+    let y = 46;
+    doc.setFillColor(17, 61, 43);
+    doc.rect(14, y, 269, 8, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.text('Number', 16, y + 5.5);
+    doc.text('Full Name', 45, y + 5.5);
+    doc.text('Email Address', 95, y + 5.5);
+    doc.text('Phone', 150, y + 5.5);
+    doc.text('Cohort', 185, y + 5.5);
+    doc.text('Status', 205, y + 5.5);
+    doc.text('Leadership Office', 240, y + 5.5);
+
+    y += 8;
+
+    // Rows
+    data.forEach((m, idx) => {
+      if (y > 185) {
+        doc.addPage();
+        y = 15;
+        // Repeat mini header
+        doc.setFillColor(17, 61, 43);
+        doc.rect(14, y, 269, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text('Number', 16, y + 5.5);
+        doc.text('Full Name', 45, y + 5.5);
+        doc.text('Email Address', 95, y + 5.5);
+        doc.text('Phone', 150, y + 5.5);
+        doc.text('Cohort', 185, y + 5.5);
+        doc.text('Status', 205, y + 5.5);
+        doc.text('Leadership Office', 240, y + 5.5);
+        y += 8;
+      }
+
+      if (idx % 2 === 1) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(14, y, 269, 7, 'F');
+      }
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(7.5);
+      doc.text(m.alumniNumber.slice(0, 15), 16, y + 4.8);
+      doc.text(m.fullName.slice(0, 25), 45, y + 4.8);
+      doc.text(m.email.slice(0, 30), 95, y + 4.8);
+      doc.text(m.phone.slice(0, 18), 150, y + 4.8);
+      doc.text(String(m.cohortYear).slice(0, 10), 185, y + 4.8);
+      doc.text(m.status.slice(0, 18), 205, y + 4.8);
+      doc.text(m.leadershipOffice.slice(0, 22), 240, y + 4.8);
+
+      y += 7;
+    });
+
+    await this.logAudit({
+      action: 'MEMBER_DATA_EXPORT_PDF',
+      performedBy: actor.email,
+      affectedRecord: filename,
+      metadata: { filter, count: data.length }
+    });
+
+    return { filename, doc };
+  },
+
+  // ==========================================
+  // SECRETARIAT OFFICIAL CONTACTS (Phase 7)
+  // ==========================================
+  async getSecretariatContacts(onlyActive = false): Promise<SecretariatContact[]> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.SECRETARIAT_CONTACTS);
+    let list: SecretariatContact[] = raw ? JSON.parse(raw) : defaultSeedSecretariatContacts;
+    if (onlyActive) {
+      list = list.filter(c => c.status === 'ACTIVE');
+    }
+    return list.sort((a, b) => a.displayOrder - b.displayOrder);
+  },
+
+  async saveSecretariatContact(contact: SecretariatContact, actorEmail = 'admin@massh.ac.ug'): Promise<SecretariatContact> {
+    const list = await this.getSecretariatContacts(false);
+    const existingIdx = list.findIndex(c => c.id === contact.id);
+    const updated = {
+      ...contact,
+      updatedAt: new Date().toISOString(),
+    };
+    if (existingIdx !== -1) {
+      list[existingIdx] = updated;
+    } else {
+      if (!updated.id) updated.id = `sec-${Date.now()}`;
+      list.push(updated);
+    }
+    safeStorage.setItem(STORAGE_KEYS.SECRETARIAT_CONTACTS, JSON.stringify(list));
+    await this.logAudit({
+      action: 'SECRETARIAT_CONTACT_SAVED',
+      performedBy: actorEmail,
+      affectedRecord: updated.name,
+      metadata: { title: updated.title, phone: updated.publishedPhone, whatsApp: updated.whatsAppNumber },
+    });
+    return updated;
+  },
+
+  async deleteSecretariatContact(id: string, actorEmail = 'admin@massh.ac.ug'): Promise<boolean> {
+    const list = await this.getSecretariatContacts(false);
+    const target = list.find(c => c.id === id);
+    const updated = list.filter(c => c.id !== id);
+    safeStorage.setItem(STORAGE_KEYS.SECRETARIAT_CONTACTS, JSON.stringify(updated));
+    if (target) {
+      await this.logAudit({
+        action: 'SECRETARIAT_CONTACT_DELETED',
+        performedBy: actorEmail,
+        affectedRecord: target.name,
+        metadata: { title: target.title },
+      });
+    }
+    return true;
+  },
+
+  // ==========================================
+  // LEGACY ALUMNI PHYSICAL REGISTER (Phase 3 & 4)
+  // ==========================================
+  async getLegacyAlumni(): Promise<LegacyAlumniRecord[]> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.LEGACY_ALUMNI);
+    return raw ? JSON.parse(raw) : defaultSeedLegacyAlumni;
+  },
+
+  async importLegacyAlumni(records: LegacyAlumniRecord[], actorEmail = 'admin@massh.ac.ug'): Promise<{ importedCount: number; duplicateCount: number }> {
+    const current = await this.getLegacyAlumni();
+    const existingNumbers = new Set(current.map(r => this.normalizeAlumniNumber(r.membershipNumber)));
+    let importedCount = 0;
+    let duplicateCount = 0;
+
+    for (const rec of records) {
+      const norm = this.normalizeAlumniNumber(rec.membershipNumber);
+      if (existingNumbers.has(norm)) {
+        duplicateCount++;
+      } else {
+        current.push({
+          ...rec,
+          id: rec.id || `leg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          membershipNumber: norm,
+          importedAt: new Date().toISOString(),
+          verifiedStatus: rec.verifiedStatus || 'TRUSTED',
+        });
+        existingNumbers.add(norm);
+        importedCount++;
+      }
+    }
+
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(current));
+
+    // Also register legacy numbers in permanent allocation ledger
+    const settings = await this.getSystemSettings();
+    const usedRegistry = new Set(settings.usedMANumbersRegistry || []);
+    records.forEach(r => usedRegistry.add(this.normalizeAlumniNumber(r.membershipNumber)));
+    settings.usedMANumbersRegistry = Array.from(usedRegistry);
+    await this.updateSystemSettings({ usedMANumbersRegistry: settings.usedMANumbersRegistry });
+
+    await this.logAudit({
+      action: 'LEGACY_ALUMNI_REGISTER_IMPORTED',
+      performedBy: actorEmail,
+      affectedRecord: `${importedCount} records`,
+      metadata: { importedCount, duplicateCount },
+    });
+
+    return { importedCount, duplicateCount };
+  },
+
+  async saveLegacyAlumniRecord(record: LegacyAlumniRecord, actorEmail = 'admin@massh.ac.ug'): Promise<LegacyAlumniRecord> {
+    const list = await this.getLegacyAlumni();
+    const idx = list.findIndex(r => r.id === record.id || this.normalizeAlumniNumber(r.membershipNumber) === this.normalizeAlumniNumber(record.membershipNumber));
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], ...record };
+    } else {
+      list.push(record);
+    }
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(list));
+    return record;
+  },
+
+  async deleteLegacyAlumniRecord(id: string, actorEmail = 'admin@massh.ac.ug'): Promise<boolean> {
+    const list = await this.getLegacyAlumni();
+    const updated = list.filter(r => r.id !== id);
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(updated));
+    return true;
+  },
+
+  // ==========================================
+  // PERMANENT RECORD DELETION WITH LEDGER RETENTION (Phase 4 & 11)
+  // ==========================================
+  async deleteAlumnus(idOrNumber: string, actorEmail = 'admin@massh.ac.ug', reason = 'Administrative deletion'): Promise<{ success: boolean; error?: string }> {
+    try {
+      const list = await this.getAlumniList();
+      const normTarget = this.normalizeAlumniNumber(idOrNumber);
+      const target = list.find(a => a.internalId === idOrNumber || this.normalizeAlumniNumber(a.alumniNumber) === normTarget);
+      if (!target) return { success: false, error: 'Alumni member not found' };
+
+      // Number MUST remain permanently reserved in the ledger
+      const settings = await this.getSystemSettings();
+      const usedRegistry = new Set(settings.usedMANumbersRegistry || []);
+      usedRegistry.add(this.normalizeAlumniNumber(target.alumniNumber));
+      settings.usedMANumbersRegistry = Array.from(usedRegistry);
+      await this.updateSystemSettings({ usedMANumbersRegistry: settings.usedMANumbersRegistry });
+
+      // Remove from active alumni collection
+      const remaining = list.filter(a => a.internalId !== target.internalId);
+      safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify(remaining));
+
+      if (isFirebaseConfigured() && db) {
+        try {
+          await updateDoc(doc(db, 'alumni', target.internalId), {
+            membershipStatus: 'INACTIVE',
+            deletedAt: new Date().toISOString(),
+            deletedBy: actorEmail,
+            deletionReason: reason,
+          });
+        } catch (e) {
+          console.warn('Firebase update failed during deleteAlumnus:', e);
+        }
+      }
+
+      await this.logAudit({
+        action: 'MEMBER_DELETED',
+        performedBy: actorEmail,
+        affectedRecord: target.alumniNumber,
+        metadata: {
+          alumnusId: target.internalId,
+          alumnusName: target.fullName || `${target.firstName} ${target.lastName}`,
+          permanentReservedNumber: target.alumniNumber,
+          reason,
+        },
+      });
+
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to delete member' };
+    }
   },
 
   // Save custom Firebase configuration

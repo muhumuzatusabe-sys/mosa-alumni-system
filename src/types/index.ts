@@ -9,7 +9,8 @@ export type UserRole =
   | 'PUBLICITY' 
   | 'CHAPTER_ADMIN' 
   | 'CUSTOM_STAFF'
-  | 'ALUMNI';
+  | 'ALUMNI'
+  | 'USER';
 
 /** Provenance of a registry record: who physically entered the data. */
 export interface RegisteredByInfo {
@@ -163,6 +164,9 @@ export interface AlumniApplication {
   registrationMode?: RegistrationMode;
   registeredBy?: RegisteredByInfo;
   accountActivated?: boolean;
+  cohortYear?: string;
+  exitYear?: string;
+  existingAlumniNumber?: string;
 }
 
 export interface SystemSettings {
@@ -220,7 +224,15 @@ export type PermissionModule =
   | 'SETTINGS'
   | 'USERS'
   | 'AUDIT'
-  | 'REPORTS';
+  | 'REPORTS'
+  | 'OVERVIEW'
+  | 'VERIFICATION'
+  | 'NUMBERS'
+  | 'LEADERSHIP'
+  | 'PERMISSIONS'
+  | 'WELCOME_PAGE'
+  | 'EXPORTS'
+  | 'SECURITY';
 
 export type PermissionAction =
   | 'VIEW'
@@ -334,6 +346,7 @@ export interface AuditLog {
   affectedRecord: string;
   timestamp: string;
   metadata?: Record<string, any>;
+  details?: string;
 }
 
 export interface AuthUser {
@@ -350,6 +363,14 @@ export interface AuthUser {
   active?: boolean;
   assignedPermissions?: PermissionModule[];
   roleTitle?: string;
+  alumniOnboardingDecision?: 'PENDING' | 'SKIPPED' | 'SUBMITTED' | 'COMPLETED';
+  mustChangePassword?: boolean;
+  officeId?: string;
+  officeTitle?: string;
+  appointmentStatus?: 'ACTIVE' | 'SUSPENDED' | 'EXPIRED';
+  appointmentStartDate?: string;
+  appointmentEndDate?: string;
+  granularPermissions?: Partial<Record<PermissionModule, PermissionAction[]>>;
 }
 
 export type ChapterStatus = 'ACTIVE' | 'INACTIVE';
@@ -417,6 +438,8 @@ export interface MOSAEvent {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+  isFeatured?: boolean;
+  isPublished?: boolean;
 }
 
 export interface EventRegistration {
@@ -517,6 +540,29 @@ export interface DonationCampaign {
   endDate?: string;
   createdAt: string;
   createdBy: string;
+  paymentInstructions?: string;
+  isFeatured?: boolean;
+}
+
+export interface SecretariatContact {
+  id: string;
+  name: string;
+  title: string;
+  publishedPhone: string;
+  whatsAppNumber: string;
+  email?: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  displayOrder?: number;
+}
+
+export interface LegacyAlumniRecord {
+  id: string;
+  alumniNumber: string; // e.g. "MA. 0001"
+  fullName: string;
+  cohortYear?: number;
+  level?: 'O_LEVEL' | 'A_LEVEL' | 'BOTH';
+  verifiedDate?: string;
+  notes?: string;
 }
 
 // ==========================================
@@ -1119,4 +1165,98 @@ export interface CardVerificationResult {
   issuedAt?: string;
   expiresAt?: string;
 }
+
+// ==========================================
+// LEADERSHIP OFFICES & GRANULAR PERMISSIONS
+// ==========================================
+
+export type OfficeCategory = 'EXECUTIVE' | 'SECRETARIAT' | 'COMMITTEE' | 'REGIONAL' | 'SPECIAL';
+
+export interface LeadershipOffice {
+  id: string;
+  title: string;
+  description: string;
+  category: OfficeCategory;
+  assignedAlumniId?: string;
+  assignedAlumniNumber?: string;
+  assignedAlumniName?: string;
+  assignedEmail?: string;
+  appointmentStartDate?: string;
+  appointmentEndDate?: string;
+  status: 'ACTIVE' | 'VACANT' | 'SUSPENDED' | 'EXPIRED';
+  modules: PermissionModule[];
+  granularPermissions: Partial<Record<PermissionModule, PermissionAction[]>>;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+// ==========================================
+// MOSA WELCOME PAGE MANAGEMENT
+// ==========================================
+
+export interface WelcomePageConfig {
+  heroTitle: string; // e.g. "WELCOME TO MOSA"
+  slogan: string; // e.g. "PROUDLY MANDELIAN"
+  subtitle: string; // e.g. "One family. One legacy. A lifetime of connection."
+  introMessage: string; // e.g. "Your journey with the Mandela Old Students Association starts here."
+  heroImageUrl?: string;
+  draftHeroTitle?: string;
+  draftSlogan?: string;
+  draftSubtitle?: string;
+  draftIntroMessage?: string;
+  draftHeroImageUrl?: string;
+  hasUnpublishedDraft?: boolean;
+  lastPublishedAt?: string;
+  lastPublishedBy?: string;
+}
+
+// ==========================================
+// MEMBER DATA EXPORTS
+// ==========================================
+
+export interface MemberExportFilter {
+  statusScope: 'ALL' | 'VERIFIED' | 'PENDING' | 'UNREGISTERED';
+  cohortYear?: number | 'ALL';
+  officeId?: string | 'ALL';
+  searchTerm?: string;
+}
+
+// ==========================================
+// SECRETARIAT & OFFICIAL CONTACTS
+// ==========================================
+export interface SecretariatContact {
+  id: string;
+  name: string;
+  title: string;
+  publishedPhone: string;
+  whatsAppNumber: string;
+  email?: string;
+  officeCategory?: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  displayOrder: number;
+  notes?: string;
+  updatedAt?: string;
+}
+
+// ==========================================
+// LEGACY ALUMNI PHYSICAL REGISTER
+// ==========================================
+export interface LegacyAlumniRecord {
+  id: string;
+  membershipNumber: string;
+  fullName: string;
+  cohortYear?: string | number;
+  phone?: string;
+  email?: string;
+  physicalRegisterPage?: string;
+  verifiedStatus: 'TRUSTED' | 'FLAGGED' | 'LINKED' | 'VERIFIED';
+  linkedUserId?: string;
+  linkedAlumniId?: string;
+  linkedDate?: string;
+  importedAt?: string;
+  notes?: string;
+}
+
+
 

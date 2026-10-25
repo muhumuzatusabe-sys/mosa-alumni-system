@@ -14,11 +14,15 @@ import {
   QrCode,
   ClipboardCheck,
   ShieldCheck,
-  Menu
+  Menu,
+  Clock,
+  UserPlus,
+  GraduationCap
 } from 'lucide-react';
 import { 
   AuthUser, 
   AlumniProfile, 
+  AlumniApplication,
   DonationCampaign, 
   PaymentTransaction 
 } from '../types';
@@ -44,6 +48,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onSelectAlumni,
 }) => {
   const [memberProfile, setMemberProfile] = useState<AlumniProfile | null>(null);
+  const [userApplication, setUserApplication] = useState<AlumniApplication | null>(null);
   const [memberPayments, setMemberPayments] = useState<PaymentTransaction[]>([]);
   const [activeCampaigns, setActiveCampaigns] = useState<DonationCampaign[]>([]);
   const [compactAlumni, setCompactAlumni] = useState<AlumniProfile[]>([]);
@@ -80,10 +85,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
           userProfile = alumniList.find(a => a.email.toLowerCase() === currentUser.email.toLowerCase()) || null;
         }
 
-        // If no authenticated profile, provide default preview alumnus
-        if (!userProfile && alumniList.length > 0) {
-          userProfile = alumniList[0];
+        // Check if user has an application on file
+        let appOnRecord: AlumniApplication | null = null;
+        if (currentUser?.email) {
+          appOnRecord = await dataService.getApplicationByEmail(currentUser.email);
         }
+        setUserApplication(appOnRecord);
+
+        // Explicitly set genuine profile without fabricating alumni information
         setMemberProfile(userProfile);
 
         // Member contributions
@@ -139,124 +148,331 @@ export const HomeView: React.FC<HomeViewProps> = ({
             gap: '1.25rem',
           }}
         >
-          {/* Member Photo Block with Exact Heading */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
-            <span
-              style={{
-                fontSize: '0.66rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.07em',
-                color: '#FCD34D',
-                fontWeight: 800,
-              }}
-            >
-              MASH Alumni Photo
-            </span>
-
-            {memberProfile?.photoUrl ? (
-              <img
-                src={memberProfile.photoUrl}
-                alt={memberProfile.firstName || 'MASSH Alumnus'}
-                style={{
-                  width: '58px',
-                  height: '58px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '2px solid #FBBF24',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: '58px',
-                  height: '58px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #D97706, #B45309)',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.25rem',
-                  fontWeight: 800,
-                  border: '2px solid #FDE68A',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
-                }}
-              >
-                {memberProfile ? `${memberProfile.firstName?.[0] || 'M'}${memberProfile.lastName?.[0] || 'A'}` : 'MA'}
-              </div>
-            )}
-          </div>
-
-          {/* Member Details Hierarchy */}
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
-              MASSH ALUMNI PORTAL
-            </div>
-
-            <h2
-              style={{
-                fontSize: '1.25rem',
-                color: '#FFFFFF',
-                margin: '0.15rem 0 0.35rem 0',
-                fontWeight: 800,
-                letterSpacing: '-0.01em',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {memberProfile?.fullName || (memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : 'Muhammad Zatusave')}
-            </h2>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <span
-                style={{
-                  fontFamily: 'monospace',
-                  fontWeight: 800,
-                  fontSize: '0.82rem',
-                  color: '#FDE68A',
-                  background: 'rgba(217, 119, 6, 0.25)',
-                  padding: '0.2rem 0.55rem',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(245, 158, 11, 0.4)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                }}
-              >
-                <Award size={13} color="#FBBF24" />
-                <span>{memberProfile?.alumniNumber || 'MA. 0001'}</span>
-              </span>
-
-              {(memberProfile?.verifiedAt || memberProfile?.membershipStatus === 'ACTIVE' || memberProfile?.membershipStatus === 'APPROVED' || !memberProfile) && (
+          {/* CASE 1: VERIFIED ALUMNUS PROFILE */}
+          {memberProfile && (memberProfile.membershipStatus === 'ACTIVE' || memberProfile.membershipStatus === 'APPROVED' || memberProfile.verifiedAt) ? (
+            <>
+              {/* Member Photo Block with Exact Heading */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
                 <span
                   style={{
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    color: '#D1FAE5',
-                    background: 'rgba(5, 150, 105, 0.3)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '999px',
-                    border: '1px solid rgba(16, 185, 129, 0.45)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
+                    fontSize: '0.66rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    color: '#FCD34D',
+                    fontWeight: 800,
                   }}
                 >
-                  <CheckCircle2 size={12} color="#34D399" />
-                  <span>Verified Member</span>
+                  MASH Alumni Photo
                 </span>
-              )}
 
-              {memberProfile?.city && (
-                <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <MapPin size={12} color="#FBBF24" />
-                  <span>{`${memberProfile.city} Chapter`}</span>
+                {memberProfile.photoUrl ? (
+                  <img
+                    src={memberProfile.photoUrl}
+                    alt={memberProfile.firstName || 'MASSH Alumnus'}
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid #FBBF24',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #D97706, #B45309)',
+                      color: '#FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.25rem',
+                      fontWeight: 800,
+                      border: '2px solid #FDE68A',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                    }}
+                  >
+                    {`${memberProfile.firstName?.[0] || 'M'}${memberProfile.lastName?.[0] || 'A'}`}
+                  </div>
+                )}
+              </div>
+
+              {/* Member Details Hierarchy */}
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
+                  MASSH ALUMNI PORTAL
+                </div>
+
+                <h2
+                  style={{
+                    fontSize: '1.25rem',
+                    color: '#FFFFFF',
+                    margin: '0.15rem 0 0.35rem 0',
+                    fontWeight: 800,
+                    letterSpacing: '-0.01em',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {memberProfile.fullName || `${memberProfile.firstName} ${memberProfile.lastName}`}
+                </h2>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <span
+                    style={{
+                      fontFamily: 'monospace',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      color: '#FDE68A',
+                      background: 'rgba(217, 119, 6, 0.25)',
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(245, 158, 11, 0.4)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <Award size={13} color="#FBBF24" />
+                    <span>{memberProfile.alumniNumber}</span>
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      color: '#D1FAE5',
+                      background: 'rgba(5, 150, 105, 0.3)',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '999px',
+                      border: '1px solid rgba(16, 185, 129, 0.45)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                    }}
+                  >
+                    <CheckCircle2 size={12} color="#34D399" />
+                    <span>Verified Member</span>
+                  </span>
+
+                  {memberProfile.city && (
+                    <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <MapPin size={12} color="#FBBF24" />
+                      <span>{`${memberProfile.city} Chapter`}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : userApplication ? (
+            /* CASE 2: REGISTRATION SUBMITTED & AWAITING VERIFICATION */
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                <span
+                  style={{
+                    fontSize: '0.66rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    color: '#FCD34D',
+                    fontWeight: 800,
+                  }}
+                >
+                  Alumni Membership
                 </span>
-              )}
-            </div>
-          </div>
+
+                <div
+                  style={{
+                    width: '58px',
+                    height: '58px',
+                    borderRadius: '50%',
+                    background: 'rgba(245, 158, 11, 0.2)',
+                    color: '#FCD34D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px dashed #FBBF24',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
+                  }}
+                >
+                  <Clock size={24} />
+                </div>
+              </div>
+
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
+                  MASSH ALUMNI PORTAL
+                </div>
+
+                <h2
+                  style={{
+                    fontSize: '1.25rem',
+                    color: '#FFFFFF',
+                    margin: '0.15rem 0 0.35rem 0',
+                    fontWeight: 800,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {[userApplication.firstName, userApplication.lastName].filter(Boolean).join(' ') || currentUser?.displayName || 'Alumni Applicant'}
+                </h2>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <span
+                    style={{
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      color: '#FDE68A',
+                      background: 'rgba(217, 119, 6, 0.2)',
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(245, 158, 11, 0.3)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <Clock size={13} color="#FBBF24" />
+                    <span>Pending Verification</span>
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      color: '#FEF3C7',
+                      background: 'rgba(217, 119, 6, 0.35)',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '999px',
+                      border: '1px solid rgba(251, 191, 36, 0.45)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                    }}
+                  >
+                    <Clock size={12} color="#FDE68A" />
+                    <span>Application Under Review</span>
+                  </span>
+
+                  <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>
+                    Submitted {userApplication.submittedAt ? new Date(userApplication.submittedAt).toLocaleDateString() : 'recently'}
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : (
+            /* CASE 3: AUTHENTICATED USER — NOT YET REGISTERED AS ALUMNUS (Section 5 Requirement) */
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
+                <span
+                  style={{
+                    fontSize: '0.66rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    color: '#FCD34D',
+                    fontWeight: 800,
+                  }}
+                >
+                  Alumni Membership
+                </span>
+
+                <div
+                  style={{
+                    width: '58px',
+                    height: '58px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    color: '#CBD5E1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                  }}
+                >
+                  <GraduationCap size={24} color="#94A3B8" />
+                </div>
+              </div>
+
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
+                  MASSH ALUMNI PORTAL
+                </div>
+
+                <h2
+                  style={{
+                    fontSize: '1.25rem',
+                    color: '#FFFFFF',
+                    margin: '0.15rem 0 0.35rem 0',
+                    fontWeight: 800,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {currentUser?.displayName && currentUser.displayName.trim() ? currentUser.displayName : 'No name allocated'}
+                </h2>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <span
+                    style={{
+                      fontFamily: 'monospace',
+                      fontWeight: 600,
+                      fontSize: '0.8rem',
+                      color: '#CBD5E1',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: '6px',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                    }}
+                  >
+                    No alumni number allocated
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      color: '#E2E8F0',
+                      background: 'rgba(100, 116, 139, 0.3)',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '999px',
+                      border: '1px solid rgba(148, 163, 184, 0.35)',
+                    }}
+                  >
+                    Not yet registered
+                  </span>
+
+                  {/* Subtle Register as Alumnus Action (Section 5) */}
+                  <button
+                    id="btn-home-pass-register"
+                    onClick={onOpenRegister}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      background: 'linear-gradient(135deg, #C68A24 0%, #9A6814 100%)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '0.35rem 0.75rem',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(198, 138, 36, 0.3)',
+                      transition: 'transform 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+                  >
+                    <UserPlus size={13} />
+                    <span>Register as Alumnus</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

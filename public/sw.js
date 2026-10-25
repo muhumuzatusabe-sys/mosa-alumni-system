@@ -1,7 +1,7 @@
-// MASSH ALUMNI PORTAL Service Worker v2.0.0
+// MASSH ALUMNI PORTAL Service Worker v3.0.0
 // Caches core application shells, fonts, brand assets, and offline membership card passes
 
-const CACHE_NAME = 'massh-alumni-cache-v2';
+const CACHE_NAME = 'massh-alumni-cache-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

@@ -16,10 +16,14 @@ import { AlumniRegistrationWizard } from './components/AlumniRegistrationWizard'
 import { AlumniProfileModal } from './components/AlumniProfileModal';
 import { AlumniDashboardView } from './components/AlumniDashboardView';
 import { AuthModal } from './components/AuthModal';
+import { AuthenticationGate } from './components/AuthenticationGate';
+import { AlumniOnboardingScreen } from './components/AlumniOnboardingScreen';
 import { PublicVerifyAlumniModal } from './components/PublicVerifyAlumniModal';
 import { NotificationsModal } from './components/NotificationsModal';
 import { NotificationsView } from './components/NotificationsView';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { MOSAWelcomeView } from './components/MOSAWelcomeView';
+import { SuperAdminPasswordChangeModal } from './components/SuperAdminPasswordChangeModal';
 import { dataService } from './services/dataService';
 import { isStaffRole } from './services/governanceService';
 import { MemberAttendanceView } from './components/MemberAttendanceView';
@@ -27,7 +31,7 @@ import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { ElectionsHub } from './components/ElectionsHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
-import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2 } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Application Mode: Member Portal vs Dedicated Admin Control Panel
@@ -37,7 +41,9 @@ export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [tabHistory, setTabHistory] = useState<string[]>(['home']);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [authResolving, setAuthResolving] = useState<boolean>(true);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState<number>(0);
+  const [showAuthGate, setShowAuthGate] = useState<boolean>(false);
 
   const handleNavigate = (tab: string) => {
     if (tab === currentTab) return;
@@ -77,6 +83,7 @@ export const App: React.FC = () => {
       case 'my-profile': return 'My Alumni Dashboard';
       case 'opportunities': return 'Opportunities & Mentorship Hub';
       case 'elections': return 'Elections & Digital Voting';
+      case 'welcome': return 'MOSA Welcome Experience';
       default: return 'Alumni Services';
     }
   };
@@ -130,7 +137,14 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
-    refreshUserData();
+    const initApp = async () => {
+      try {
+        await refreshUserData();
+      } finally {
+        setAuthResolving(false);
+      }
+    };
+    initApp();
 
     // Check for ?verify-card= query parameter from scannable QR code
     if (typeof window !== 'undefined' && window.location.search) {
@@ -148,6 +162,7 @@ export const App: React.FC = () => {
     setCurrentUser(null);
     setPortalMode('member');
     setCurrentTab('home');
+    setTabHistory(['home']);
   };
 
   const handleLoginSuccess = (user: AuthUser) => {
@@ -168,9 +183,196 @@ export const App: React.FC = () => {
     }
   };
 
-  // If in Dedicated Admin Mode and authenticated as Admin or Executive Staff
+  // ==============================================================
+  // 1. SESSION RESOLUTION LOADING STATE (Requirement Section 1)
+  // ==============================================================
+  if (authResolving) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'radial-gradient(ellipse at top, #113D2B 0%, #0A271B 65%, #05160F 100%)',
+          color: '#FFFFFF',
+          padding: '1.5rem',
+        }}
+      >
+        <div
+          style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #C68A24 0%, #9A6814 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '1.25rem',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+            border: '2px solid rgba(255, 255, 255, 0.25)',
+          }}
+        >
+          <GraduationCap size={34} color="#FFFFFF" />
+        </div>
+        <div
+          style={{
+            fontSize: '0.74rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: '#FCD34D',
+            fontWeight: 800,
+            marginBottom: '0.25rem',
+          }}
+        >
+          Mandela Old Students Association
+        </div>
+        <h1
+          style={{
+            fontSize: '1.45rem',
+            fontWeight: 900,
+            color: '#FFFFFF',
+            margin: '0 0 1.25rem 0',
+          }}
+        >
+          MASSH ALUMNI PORTAL
+        </h1>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            color: '#CBD5E1',
+            fontSize: '0.88rem',
+            background: 'rgba(255, 255, 255, 0.08)',
+            padding: '0.5rem 1rem',
+            borderRadius: '999px',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+          }}
+        >
+          <Loader2 size={17} className="animate-spin" />
+          <span>Restoring authenticated session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // ==============================================================
+  // 2. MOSA WELCOME VIEW & AUTHENTICATION GATE
+  // Public visitors see the official MOSA Welcome Experience by default
+  // ==============================================================
+  if (!currentUser) {
+    if (showAuthGate) {
+      return (
+        <AuthenticationGate
+          onLoginSuccess={(user) => {
+            setShowAuthGate(false);
+            handleLoginSuccess(user);
+          }}
+          onCancel={() => setShowAuthGate(false)}
+        />
+      );
+    }
+
+    return (
+      <>
+        <MOSAWelcomeView
+          currentUser={null}
+          onOpenLogin={() => setShowAuthGate(true)}
+          onOpenRegisterAccount={() => setShowAuthGate(true)}
+          onOpenAlumniRegistration={() => setIsRegisterOpen(true)}
+          onOpenVerify={() => setIsVerifyOpen(true)}
+          onGoToPortal={() => setShowAuthGate(true)}
+          onGoToAdmin={() => setShowAuthGate(true)}
+        />
+        {isVerifyOpen && (
+          <PublicVerifyAlumniModal
+            isOpen={isVerifyOpen}
+            onClose={() => setIsVerifyOpen(false)}
+            initialQuery={verifyInitialQuery}
+          />
+        )}
+        {isRegisterOpen && (
+          <AlumniRegistrationWizard
+            isOpen={isRegisterOpen}
+            onClose={() => setIsRegisterOpen(false)}
+            onSuccess={() => {
+              setIsRegisterOpen(false);
+              setShowAuthGate(true);
+            }}
+            currentUser={null}
+          />
+        )}
+      </>
+    );
+  }
+
+  // ==============================================================
+  // 2.5. SUPER ADMIN FORCED PASSWORD CHANGE (Requirement Section 4)
+  // Blocks admin dashboard access until initial temporary password replaced
+  // ==============================================================
+  if (currentUser.mustChangePassword && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN')) {
+    return (
+      <SuperAdminPasswordChangeModal
+        currentUser={currentUser}
+        onSuccess={() => {
+          const updated = dataService.getCurrentUser();
+          if (updated) setCurrentUser(updated);
+        }}
+        onCancel={() => {
+          handleLogout();
+        }}
+      />
+    );
+  }
+
+  // ==============================================================
+  // 3. OPTIONAL ALUMNI ONBOARDING (Requirement Section 3 & 4)
+  // Presented immediately after account creation
+  // ==============================================================
+  if (currentUser.alumniOnboardingDecision === 'PENDING') {
+    return (
+      <>
+        <AlumniOnboardingScreen
+          currentUser={currentUser}
+          onRegister={() => setIsRegisterOpen(true)}
+          onSkip={async () => {
+            await dataService.skipAlumniOnboarding(currentUser.uid);
+            setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'SKIPPED' } : null);
+            setCurrentTab('welcome');
+          }}
+        />
+        {isRegisterOpen && (
+          <AlumniRegistrationWizard
+            isOpen={isRegisterOpen}
+            onClose={() => {
+              setIsRegisterOpen(false);
+              const latestUser = dataService.getCurrentUser();
+              if (latestUser) {
+                setCurrentUser(latestUser);
+              } else {
+                setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
+              }
+              refreshUserData();
+            }}
+            onSuccess={async () => {
+              await dataService.completeAlumniOnboarding(currentUser.uid);
+              refreshUserData();
+            }}
+            currentUser={currentUser}
+          />
+        )}
+      </>
+    );
+  }
+
+  // ==============================================================
+  // 4. DEDICATED ADMINISTRATOR ACCESS (Requirement Section 5)
+  // Ordinary accounts never receive administrative privileges automatically
+  // ==============================================================
   if (portalMode === 'admin') {
-    if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role))) {
+    if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) {
       return (
         <AdminControlPanel
           currentUser={currentUser}
@@ -179,44 +381,7 @@ export const App: React.FC = () => {
         />
       );
     } else {
-      // Admin authentication prompt
-      return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0A271B', padding: '1.5rem' }}>
-          <div className="mosa-card" style={{ maxWidth: '480px', width: '100%', padding: '2.5rem', textAlign: 'center', background: '#FFFFFF', border: '1px solid #E5DFD1' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem auto' }}>
-              <ShieldCheck size={36} color="#B45309" />
-            </div>
-            <h2 style={{ fontSize: '1.4rem', color: '#0B271C', marginBottom: '0.5rem' }}>
-              MOSA Administrative Portal
-            </h2>
-            <p style={{ color: '#64748B', fontSize: '0.9rem', marginBottom: '1.75rem', lineHeight: '1.6' }}>
-              Access to the administrative control suite, member reviews, and system settings is restricted to authorized MASSH administrators.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <button
-                className="btn btn-primary"
-                onClick={() => openAuth('admin')}
-                style={{ width: '100%', padding: '0.85rem' }}
-              >
-                Sign In as Administrator
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setPortalMode('member')}
-                style={{ width: '100%', padding: '0.85rem' }}
-              >
-                Return to Member Portal
-              </button>
-            </div>
-          </div>
-          <AuthModal
-            isOpen={isAuthOpen}
-            initialPortal={authPortal}
-            onClose={() => setIsAuthOpen(false)}
-            onLoginSuccess={handleLoginSuccess}
-          />
-        </div>
-      );
+      setPortalMode('member');
     }
   }
 
@@ -304,6 +469,19 @@ export const App: React.FC = () => {
             onBack={handleBack}
             onOpenAdmin={handleAdminGateClick}
             onRefreshNotifs={refreshUserData}
+          />
+        )}
+
+        {/* 0.5. OFFICIAL MOSA WELCOME VIEW */}
+        {currentTab === 'welcome' && (
+          <MOSAWelcomeView
+            currentUser={currentUser}
+            onOpenLogin={() => openAuth('alumni')}
+            onOpenRegisterAccount={() => openAuth('alumni')}
+            onOpenAlumniRegistration={() => setIsRegisterOpen(true)}
+            onOpenVerify={() => setIsVerifyOpen(true)}
+            onGoToPortal={() => handleNavigate('home')}
+            onGoToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : undefined}
           />
         )}
 
@@ -501,12 +679,21 @@ export const App: React.FC = () => {
         unreadNotificationsCount={unreadNotifsCount}
       />
 
-      {/* Member Registration Wizard with Direct Image Upload & Auto-Approval */}
+      {/* Member Registration Wizard */}
       {isRegisterOpen && (
         <AlumniRegistrationWizard
           isOpen={isRegisterOpen}
-          onClose={() => setIsRegisterOpen(false)}
-          onSuccess={refreshUserData}
+          onClose={() => {
+            setIsRegisterOpen(false);
+            refreshUserData();
+          }}
+          onSuccess={async () => {
+            if (currentUser) {
+              await dataService.completeAlumniOnboarding(currentUser.uid);
+              setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
+            }
+            refreshUserData();
+          }}
           currentUser={currentUser}
         />
       )}

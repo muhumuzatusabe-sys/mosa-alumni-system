@@ -4,7 +4,8 @@ import {
   AlumniProfile, 
   ApplicationStatus, 
   MembershipStatus, 
-  SystemSettings 
+  SystemSettings,
+  LegacyAlumniRecord
 } from '../types';
 import { dataService } from '../services/dataService';
 import { 
@@ -36,7 +37,10 @@ import {
   Printer,
   Copy,
   Save,
-  X
+  X,
+  BookOpen,
+  Upload,
+  FileSpreadsheet
 } from 'lucide-react';
 import { AuthUser } from '../types';
 import { DigitalMembershipCardModal } from './DigitalMembershipCardModal';
@@ -49,7 +53,7 @@ interface Props {
   onTabChange?: (tab: AdminRegistryTab) => void;
 }
 
-export type AdminRegistryTab = 'members' | 'ma_numbers' | 'applications' | 'verification' | 'assisted';
+export type AdminRegistryTab = 'members' | 'ma_numbers' | 'legacy' | 'applications' | 'verification' | 'assisted';
 
 export const AdminApplicationReview: React.FC<Props> = ({ 
   adminEmail, 
@@ -94,9 +98,21 @@ export const AdminApplicationReview: React.FC<Props> = ({
   // MA Numbers Configuration Tab State
   const [prefixInput, setPrefixInput] = useState('');
   const [padDigitsInput, setPadDigitsInput] = useState(4);
+  const [nextNumberInput, setNextNumberInput] = useState(1);
   const [autoApproveInput, setAutoApproveInput] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
-  const [settingsNotice, setSettingsNotice] = useState('');
+  const [settingsNotice, setSettingsNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+  // Legacy Physical Register Tab State
+  const [legacyRecords, setLegacyRecords] = useState<LegacyAlumniRecord[]>([]);
+  const [legacySearchTerm, setLegacySearchTerm] = useState('');
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importRawText, setImportRawText] = useState('');
+  const [importPreview, setImportPreview] = useState<Array<{ record: LegacyAlumniRecord; duplicate: boolean; reason?: string }>>([]);
+  const [isImporting, setIsImporting] = useState(false);
+  const [legacyNotice, setLegacyNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isLegacyModalOpen, setIsLegacyModalOpen] = useState(false);
+  const [editingLegacy, setEditingLegacy] = useState<Partial<LegacyAlumniRecord> | null>(null);
 
   // Verification Desk Tab State
   const [verifySearchQuery, setVerifySearchQuery] = useState('');
@@ -167,17 +183,20 @@ export const AdminApplicationReview: React.FC<Props> = ({
   const loadData = async () => {
     setLoading(true);
     try {
-      const [apps, alumniList, settings] = await Promise.all([
+      const [apps, alumniList, settings, leg] = await Promise.all([
         dataService.getApplications(),
         dataService.getAlumniList(),
         dataService.getSystemSettings(),
+        dataService.getLegacyAlumni(),
       ]);
       setApplications(apps);
       setMembers(alumniList);
       setSystemSettings(settings);
+      setLegacyRecords(leg);
       if (settings) {
-        setPrefixInput(settings.prefix || 'MA.-');
+        setPrefixInput(settings.prefix || 'MA. ');
         setPadDigitsInput(settings.padDigits || 4);
+        setNextNumberInput(settings.nextAlumniNumber || 1);
         setAutoApproveInput(settings.autoApproveRegistrations !== false);
       }
     } catch (err) {
@@ -190,22 +209,106 @@ export const AdminApplicationReview: React.FC<Props> = ({
   const handleSaveSettings = async () => {
     if (!systemSettings) return;
     setSavingSettings(true);
-    setSettingsNotice('');
+    setSettingsNotice(null);
     try {
       const updated: SystemSettings = {
         ...systemSettings,
         prefix: prefixInput.trim() || systemSettings.prefix,
         padDigits: Number(padDigitsInput) || systemSettings.padDigits,
+        nextAlumniNumber: Number(nextNumberInput) || systemSettings.nextAlumniNumber,
         autoApproveRegistrations: autoApproveInput,
       };
       await dataService.updateSystemSettings(updated);
       await loadData();
-      setSettingsNotice('MA Number formatting and auto-approval settings saved successfully!');
-      setTimeout(() => setSettingsNotice(''), 4000);
+      setSettingsNotice({ text: 'MA Number formatting, sequence counter, and auto-approval settings saved successfully!', type: 'success' });
+      setTimeout(() => setSettingsNotice(null), 4000);
     } catch (e: any) {
-      alert(e.message || 'Failed to update system settings');
+      setSettingsNotice({ text: e.message || 'Failed to update system settings', type: 'error' });
     } finally {
       setSavingSettings(false);
+    }
+  };
+
+  const handleDeleteMemberPermanently = async () => {
+    if (!adminManagingMember) return;
+    const reason = prompt(`Please enter the official audit reason for deleting ${adminManagingMember.fullName || adminManagingMember.firstName}. Under permanent ledger rules, membership number ${adminManagingMember.alumniNumber} will remain permanently reserved.`);
+    if (!reason || !reason.trim()) {
+      alert('A valid reason is required for permanent deletion audit.');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await dataService.deleteAlumnus(adminManagingMember.internalId, adminEmail, reason.trim());
+      setAdminManagingMember(null);
+      await loadData();
+      onAlumniCreated();
+      alert(`Member record deleted. Membership number ${adminManagingMember.alumniNumber} remains permanently reserved in the ledger.`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete member record.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handlePreviewImport = () => {
+    if (!importRawText.trim()) return;
+    const lines = importRawText.split('\n').map(l => l.trim()).filter(Boolean);
+    const existingNums = new Set([
+      ...legacyRecords.map(r => r.membershipNumber.toLowerCase()),
+      ...members.map(m => m.alumniNumber.toLowerCase())
+    ]);
+
+    const results: Array<{ record: LegacyAlumniRecord; duplicate: boolean; reason?: string }> = [];
+
+    lines.forEach((line, idx) => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length >= 2) {
+        const rawNum = parts[0];
+        const normalized = dataService.normalizeAlumniNumber(rawNum);
+        const name = parts[1];
+        const cohort = parts[2] ? parseInt(parts[2].replace(/[^0-9]/g, '')) || undefined : undefined;
+        const page = parts[3] || `Entry #${idx + 1}`;
+
+        const isDuplicate = existingNums.has(normalized.toLowerCase());
+        results.push({
+          record: {
+            id: `legacy-${Date.now()}-${idx}`,
+            membershipNumber: normalized,
+            fullName: name,
+            cohortYear: cohort,
+            physicalRegisterPage: page,
+            verifiedStatus: 'VERIFIED',
+          },
+          duplicate: isDuplicate,
+          reason: isDuplicate ? `Membership number ${normalized} is already registered or allocated in ledger` : undefined
+        });
+      }
+    });
+
+    setImportPreview(results);
+  };
+
+  const handleCommitImport = async () => {
+    const validRecords = importPreview.filter(p => !p.duplicate).map(p => p.record);
+    if (validRecords.length === 0) {
+      alert('No new valid legacy records to import. All entries were duplicates or empty.');
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      await dataService.importLegacyAlumni(validRecords);
+      setIsImportModalOpen(false);
+      setImportRawText('');
+      setImportPreview([]);
+      await loadData();
+      setLegacyNotice({ text: `Successfully imported ${validRecords.length} legacy physical register records!`, type: 'success' });
+      setTimeout(() => setLegacyNotice(null), 4000);
+    } catch (err: any) {
+      setLegacyNotice({ text: err.message || 'Failed to import legacy records.', type: 'error' });
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -609,6 +712,27 @@ export const AdminApplicationReview: React.FC<Props> = ({
             </button>
 
             <button
+              onClick={() => setActiveAdminTab('legacy')}
+              className="btn"
+              style={{
+                background: activeAdminTab === 'legacy' ? '#0B203E' : '#F1F5F9',
+                color: activeAdminTab === 'legacy' ? '#FFFFFF' : '#475569',
+                border: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.55rem 1.05rem',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              <BookOpen size={16} />
+              Legacy Physical Register ({legacyRecords.length})
+            </button>
+
+            <button
               onClick={() => setActiveAdminTab('applications')}
               className="btn"
               style={{
@@ -967,25 +1091,37 @@ export const AdminApplicationReview: React.FC<Props> = ({
               <Award size={18} color="#D97706" /> Sequential Numbering Configuration &amp; Auto-Approval
             </h3>
             <p style={{ color: '#64748B', fontSize: '0.85rem', margin: '0 0 1.25rem 0' }}>
-              Control prefix formatting, sequence padding digits, and whether newly registered alumni automatically receive their MA Number.
+              Control prefix formatting (MASSH standard: <code>MA. </code>), zero padding, starting sequence counter, and auto-approval.
             </p>
 
             {settingsNotice && (
-              <div style={{ padding: '0.65rem 0.9rem', borderRadius: '8px', background: '#DCFCE7', color: '#166534', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
-                {settingsNotice}
+              <div style={{ 
+                padding: '0.75rem 1rem', 
+                borderRadius: '8px', 
+                background: settingsNotice.type === 'success' ? '#DCFCE7' : '#FEE2E2', 
+                color: settingsNotice.type === 'success' ? '#166534' : '#991B1B', 
+                fontSize: '0.85rem', 
+                marginBottom: '1rem', 
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                {settingsNotice.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{settingsNotice.text}</span>
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', alignItems: 'flex-end' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', alignItems: 'flex-end' }}>
               <div>
                 <label className="form-label" style={{ fontWeight: 600 }}>Official Prefix</label>
                 <input
                   className="form-control"
                   value={prefixInput}
                   onChange={e => setPrefixInput(e.target.value)}
-                  placeholder="e.g. MA.- or MA. "
+                  placeholder="e.g. MA. "
                 />
-                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>MASSH standard is <code>MA.-</code></span>
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>MASSH standard is <code>MA. </code></span>
               </div>
 
               <div>
@@ -995,13 +1131,25 @@ export const AdminApplicationReview: React.FC<Props> = ({
                   value={padDigitsInput}
                   onChange={e => setPadDigitsInput(Number(e.target.value))}
                 >
-                  <option value={1}>1 digit (e.g. MA. 1, MA. 2, MA. 3)</option>
-                  <option value={2}>2 digits (e.g. MA. 01, MA. 02, MA. 03)</option>
-                  <option value={3}>3 digits (e.g. MA. 001, MA. 002, MA. 003)</option>
-                  <option value={4}>4 digits (e.g. MA. 0001, MA. 0002, MA. 0003)</option>
+                  <option value={1}>1 digit (e.g. MA. 1, MA. 2)</option>
+                  <option value={2}>2 digits (e.g. MA. 01, MA. 02)</option>
+                  <option value={3}>3 digits (e.g. MA. 001, MA. 002)</option>
+                  <option value={4}>4 digits (e.g. MA. 0001, MA. 0002)</option>
                   <option value={5}>5 digits (e.g. MA. 00001)</option>
                 </select>
-                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Determines leading zeros</span>
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Leading zero formatting</span>
+              </div>
+
+              <div>
+                <label className="form-label" style={{ fontWeight: 600 }}>Next Starting Number (e.g. 5000)</label>
+                <input
+                  type="number"
+                  min="1"
+                  className="form-control"
+                  value={nextNumberInput}
+                  onChange={e => setNextNumberInput(Number(e.target.value))}
+                />
+                <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Sets sequence counter for new cohorts</span>
               </div>
 
               <div style={{ paddingBottom: '0.5rem' }}>
@@ -1014,7 +1162,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                   <span>Auto-Assign MA Number on Signup</span>
                 </label>
                 <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.2rem' }}>
-                  When active, newly registered alumni receive MA number instantly
+                  Newly registered alumni receive permanent number instantly
                 </span>
               </div>
 
@@ -1031,24 +1179,289 @@ export const AdminApplicationReview: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Sequence Preview */}
-          <div className="mosa-card" style={{ padding: '1.5rem' }}>
-            <h4 style={{ fontSize: '1rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>
-              Upcoming Number Sequence Projection
-            </h4>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
-              {[0, 1, 2, 3, 4, 5, 6, 7].map(offset => {
-                const num = (systemSettings?.nextAlumniNumber || 1) + offset;
-                const formatted = dataService.formatAlumniNumber(num, prefixInput || 'MA.-', padDigitsInput || 4);
-                return (
-                  <div key={num} style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '0.5rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.7rem', color: '#94A3B8' }}>#{num}</div>
-                    <div style={{ fontWeight: 800, color: '#0B203E', fontSize: '0.95rem', fontFamily: 'monospace' }}>{formatted}</div>
-                  </div>
-                );
-              })}
+          {/* Sequence Preview & Ledger Information */}
+          <div className="grid-2">
+            <div className="mosa-card" style={{ padding: '1.5rem' }}>
+              <h4 style={{ fontSize: '1rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>
+                Upcoming Number Sequence Projection
+              </h4>
+              <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '0 0 0.85rem 0' }}>
+                Preview of next permanent sequential membership numbers allocated to upcoming alumni applicants:
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {[0, 1, 2, 3, 4, 5, 6, 7].map(offset => {
+                  const num = (systemSettings?.nextAlumniNumber || 1) + offset;
+                  const formatted = dataService.formatAlumniNumber(num, prefixInput || 'MA. ', padDigitsInput || 4);
+                  return (
+                    <div key={num} style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '0.5rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94A3B8' }}>#{num}</div>
+                      <div style={{ fontWeight: 800, color: '#0B203E', fontSize: '0.95rem', fontFamily: 'monospace' }}>{formatted}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mosa-card" style={{ padding: '1.5rem', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+              <h4 style={{ fontSize: '1rem', color: '#0B203E', margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <ShieldCheck size={18} color="#059669" /> Permanent Non-Repeating Ledger
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
+                Every allocated membership number is permanently recorded in the database ledger. Even if a member record is deactivated or deleted, their number remains strictly reserved and is never reused for any future alumnus.
+              </p>
+              <div style={{ marginTop: '0.85rem', padding: '0.5rem 0.75rem', background: '#DCFCE7', borderRadius: '6px', fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                ✓ Concurrency-safe unique ledger active. Zero collisions guaranteed.
+              </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* TAB: LEGACY PHYSICAL REGISTER & AUTO-VERIFICATION */}
+      {activeAdminTab === 'legacy' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Header Card */}
+          <div className="mosa-card" style={{ padding: '1.5rem', background: '#FFFFFF', border: '1px solid #E2E8F0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <BookOpen size={22} color="#0B203E" />
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0B203E', margin: 0 }}>
+                    Authoritative Legacy Physical Register
+                  </h2>
+                </div>
+                <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
+                  Authoritative records from Mandela Secondary School Hoima physical registers (Est. 1997). When an applicant inputs their existing number, matching records are automatically verified and linked.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setIsImportModalOpen(true)}
+                  className="btn btn-primary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.6rem 1.15rem' }}
+                >
+                  <Upload size={16} /> Import Physical Book Records
+                </button>
+              </div>
+            </div>
+
+            {legacyNotice && (
+              <div style={{ 
+                marginTop: '1rem', 
+                padding: '0.75rem 1rem', 
+                borderRadius: '8px', 
+                fontSize: '0.85rem', 
+                fontWeight: 600,
+                background: legacyNotice.type === 'success' ? '#DCFCE7' : '#FEE2E2',
+                color: legacyNotice.type === 'success' ? '#166534' : '#991B1B',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                {legacyNotice.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                <span>{legacyNotice.text}</span>
+              </div>
+            )}
+
+            {/* Metrics */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+              <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '0.85rem 1rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Total Legacy Records</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0B203E', marginTop: '0.2rem' }}>{legacyRecords.length}</div>
+              </div>
+              <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '8px', padding: '0.85rem 1rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#065F46', textTransform: 'uppercase' }}>Linked to Digital Accounts</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#059669', marginTop: '0.2rem' }}>
+                  {legacyRecords.filter(r => r.verifiedStatus === 'LINKED' || !!r.linkedAlumniId).length}
+                </div>
+              </div>
+              <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '0.85rem 1rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase' }}>Available for Matching</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2563EB', marginTop: '0.2rem' }}>
+                  {legacyRecords.filter(r => r.verifiedStatus !== 'LINKED' && !r.linkedAlumniId).length}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Table */}
+          <div className="mosa-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <input
+                className="form-control"
+                placeholder="Search legacy records by MA Number, Name, or Year..."
+                value={legacySearchTerm}
+                onChange={e => setLegacySearchTerm(e.target.value)}
+                style={{ maxWidth: '380px', padding: '0.55rem 0.85rem', fontSize: '0.85rem' }}
+              />
+              <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                Normalized MASSH Format: <code>MA. XXXX</code>
+              </span>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ background: '#F1F5F9', borderBottom: '1px solid #CBD5E1', color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                    <th style={{ padding: '0.75rem 1rem' }}>Physical Register #</th>
+                    <th style={{ padding: '0.75rem 1rem' }}>Alumnus Full Name</th>
+                    <th style={{ padding: '0.75rem 1rem' }}>Exit Cohort Year</th>
+                    <th style={{ padding: '0.75rem 1rem' }}>Register Book Reference</th>
+                    <th style={{ padding: '0.75rem 1rem' }}>Verification State</th>
+                    <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {legacyRecords
+                    .filter(r => {
+                      if (!legacySearchTerm.trim()) return true;
+                      const q = legacySearchTerm.toLowerCase();
+                      return (
+                        r.membershipNumber.toLowerCase().includes(q) ||
+                        r.fullName.toLowerCase().includes(q) ||
+                        (r.cohortYear && r.cohortYear.toString().includes(q)) ||
+                        (r.physicalRegisterPage && r.physicalRegisterPage.toLowerCase().includes(q))
+                      );
+                    })
+                    .map((record, idx) => (
+                      <tr key={record.id} style={{ borderBottom: '1px solid #E2E8F0', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
+                        <td style={{ padding: '0.85rem 1rem' }}>
+                          <span className="alumni-no-pill small" style={{ fontWeight: 800 }}>
+                            {record.membershipNumber}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#0B203E' }}>
+                          {record.fullName}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: '#475569' }}>
+                          {record.cohortYear ? `Class of ${record.cohortYear}` : 'Historical Record'}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: '#64748B', fontSize: '0.8rem' }}>
+                          {record.physicalRegisterPage || 'Register Book'}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem' }}>
+                          {record.verifiedStatus === 'LINKED' || record.linkedAlumniId ? (
+                            <span style={{ background: '#DCFCE7', color: '#166534', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
+                              Linked to Member
+                            </span>
+                          ) : (
+                            <span style={{ background: '#EFF6FF', color: '#1E40AF', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                              Verified Physical Record
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                          <button
+                            onClick={async () => {
+                              if (window.confirm(`Delete legacy record for ${record.fullName} (${record.membershipNumber})?`)) {
+                                await dataService.deleteLegacyAlumniRecord(record.id);
+                                await loadData();
+                              }
+                            }}
+                            className="btn btn-secondary"
+                            style={{ padding: '0.35rem 0.6rem', fontSize: '0.75rem', color: '#991B1B' }}
+                            title="Delete Legacy Record"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Import Modal */}
+          {isImportModalOpen && (
+            <div className="modal-overlay" style={{ zIndex: 1000 }}>
+              <div className="modal-content" style={{ maxWidth: '640px', padding: '1.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Upload size={20} color="#0B203E" />
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#0B203E', fontWeight: 800 }}>
+                      Import Physical Alumni Register
+                    </h3>
+                  </div>
+                  <button onClick={() => setIsImportModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}>
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: '#64748B', margin: '0 0 1rem 0' }}>
+                  Paste CSV lines from the physical book registers. Format: <code>MA. Number, Full Name, Exit Year, Page Reference</code>. Duplicate numbers will be automatically detected and highlighted.
+                </p>
+
+                <textarea
+                  rows={5}
+                  className="form-control"
+                  placeholder="MA. 0001, John Kagoro, 1999, Page 12&#10;MA. 0002, Sarah Atugonza, 2001, Page 14&#10;MA. 0003, David Byaruhanga, 2003, Page 18"
+                  value={importRawText}
+                  onChange={e => setImportRawText(e.target.value)}
+                  style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+                />
+
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', marginTop: '1rem' }}>
+                  <button
+                    onClick={handlePreviewImport}
+                    className="btn btn-secondary"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+                  >
+                    <FileSpreadsheet size={15} /> Analyze &amp; Detect Duplicates
+                  </button>
+
+                  {importPreview.length > 0 && (
+                    <button
+                      onClick={handleCommitImport}
+                      disabled={isImporting || importPreview.every(p => p.duplicate)}
+                      className="btn btn-primary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+                    >
+                      <CheckCircle2 size={15} /> {isImporting ? 'Importing...' : `Confirm Import (${importPreview.filter(p => !p.duplicate).length} Records)`}
+                    </button>
+                  )}
+                </div>
+
+                {importPreview.length > 0 && (
+                  <div style={{ marginTop: '1.25rem', border: '1px solid #E2E8F0', borderRadius: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                      <thead style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0' }}>
+                        <tr>
+                          <th style={{ padding: '0.5rem 0.75rem' }}>Number</th>
+                          <th style={{ padding: '0.5rem 0.75rem' }}>Full Name</th>
+                          <th style={{ padding: '0.5rem 0.75rem' }}>Year</th>
+                          <th style={{ padding: '0.5rem 0.75rem' }}>Duplicate Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importPreview.map((item, i) => (
+                          <tr key={i} style={{ borderBottom: '1px solid #F1F5F9', background: item.duplicate ? '#FFF1F2' : '#FFFFFF' }}>
+                            <td style={{ padding: '0.5rem 0.75rem', fontFamily: 'monospace', fontWeight: 700 }}>
+                              {item.record.membershipNumber}
+                            </td>
+                            <td style={{ padding: '0.5rem 0.75rem' }}>{item.record.fullName}</td>
+                            <td style={{ padding: '0.5rem 0.75rem' }}>{item.record.cohortYear || '-'}</td>
+                            <td style={{ padding: '0.5rem 0.75rem' }}>
+                              {item.duplicate ? (
+                                <span style={{ color: '#991B1B', fontWeight: 700 }}>
+                                  ⚠️ Duplicate: {item.reason}
+                                </span>
+                              ) : (
+                                <span style={{ color: '#166534', fontWeight: 700 }}>
+                                  ✓ Valid New Entry
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -2449,6 +2862,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                 { id: 'number', label: 'Change MA Number', icon: Award },
                 { id: 'history', label: 'Audit Trail & History', icon: History },
                 { id: 'profile', label: 'Profile Summary', icon: UserCheck },
+                { id: 'delete', label: 'Delete Record', icon: Trash2 },
               ].map(t => {
                 const Icon = t.icon;
                 const isActive = adminModalTab === t.id;
@@ -2792,6 +3206,26 @@ export const AdminApplicationReview: React.FC<Props> = ({
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* TAB 5: DELETE RECORD WITH PERMANENT LEDGER RETENTION */}
+              {adminModalTab === 'delete' && (
+                <div style={{ background: '#FFF1F2', border: '1px solid #FECDD3', borderRadius: '10px', padding: '1.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#991B1B', fontWeight: 800, fontSize: '1rem', marginBottom: '0.5rem' }}>
+                    <Trash2 size={18} /> Permanent Record Removal with Ledger Preservation
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: '#7F1D1D', lineHeight: 1.5, margin: '0 0 1rem 0' }}>
+                    Removing this member record will permanently deactivate their account. Under Phase 4 permanent non-repeating rules, membership number <strong>{adminManagingMember.alumniNumber}</strong> will remain permanently reserved in the system ledger and can never be reissued to another person.
+                  </p>
+                  <button
+                    onClick={handleDeleteMemberPermanently}
+                    disabled={actionLoading}
+                    className="btn"
+                    style={{ background: '#DC2626', color: '#FFFFFF', border: 'none', padding: '0.65rem 1.25rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                  >
+                    <Trash2 size={16} /> {actionLoading ? 'Deleting...' : 'Confirm Deletion & Reserve MA Number'}
+                  </button>
                 </div>
               )}
             </div>
