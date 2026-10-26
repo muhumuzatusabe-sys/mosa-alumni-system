@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat: refine portal navigation menu - cyan active section highlight, separate submenu window, compact footprint, and removal of Secretariat, Admin Console, Verify Alumni Number, and Register as Member entries"
+git commit -m "feat(phase-13): clean test baseline, e2e testing readiness, hardened RBAC security rules, activity history management, and mobile UX"
 echo [OK] Staged and committed changes.
 
 echo.

@@ -202,26 +202,17 @@ export const AuthModal: React.FC<Props> = ({
     }
   };
 
-  // Quick fill helper for testing
-  const handleQuickFill = (type: 'alumni-seeded' | 'alumni-new' | 'admin') => {
+  // Quick fill helper for administrator access
+  const handleQuickFill = (type: 'admin' | 'superadmin') => {
     setErrorMsg('');
     setSuccessMsg('');
-    if (type === 'admin') {
-      setPortal('admin');
+    setPortal('admin');
+    if (type === 'superadmin') {
+      setEmail('superadmin@mosa.org');
+      setPassword('admin123');
+    } else {
       setEmail('admin@massh.ac.ug');
       setPassword('admin123');
-    } else if (type === 'alumni-seeded') {
-      setPortal('alumni');
-      setAlumniMode('signin');
-      setEmail('muhammad.z@alumni.massh.ac.ug');
-      setPassword('alumni123');
-    } else if (type === 'alumni-new') {
-      setPortal('alumni');
-      setAlumniMode('create_password');
-      setEmail('brenda.k@alumni.massh.ac.ug');
-      setPassword('mandela2026');
-      setConfirmPassword('mandela2026');
-      handleCheckEmail('brenda.k@alumni.massh.ac.ug');
     }
   };
 
@@ -496,7 +487,7 @@ export const AuthModal: React.FC<Props> = ({
                       type="email"
                       required
                       className="form-input"
-                      placeholder="e.g. muhammad.z@alumni.massh.ac.ug"
+                      placeholder="e.g. member@alumni.massh.ac.ug or personal email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       style={{
@@ -932,7 +923,7 @@ export const AuthModal: React.FC<Props> = ({
             </div>
           )}
 
-          {/* Quick Demo Credentials Panel */}
+          {/* Quick Administrator Credentials Panel */}
           <div 
             style={{ 
               marginTop: '1.5rem', 
@@ -944,55 +935,16 @@ export const AuthModal: React.FC<Props> = ({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.5rem' }}>
-              <Sparkles size={14} color="#C68A24" />
-              <span>Quick Test Presets:</span>
+              <ShieldCheck size={14} color="#C68A24" />
+              <span>Official Administrator Access:</span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
               <button
                 type="button"
-                onClick={() => handleQuickFill('alumni-seeded')}
-                style={{
-                  padding: '0.4rem 0.5rem',
-                  background: '#FFFFFF',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '6px',
-                  fontSize: '0.73rem',
-                  color: '#113D2B',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
-                👤 Seeded Alumnus
-                <div style={{ fontSize: '0.67rem', color: '#6B7280', fontWeight: 400 }}>MA. 0001 (alumni123)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickFill('alumni-new')}
-                style={{
-                  padding: '0.4rem 0.5rem',
-                  background: '#FFFFFF',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: '6px',
-                  fontSize: '0.73rem',
-                  color: '#113D2B',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
-                ✨ New Password Flow
-                <div style={{ fontSize: '0.67rem', color: '#6B7280', fontWeight: 400 }}>Test Password Creation</div>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => handleQuickFill('admin')}
                 style={{
-                  gridColumn: 'span 2',
-                  padding: '0.4rem 0.5rem',
+                  padding: '0.45rem 0.6rem',
                   background: '#FFFFFF',
                   border: '1px solid #FDE68A',
                   borderRadius: '6px',
@@ -1000,14 +952,30 @@ export const AuthModal: React.FC<Props> = ({
                   color: '#B45309',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  textAlign: 'left',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
+                  textAlign: 'left'
                 }}
               >
-                <span>🛡️ MASSH Administrator</span>
-                <span style={{ fontSize: '0.68rem', color: '#92400E', fontWeight: 400 }}>admin@massh.ac.ug (admin123)</span>
+                🛡️ ICT Super Admin
+                <div style={{ fontSize: '0.67rem', color: '#92400E', fontWeight: 400 }}>admin@massh.ac.ug</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickFill('superadmin')}
+                style={{
+                  padding: '0.45rem 0.6rem',
+                  background: '#FFFFFF',
+                  border: '1px solid #FDE68A',
+                  borderRadius: '6px',
+                  fontSize: '0.73rem',
+                  color: '#B45309',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}
+              >
+                🛡️ Executive Admin
+                <div style={{ fontSize: '0.67rem', color: '#92400E', fontWeight: 400 }}>superadmin@mosa.org</div>
               </button>
             </div>
           </div>

@@ -21,6 +21,7 @@ interface MOSAWelcomeViewProps {
   currentUser: AuthUser | null;
   onOpenLogin: () => void;
   onOpenRegisterAccount: () => void;
+  onOpenAlumniRegistration?: () => void;
   onOpenVerify: () => void;
   onGoToPortal: () => void;
   onGoToAdmin?: () => void;
@@ -30,6 +31,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
   currentUser,
   onOpenLogin,
   onOpenRegisterAccount,
+  onOpenAlumniRegistration,
   onOpenVerify,
   onGoToPortal,
   onGoToAdmin,
@@ -74,9 +76,9 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
         setStats({
           totalAccounts: Math.max(users.length, alumniList.length),
           verifiedAlumni: verified.length,
-          cohortsCount: Math.max(cohorts.size, 29),
+          cohortsCount: cohorts.size,
           allocatedMANumbers: allocated.length,
-          eventsHeld: Math.max(events.length, 6),
+          eventsHeld: events.length,
         });
       } catch (err) {
         console.error('Failed to load welcome page data:', err);
@@ -292,9 +294,9 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 <button
                   onClick={onOpenRegisterAccount}
                   style={{
-                    background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)',
+                    background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
                     color: '#FFFFFF',
-                    border: '1px solid rgba(244, 63, 94, 0.45)',
+                    border: '1px solid rgba(245, 158, 11, 0.45)',
                     padding: '0.5rem 1.15rem',
                     borderRadius: '8px',
                     fontWeight: 700,
@@ -303,16 +305,16 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    boxShadow: '0 2px 8px rgba(190, 24, 93, 0.3)',
+                    boxShadow: '0 2px 8px rgba(217, 119, 6, 0.3)',
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(190, 24, 93, 0.4)';
+                    e.currentTarget.style.boxShadow = '0 4px 14px rgba(217, 119, 6, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(190, 24, 93, 0.3)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(217, 119, 6, 0.3)';
                   }}
                 >
                   <UserPlus size={15} />
@@ -344,7 +346,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             right: '-5%',
             width: '450px',
             height: '450px',
-            background: 'radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(10, 39, 27, 0) 70%)',
+            background: 'radial-gradient(circle, rgba(217, 119, 6, 0.14) 0%, rgba(10, 39, 27, 0) 70%)',
             borderRadius: '50%',
             pointerEvents: 'none',
           }}
@@ -352,7 +354,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
 
         <div style={{ maxWidth: '1160px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3.5rem', alignItems: 'center' }}>
           
-          {/* Left Column: Essential Identity & Only Two Primary Actions */}
+          {/* Left Column: Essential Identity & Three Clean Primary Actions */}
           <div>
             {/* Proudly Mandelian Slogan Badge */}
             <div
@@ -360,15 +362,15 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                background: 'linear-gradient(90deg, rgba(236, 72, 153, 0.22) 0%, rgba(190, 24, 93, 0.15) 100%)',
-                border: '1px solid rgba(244, 63, 94, 0.45)',
+                background: 'linear-gradient(90deg, rgba(217, 119, 6, 0.22) 0%, rgba(180, 83, 9, 0.15) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
                 padding: '0.4rem 0.9rem',
                 borderRadius: '999px',
                 marginBottom: '1.25rem',
               }}
             >
-              <Sparkles size={14} color="#F43F5E" />
-              <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FDA4AF', fontWeight: 800 }}>
+              <Sparkles size={14} color="#F59E0B" />
+              <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FDE68A', fontWeight: 800 }}>
                 {slogan}
               </span>
             </div>
@@ -413,36 +415,36 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               {introMessage}
             </p>
 
-            {/* ONLY TWO PRIMARY ACTIONS: Create Account & Log In */}
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* THREE PRIMARY ACTIONS: Explore Alumni Portal, Member Sign In / Register, & Public Verification Desk */}
+            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <button
-                onClick={onOpenRegisterAccount}
+                onClick={onGoToPortal}
                 style={{
-                  background: 'linear-gradient(135deg, #BE185D 0%, #9D174D 100%)',
+                  background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
                   color: '#FFFFFF',
-                  border: '1px solid rgba(244, 63, 94, 0.5)',
-                  padding: '0.95rem 1.85rem',
+                  border: '1px solid rgba(245, 158, 11, 0.55)',
+                  padding: '0.9rem 1.65rem',
                   borderRadius: '12px',
                   fontWeight: 800,
-                  fontSize: '1rem',
+                  fontSize: '0.96rem',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: '0 8px 24px rgba(190, 24, 93, 0.35)',
+                  gap: '0.55rem',
+                  boxShadow: '0 8px 24px rgba(217, 119, 6, 0.35)',
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(190, 24, 93, 0.45)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(217, 119, 6, 0.45)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(190, 24, 93, 0.35)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(217, 119, 6, 0.35)';
                 }}
               >
-                <UserPlus size={19} />
-                <span>Create Account</span>
+                <span>Explore Alumni Portal</span>
+                <ArrowRight size={18} />
               </button>
 
               <button
@@ -451,14 +453,14 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                   background: 'rgba(255, 255, 255, 0.08)',
                   color: '#F8FAFC',
                   border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                  padding: '0.95rem 1.75rem',
+                  padding: '0.9rem 1.45rem',
                   borderRadius: '12px',
                   fontWeight: 700,
-                  fontSize: '1rem',
+                  fontSize: '0.94rem',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.55rem',
+                  gap: '0.5rem',
                   transition: 'all 0.15s ease',
                 }}
                 onMouseEnter={(e) => {
@@ -472,8 +474,39 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                <LogIn size={18} />
-                <span>Log In</span>
+                <LogIn size={17} />
+                <span>Member Sign In</span>
+              </button>
+
+              <button
+                onClick={onOpenVerify}
+                style={{
+                  background: 'rgba(5, 150, 105, 0.18)',
+                  color: '#6EE7B7',
+                  border: '1.5px solid rgba(16, 185, 129, 0.45)',
+                  padding: '0.9rem 1.35rem',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '0.92rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(5, 150, 105, 0.28)';
+                  e.currentTarget.style.borderColor = '#10B981';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(5, 150, 105, 0.18)';
+                  e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <ShieldCheck size={17} />
+                <span>Verify Alumni Number</span>
               </button>
             </div>
           </div>
@@ -679,7 +712,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
         <div style={{ maxWidth: '1160px', margin: '0 auto' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-            <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#FDA4AF', fontWeight: 800 }}>
+            <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#FCD34D', fontWeight: 800 }}>
               Live Community Records
             </span>
             <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FFFFFF', margin: '0.2rem 0 0 0' }}>
@@ -746,7 +779,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 textAlign: 'center',
               }}
             >
-              <div style={{ color: '#FDA4AF', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ color: '#FBBF24', marginBottom: '0.35rem', display: 'flex', justifyContent: 'center' }}>
                 <GraduationCap size={24} />
               </div>
               <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
@@ -820,15 +853,15 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
                 width: '44px',
                 height: '44px',
                 borderRadius: '12px',
-                background: 'rgba(236, 72, 153, 0.18)',
+                background: 'rgba(217, 119, 6, 0.18)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '1rem',
-                border: '1px solid rgba(244, 63, 94, 0.35)',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
               }}
             >
-              <Award size={22} color="#F43F5E" />
+              <Award size={22} color="#FBBF24" />
             </div>
             <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF', margin: '0 0 0.4rem 0' }}>
               Lifelong MA Membership Numbers

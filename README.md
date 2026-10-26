@@ -5,7 +5,7 @@
 ![MASSH Colors](https://img.shields.io/badge/School-MASSH%20Hoima-0B203E?style=for-the-badge)
 ![Alumni Association](https://img.shields.io/badge/Association-MOSA-D97706?style=for-the-badge)
 ![Established](https://img.shields.io/badge/Est.-1997-0B203E?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Automated%20Tests-205%20Passing-10B981?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Automated%20Tests-242%20Passing-10B981?style=for-the-badge)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge)
 ![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge)
 
@@ -149,6 +149,7 @@ npx tsx src/tests/test_phase4.ts
 npx tsx src/tests/test_phase5.ts
 npx tsx src/tests/test_phase6.ts
 npx tsx src/tests/test_phase7.ts
+npx tsx src/tests/test_security_rbac_hardening.ts
 ```
 
 ### Test Coverage Breakdown
@@ -158,6 +159,7 @@ npx tsx src/tests/test_phase7.ts
 - **`test_phase5.ts` (37 Tests)**: MTN MoMo, Airtel, and Bank transfer logging, dues verification, receipt numbering (`MOSA-RCP-YYYY-XXXX`), campaign donor tracking.
 - **`test_phase6.ts` (31 Tests)**: Broadcast audience targeting, multi-channel dispatch, announcement pinning, view telemetry, notification center.
 - **`test_phase7.ts` (40 Tests)**: System analytics aggregation, O/A level distributions, generational cohorts, solvency ratios, AGM report structure, CSV export integrity.
+- **`test_security_rbac_hardening.ts` (37 Tests)**: Role-based boundary isolation, anti-tampering verification guards on `MA. XXXX` numbers, single-vote constitutional secret ballots, treasury receipt integrity, smart meeting state locking, and forensic audit immutability.
 
 ---
 

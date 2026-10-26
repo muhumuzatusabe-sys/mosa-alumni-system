@@ -307,8 +307,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Far Right: Admin Panel Button */}
-          {isStaff ? (
+          {/* Far Right: Admin Panel Button strictly for authorized staff */}
+          {isStaff && (
             <button
               onClick={handleAdminClick}
               style={{
@@ -332,33 +332,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Sliders size={16} color="#FBBF24" />
               <span>Admin Panel</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                if (onOpenAdmin) onOpenAdmin();
-                else onOpenAuth();
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                padding: '0.45rem 0.65rem',
-                borderRadius: '8px',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                color: '#FDE68A',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                marginLeft: '0.25rem',
-              }}
-              title="Secretariat & Administration Gate"
-              aria-label="Secretariat & Administration Gate"
-            >
-              <Sliders size={14} color="#FBBF24" />
-              <span className="hidden sm:inline">Admin Gate</span>
             </button>
           )}
         </div>

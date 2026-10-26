@@ -196,10 +196,26 @@ export const EventsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }) 
       ) : filteredEvents.length === 0 ? (
         <div className="mosa-card" style={{ padding: '3.5rem', textAlign: 'center' }}>
           <Calendar size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>No Events Scheduled</h3>
+          <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>
+            {events.length === 0 ? 'No events have been added yet' : 'No Events Found'}
+          </h3>
           <p style={{ color: '#64748B', maxWidth: '420px', margin: '0 auto 1.5rem auto', fontSize: '0.9rem' }}>
-            No events match your current filter criteria. Check back soon or create a new event.
+            {events.length === 0 
+              ? 'There are no active or scheduled MOSA alumni events at this time.' 
+              : 'No events match your current filter criteria. Try resetting your search filter.'}
           </p>
+          {isAdmin ? (
+            <button 
+              className="btn btn-primary" 
+              onClick={() => { setEventToEdit(null); setIsFormOpen(true); }}
+            >
+              <Plus size={16} /> Create First Event
+            </button>
+          ) : events.length > 0 ? (
+            <button className="btn btn-secondary" onClick={() => setSelectedType('ALL')}>
+              View All Events
+            </button>
+          ) : null}
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>

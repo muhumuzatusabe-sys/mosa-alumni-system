@@ -205,11 +205,11 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
     return true;
   });
 
-  // User's own payments or sample statement
+  // User's own payments
   const userFiltered = currentUser?.alumniNumber
     ? payments.filter(p => p.alumniNumber.toUpperCase() === currentUser.alumniNumber?.toUpperCase() || (currentAlumnus && p.alumniId === currentAlumnus.internalId))
     : [];
-  const myPayments = userFiltered.length > 0 ? userFiltered : payments.slice(0, 5);
+  const myPayments = userFiltered;
 
   // Statement Metrics (NSSF GO-Inspired Statement Experience)
   const myTotalContributions = myPayments.reduce((acc, p) => p.status === 'VERIFIED' ? acc + p.amount : acc, 0);
@@ -478,16 +478,33 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
       {/* ============================================================== */}
       {activeTab === 'campaigns' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-            {campaigns.map(camp => {
-              const pct = Math.min(100, Math.round((camp.raisedAmount / camp.targetAmount) * 100));
-
-              return (
-                <div 
-                  key={camp.id} 
-                  className="mosa-card" 
-                  style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}
+          {campaigns.length === 0 ? (
+            <div className="mosa-card" style={{ padding: '3.5rem', textAlign: 'center' }}>
+              <HeartHandshake size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
+              <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>No Active Campaigns</h3>
+              <p style={{ color: '#64748B', maxWidth: '420px', margin: '0 auto 1.5rem auto', fontSize: '0.9rem' }}>
+                No school development or fundraising campaigns have been launched yet.
+              </p>
+              {isAdmin && (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => { setCampaignToEdit(null); setIsCampaignModalOpen(true); }}
                 >
+                  <Plus size={16} /> Launch First Campaign
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+              {campaigns.map(camp => {
+                const pct = Math.min(100, Math.round((camp.raisedAmount / camp.targetAmount) * 100));
+
+                return (
+                  <div 
+                    key={camp.id} 
+                    className="mosa-card" 
+                    style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}
+                  >
                   <div style={{ position: 'relative', height: '180px', background: '#0B203E', overflow: 'hidden' }}>
                     <img 
                       src={camp.coverImage || 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80'} 
@@ -552,6 +569,7 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
               );
             })}
           </div>
+          )}
         </div>
       )}      {/* ============================================================== */}
       {/* TAB 2: VOLUNTARY ANNUAL ALUMNI CONTRIBUTION                    */}

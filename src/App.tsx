@@ -44,6 +44,7 @@ export const App: React.FC = () => {
   const [authResolving, setAuthResolving] = useState<boolean>(true);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState<number>(0);
   const [showAuthGate, setShowAuthGate] = useState<boolean>(false);
+  const [isGuestBrowsing, setIsGuestBrowsing] = useState<boolean>(false);
 
   const handleNavigate = (tab: string) => {
     if (tab === currentTab) return;
@@ -160,6 +161,7 @@ export const App: React.FC = () => {
   const handleLogout = () => {
     dataService.logout();
     setCurrentUser(null);
+    setIsGuestBrowsing(false);
     setPortalMode('member');
     setCurrentTab('home');
     setTabHistory(['home']);
@@ -262,7 +264,7 @@ export const App: React.FC = () => {
   // 2. MOSA WELCOME VIEW & AUTHENTICATION GATE
   // Public visitors see the official MOSA Welcome Experience by default
   // ==============================================================
-  if (!currentUser) {
+  if (!currentUser && !isGuestBrowsing) {
     if (showAuthGate) {
       return (
         <AuthenticationGate
@@ -284,7 +286,7 @@ export const App: React.FC = () => {
           onOpenLogin={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
           onOpenRegisterAccount={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
           onOpenVerify={() => setIsVerifyOpen(true)}
-          onGoToPortal={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
+          onGoToPortal={() => { setIsGuestBrowsing(true); setCurrentTab('home'); }}
           onGoToAdmin={() => { setAuthPortal('admin'); setShowAuthGate(true); }}
         />
         {isVerifyOpen && (

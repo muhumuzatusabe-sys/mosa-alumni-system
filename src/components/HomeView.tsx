@@ -52,7 +52,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [memberPayments, setMemberPayments] = useState<PaymentTransaction[]>([]);
   const [activeCampaigns, setActiveCampaigns] = useState<DonationCampaign[]>([]);
   const [compactAlumni, setCompactAlumni] = useState<AlumniProfile[]>([]);
-  const [totalAlumniCount, setTotalAlumniCount] = useState<number>(2840);
+  const [totalAlumniCount, setTotalAlumniCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         setActiveCampaigns(campaignsList.slice(0, 2));
         setCompactAlumni(alumniList.slice(0, 3));
-        setTotalAlumniCount(Math.max(alumniList.length, 2840));
+        setTotalAlumniCount(alumniList.length);
 
         // Resolve current member profile
         let userProfile: AlumniProfile | null = null;
@@ -119,9 +119,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
     .reduce((sum, p) => sum + p.amount, 0);
 
   const featuredCampaign = activeCampaigns.length > 0 ? activeCampaigns[0] : null;
-  const campaignPercent = featuredCampaign 
-    ? Math.min(Math.round((featuredCampaign.raisedAmount / (featuredCampaign.targetAmount || 1)) * 100), 100)
-    : 70;
+  const campaignPercent = featuredCampaign && featuredCampaign.targetAmount > 0
+    ? Math.min(Math.round((featuredCampaign.raisedAmount / featuredCampaign.targetAmount) * 100), 100)
+    : 0;
 
   return (
     <div className="home-container" style={{ padding: '1rem 1rem 2.5rem 1rem', background: 'transparent', maxWidth: '1160px', margin: '0 auto' }}>
@@ -647,36 +647,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       Verified Contributions to Date
                     </div>
                     <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FDE68A', margin: '0.1rem 0' }}>
-                      UGX {totalVerifiedGiving > 0 ? totalVerifiedGiving.toLocaleString() : '350,000'}
+                      UGX {totalVerifiedGiving.toLocaleString()}
                     </div>
                   </div>
 
                   <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D1FAE5', background: 'rgba(22, 163, 74, 0.35)', padding: '0.2rem 0.55rem', borderRadius: '6px' }}>
-                    Active Contributor
+                    {totalVerifiedGiving > 0 ? 'Active Contributor' : 'Verified Member'}
                   </span>
                 </div>
               </div>
 
               {/* Active Project Progress */}
-              <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E5DFD1', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0B271C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {featuredCampaign?.title || 'MASSH Science Complex Appeal'}
-                  </span>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#C68A24', flexShrink: 0 }}>
-                    {campaignPercent}%
-                  </span>
+              {featuredCampaign ? (
+                <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E5DFD1', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0B271C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {featuredCampaign.title}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#C68A24', flexShrink: 0 }}>
+                      {campaignPercent}%
+                    </span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div style={{ width: '100%', height: '6px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
+                    <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #16A34A, #C68A24)', borderRadius: '999px' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.25rem' }}>
+                    <span>Raised: UGX {featuredCampaign.raisedAmount.toLocaleString()}</span>
+                    <span>Goal: UGX {featuredCampaign.targetAmount.toLocaleString()}</span>
+                  </div>
                 </div>
-                
-                {/* Progress Bar */}
-                <div style={{ width: '100%', height: '6px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
-                  <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #16A34A, #C68A24)', borderRadius: '999px' }} />
+              ) : (
+                <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.85rem', border: '1px solid #E5DFD1', marginBottom: '1rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.2rem' }}>
+                    No Active Campaigns
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
+                    School development and project campaigns will appear here.
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.25rem' }}>
-                  <span>Raised: UGX {featuredCampaign ? featuredCampaign.raisedAmount.toLocaleString() : '42,500,000'}</span>
-                  <span>Goal: UGX {featuredCampaign ? featuredCampaign.targetAmount.toLocaleString() : '60,000,000'}</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -754,7 +765,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       Alumni Registry
                     </h3>
                     <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
-                      {totalAlumniCount.toLocaleString()} verified scholars recorded
+                      {totalAlumniCount > 0 ? `${totalAlumniCount.toLocaleString()} verified scholars recorded` : 'No alumni registered yet'}
                     </div>
                   </div>
                 </div>
@@ -780,7 +791,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Compact 3-Member Preview */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.85rem' }}>
-                {compactAlumni.map((alumnus, idx) => {
+                {compactAlumni.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '1.5rem 0.5rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8' }}>
+                    <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.25rem' }}>
+                      No alumni registered yet
+                    </div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
+                      Be the first Mandelian scholar to complete registration.
+                    </div>
+                  </div>
+                ) : (
+                  compactAlumni.map((alumnus, idx) => {
                   const fullName = `${alumnus.firstName} ${alumnus.lastName}`;
                   const occupation = alumnus.occupation || 'Mandela Secondary School Alumnus';
                   const alumniNo = alumnus.alumniNumber || `MA. 000${idx + 1}`;
@@ -861,7 +882,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       </span>
                     </div>
                   );
-                })}
+                })
+              )}
               </div>
             </div>
 

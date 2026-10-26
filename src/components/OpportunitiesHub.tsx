@@ -580,25 +580,53 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
           {filteredOpportunities.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
               <Briefcase size={42} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
-              <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>No Opportunities Match Your Filter</h3>
+              <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>
+                {opportunities.length === 0 ? 'No opportunities have been posted yet' : 'No Opportunities Match Your Filter'}
+              </h3>
               <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 1.25rem auto' }}>
-                Try adjusting your search keywords or switching filters to view all openings across the alumni network.
+                {opportunities.length === 0
+                  ? 'There are no career, scholarship, or internship opportunities listed at this time. Alumni and administrators can share verified openings with the community.'
+                  : 'Try adjusting your search keywords or switching filters to view all openings across the alumni network.'}
               </p>
-              <button
-                onClick={() => { setSelectedType('ALL'); setSelectedWorkplace('ALL'); setSearchQuery(''); }}
-                style={{
-                  background: '#0B203E',
-                  color: '#FFFFFF',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                Clear Filters
-              </button>
+              {opportunities.length === 0 ? (
+                <button
+                  onClick={() => {
+                    if (currentUser) {
+                      setIsCreateOppOpen(true);
+                    } else {
+                      onOpenAuth();
+                    }
+                  }}
+                  style={{
+                    background: '#0B203E',
+                    color: '#FFFFFF',
+                    padding: '0.55rem 1.15rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Post First Opportunity
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setSelectedType('ALL'); setSelectedWorkplace('ALL'); setSearchQuery(''); }}
+                  style={{
+                    background: '#0B203E',
+                    color: '#FFFFFF',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
@@ -856,8 +884,34 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
           </div>
 
           {/* Mentors Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
-            {filteredMentors.map(mentor => (
+          {filteredMentors.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3.5rem 1rem', background: '#FFFFFF', borderRadius: '12px', border: '1px dashed #CBD5E1' }}>
+              <GraduationCap size={42} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
+              <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>
+                {mentors.length === 0 ? 'No mentor profiles registered yet' : 'No Mentors Match Your Criteria'}
+              </h3>
+              <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '420px', margin: '0 auto 1.25rem auto' }}>
+                {mentors.length === 0
+                  ? 'Experienced alumni can join the MOSA Mentorship Directory to guide students and recent graduates.'
+                  : 'Try selecting all professional fields or clearing your search keywords.'}
+              </p>
+              <button
+                onClick={() => {
+                  if (currentUser) {
+                    setIsBecomeMentorOpen(true);
+                  } else {
+                    onOpenAuth();
+                  }
+                }}
+                className="btn btn-gold"
+                style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem' }}
+              >
+                Join as a Mentor
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
+              {filteredMentors.map(mentor => (
               <div
                 key={mentor.id}
                 style={{
@@ -965,6 +1019,7 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
               </div>
             ))}
           </div>
+          )}
         </div>
       )}
 

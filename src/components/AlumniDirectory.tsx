@@ -196,7 +196,7 @@ export const AlumniDirectory: React.FC<Props> = ({
               Registered Alumni
             </div>
             <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#0B203E', lineHeight: 1.1, marginTop: '0.15rem' }}>
-              {totalRegistered > 0 ? totalRegistered.toLocaleString() : '...'}
+              {totalRegistered > 0 ? totalRegistered.toLocaleString() : '0'}
             </div>
             <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '0.2rem' }}>
               Total registered in membership database
@@ -237,7 +237,7 @@ export const AlumniDirectory: React.FC<Props> = ({
               Verified Alumni
             </div>
             <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#059669', lineHeight: 1.1, marginTop: '0.15rem' }}>
-              {totalVerified > 0 ? totalVerified.toLocaleString() : '...'}
+              {totalVerified > 0 ? totalVerified.toLocaleString() : '0'}
             </div>
             <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '0.2rem' }}>
               Authenticated with official MA numbers
@@ -332,11 +332,6 @@ export const AlumniDirectory: React.FC<Props> = ({
                 </button>
               )}
             </div>
-
-            {/* Quick Nickname Search Prompt */}
-            <div style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#64748B' }}>
-              Quick filter: <button onClick={() => setSearchQuery('Bulldozer')} style={{ color: '#D97706', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>"Bulldozer"</button> or <button onClick={() => setSearchQuery('MA. 0001')} style={{ color: '#D97706', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>"MA. 0001"</button>
-            </div>
           </div>
         </div>
       </div>
@@ -349,13 +344,23 @@ export const AlumniDirectory: React.FC<Props> = ({
       ) : alumniList.length === 0 ? (
         <div className="mosa-card" style={{ padding: '3.5rem 1.5rem', textAlign: 'center' }}>
           <GraduationCap size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
-          <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>No Alumni Found</h3>
+          <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>
+            {!searchQuery && levelFilter === 'ALL' && !yearFilter ? 'No members registered yet' : 'No Alumni Found'}
+          </h3>
           <p style={{ color: '#64748B', maxWidth: '450px', margin: '0 auto 1.5rem auto', fontSize: '0.9rem' }}>
-            No registered alumni matched your current search filters. Try clearing your search or register as a new alumnus.
+            {!searchQuery && levelFilter === 'ALL' && !yearFilter
+              ? 'Be the first to join the official MOSA alumni registry. Complete your registration to receive your official membership number.'
+              : 'No registered alumni matched your current search filters. Try clearing your search or register as a new alumnus.'}
           </p>
-          <button className="btn btn-secondary" onClick={() => { setSearchQuery(''); setLevelFilter('ALL'); setYearFilter(''); }}>
-            Reset Filters
-          </button>
+          {!searchQuery && levelFilter === 'ALL' && !yearFilter ? (
+            <button className="btn btn-gold" onClick={onOpenRegister}>
+              Register as an Alumnus
+            </button>
+          ) : (
+            <button className="btn btn-secondary" onClick={() => { setSearchQuery(''); setLevelFilter('ALL'); setYearFilter(''); }}>
+              Reset Filters
+            </button>
+          )}
         </div>
       ) : (
         <div 

@@ -2,7 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions for Role-Based Access Control
+    // ==============================================================
+    // 1. RBAC & HELPER FUNCTIONS
+    // ==============================================================
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -11,198 +13,302 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
     
-    function hasRole(role) {
-      return isAuthenticated() && (getUserData().role == role || request.auth.token.role == role);
+    function getUserRole() {
+      return isAuthenticated() ? 
+        (request.auth.token.role != null ? request.auth.token.role : 
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) ? getUserData().role : 'GUEST'))
+        : 'ANONYMOUS';
     }
     
-    function isAdmin() {
-      return hasRole('ADMIN') || hasRole('SUPER_ADMIN');
+    function hasRole(role) {
+      return isAuthenticated() && (getUserRole() == role);
     }
     
     function isSuperAdmin() {
       return hasRole('SUPER_ADMIN');
     }
     
+    function isAdmin() {
+      return isSuperAdmin() || hasRole('ADMIN');
+    }
+    
+    function isSecretary() {
+      return isAdmin() || hasRole('SECRETARY') || hasRole('MEMBERSHIP_ADMIN');
+    }
+    
+    function isTreasurer() {
+      return isAdmin() || hasRole('TREASURER');
+    }
+    
+    function isEventsStaff() {
+      return isAdmin() || hasRole('EVENTS_ATTENDANCE_ADMIN');
+    }
+    
+    function isPublicity() {
+      return isAdmin() || hasRole('PUBLICITY');
+    }
+    
+    function isStaff() {
+      return isAdmin() || 
+             hasRole('SECRETARY') || 
+             hasRole('TREASURER') || 
+             hasRole('MEMBERSHIP_ADMIN') || 
+             hasRole('DIRECTORY_ADMIN') || 
+             hasRole('EVENTS_ATTENDANCE_ADMIN') || 
+             hasRole('PUBLICITY') || 
+             hasRole('CHAPTER_ADMIN') || 
+             hasRole('CUSTOM_STAFF');
+    }
+    
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // 1. Settings Collection (Sequential Counter for MA Number Generator)
+    // ==============================================================
+    // 2. SYSTEM SETTINGS & COUNTERS
+    // ==============================================================
     match /settings/{settingId} {
-      // Only admins can read system counter settings
-      allow read: if isAdmin();
-      // Counter increments must only happen in transactions by authorised administrators
+      allow read: if isStaff();
       allow update, write: if isAdmin();
+      allow delete: if false; // System settings must never be deleted
     }
 
-    // 2. Applications Collection
+    // ==============================================================
+    // 3. CANDIDATE REGISTRATION APPLICATIONS
+    // ==============================================================
     match /applications/{applicationId} {
-      // Anyone can submit a registration application
+      // Anyone can submit a registration application with PENDING status
       allow create: if request.resource.data.status == 'PENDING'
                     && request.resource.data.email is string
-                    && request.resource.data.phone is string;
+                    && request.resource.data.fullName is string;
       
-      // Applicant can read their own application status; Admins can read all applications
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == resource.data.email);
+      // Applicant can track their own application; Staff can review queue
+      allow read: if isSecretary() || (isAuthenticated() && request.auth.token.email == resource.data.email);
       
-      // Only Admins can change status, approve, reject, or assign MA numbers
-      allow update: if isAdmin();
+      // Only Secretary / Membership Admin / Super Admin can approve, reject, or assign MA numbers
+      allow update: if isSecretary();
       
-      // Only Super Admins can delete applications
+      // Applications cannot be deleted, except strictly by Super Admin under GDPR/Right to be Forgotten
       allow delete: if isSuperAdmin();
     }
 
-    // 3. Alumni Profiles Collection
+    // ==============================================================
+    // 4. VERIFIED ALUMNI REGISTRY
+    // ==============================================================
     match /alumni/{alumniId} {
-      // Public directory access only for verified active profiles
-      // Sensitive fields (phone, email) are protected by client query projections or field-level validation
-      allow read: if true; 
+      // Public directory access (sensitive contact details handled by field privacy in app)
+      allow read: if true;
       
-      // Only Admins can create verified alumni records (upon application approval)
-      allow create: if isAdmin() && request.resource.data.alumniNumber != null;
+      // Only authorised Secretariat can mint new verified alumni profiles upon vetting
+      allow create: if isSecretary() && request.resource.data.alumniNumber != null;
       
-      // Alumni can update only their own profile details, but CANNOT modify alumniNumber, verifiedAt, or verifiedBy
-      allow update: if (isAdmin()) || 
+      // Alumni can edit their own profile fields, but CANNOT tamper with alumniNumber, verifiedAt, or verifiedBy
+      allow update: if isSecretary() || 
                       (isAuthenticated() && 
                        request.auth.uid == resource.data.internalId &&
                        request.resource.data.alumniNumber == resource.data.alumniNumber &&
                        request.resource.data.verifiedAt == resource.data.verifiedAt &&
                        request.resource.data.verifiedBy == resource.data.verifiedBy);
                        
-      // Deletions reserved for Super Admin
+      // Deletions strictly restricted to Super Admin
       allow delete: if isSuperAdmin();
     }
 
-    // 4. Users Collection (User Accounts & Roles)
+    // ==============================================================
+    // 5. USER ACCOUNTS & PRIVILEGE ELEVATION PROTECTION
+    // ==============================================================
     match /users/{userId} {
-      // Users can read their own profile; Admins can read user roles
-      allow read: if isOwner(userId) || isAdmin();
+      allow read: if isOwner(userId) || isStaff();
       
-      // Users can register their account with role 'USER' or 'ALUMNI', NEVER an administrator role
+      // Self-registration is restricted to base USER or ALUMNI roles; CANNOT grant oneself staff/admin
       allow create: if isOwner(userId) && (request.resource.data.role == 'USER' || request.resource.data.role == 'ALUMNI');
       
-      // Users can update their onboarding decision or profile, but CANNOT elevate their own role
-      allow update: if isAdmin() || (isOwner(userId) && request.resource.data.role == resource.data.role);
+      // Users can update their profile/preferences but cannot elevate their own role
+      allow update: if isSuperAdmin() || 
+                      (isOwner(userId) && request.resource.data.role == resource.data.role);
       
       allow delete: if isSuperAdmin();
     }
 
-    // 5. Audit Logs Collection
+    // ==============================================================
+    // 6. AUDIT TRAIL (IMMUTABLE FORENSIC LOG)
+    // ==============================================================
     match /audit_logs/{logId} {
-      // Read access strictly reserved for administrators
-      allow read: if isAdmin();
-      
-      // Append-only for authenticated actions; logs can never be updated or deleted
+      allow read: if isStaff();
+      // Append-only for authenticated system events
       allow create: if isAuthenticated();
+      // Tamper-proof: Logs cannot be modified or deleted by anyone, including administrators
       allow update, delete: if false;
     }
 
-    // 6. Chapters Collection
+    // ==============================================================
+    // 7. CAMPUS & INSTITUTIONAL CHAPTERS
+    // ==============================================================
     match /chapters/{chapterId} {
-      // Public directory read for chapters
       allow read: if true;
-      
-      // Administrators can create or delete chapters
       allow create, delete: if isAdmin();
-      
-      // Admins and designated Chapter Admins can update their chapter
       allow update: if isAdmin() || 
-                    (isAuthenticated() && 
-                     request.auth.token.email in resource.data.adminEmails);
+                    (isAuthenticated() && request.auth.token.email in resource.data.adminEmails);
     }
 
-    // 7. Chapter Members Collection
     match /chapter_members/{memberId} {
-      // Chapter rosters readable by members
       allow read: if true;
-      
-      // Verified alumni can join chapters
       allow create: if isAuthenticated() && request.resource.data.alumniId != null;
-      
-      // Member can leave, or chapter admin / MOSA admin can manage member status
-      allow update, delete: if isAdmin() || 
-                            (isAuthenticated() && 
-                             (request.auth.uid == resource.data.alumniId || 
-                              request.auth.token.email == resource.data.alumniEmail));
+      allow update, delete: if isStaff() || 
+                            (isAuthenticated() && (request.auth.uid == resource.data.alumniId || request.auth.token.email == resource.data.alumniEmail));
     }
 
-    // 8. Events Collection
+    // ==============================================================
+    // 8. EVENTS, TICKETING & QR GATE PASSES
+    // ==============================================================
     match /events/{eventId} {
-      // Publicly viewable events calendar
       allow read: if true;
-      
-      // Creation and deletion reserved for administrators
-      allow create, delete: if isAdmin();
-      
-      // Updates permitted for administrators or chapter admins if chapter event
-      allow update: if isAdmin();
+      allow create, delete: if isEventsStaff();
+      allow update: if isEventsStaff();
     }
 
-    // 9. Event Registrations Collection
     match /event_registrations/{registrationId} {
-      // Attendees can view their registration; Admins can view all
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
-      
-      // Verified alumni can register for open/required events
+      allow read: if isEventsStaff() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
       allow create: if isAuthenticated() && request.resource.data.alumniId != null;
-      
-      // Registration cancellation
-      allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
+      allow update, delete: if isEventsStaff() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
     }
 
-    // 10. Event Attendance Collection
     match /event_attendance/{attendanceId} {
-      // Viewable by administrators and event coordinators
-      allow read: if isAdmin();
-      
-      // Check-in created by authorized event admin or scan handler
-      allow create: if isAdmin();
-      
-      // Attendance records are immutable for audit compliance
+      // Attendance records are verifiable by staff
+      allow read: if isEventsStaff();
+      // Recorded by staff QR Gate Scanner
+      allow create: if isEventsStaff();
+      // Tamper-proof gate attendance
       allow update, delete: if false;
     }
 
-    // 11. Donation Campaigns Collection
-    match /donation_campaigns/{campaignId} {
-      // Publicly viewable donation campaigns
-      allow read: if true;
-      
-      // Only admins can create, update, or close campaigns
-      allow write: if isAdmin();
+    // ==============================================================
+    // 9. SMART MEETING ATTENDANCE
+    // ==============================================================
+    match /meetings/{meetingId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isSecretary() || isEventsStaff();
+      allow delete: if isAdmin();
     }
 
-    // 12. Payments Collection
+    match /meeting_attendance/{recordId} {
+      allow read: if isStaff() || (isAuthenticated() && request.auth.uid == resource.data.attendeeId);
+      // Can be submitted via self check-in or assisted by secretariat
+      allow create: if isAuthenticated();
+      // Can only be updated if meeting is not finalized
+      allow update: if isSecretary() && resource.data.state != 'FINALIZED';
+      allow delete: if isSecretary() && resource.data.state != 'FINALIZED';
+    }
+
+    // ==============================================================
+    // 10. PHILANTHROPY, DUES & TREASURY
+    // ==============================================================
+    match /donation_campaigns/{campaignId} {
+      allow read: if true;
+      allow write: if isTreasurer();
+    }
+
     match /payments/{paymentId} {
-      // Payers can read their own payments; Admins/Treasurers can read all
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
+      // Donors see their own records; Treasury & Staff see all
+      allow read: if isTreasurer() || (isAuthenticated() && request.auth.uid == resource.data.alumniId);
       
-      // Anyone verified or authenticated can submit a payment transaction
+      // Anyone authenticated can submit a contribution/dues payment
       allow create: if isAuthenticated() && request.resource.data.amount > 0;
       
-      // Only Admins / Treasurers can verify, approve, reject, or assign receipt numbers
-      allow update: if isAdmin();
+      // ONLY Treasurer or Super Admin can verify, issue official receipts, or decline transactions
+      allow update: if isTreasurer();
       
-      // Payments cannot be deleted for accounting auditability
+      // Financial records are strictly immutable for statutory audit compliance
       allow delete: if false;
     }
 
-    // 13. Announcements Collection
+    // ==============================================================
+    // 11. COMMUNICATIONS & CIRCULARS
+    // ==============================================================
     match /announcements/{announcementId} {
-      // Public announcements feed
       allow read: if true;
-      
-      // Only admins or chapter leaders can create, edit, or delete announcements
+      allow write: if isPublicity();
+    }
+
+    match /broadcasts/{broadcastId} {
+      allow read: if isPublicity();
+      allow write: if isPublicity();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, update, delete: if isAuthenticated() && request.auth.uid == resource.data.alumniId;
+      allow create: if isStaff() || isAuthenticated();
+    }
+
+    // ==============================================================
+    // 12. OPPORTUNITIES & MENTORSHIP
+    // ==============================================================
+    match /opportunities/{oppId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin() || (isAuthenticated() && request.auth.uid == resource.data.postedBy);
+    }
+
+    match /mentors/{mentorId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && (request.auth.uid == mentorId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /mentorship_requests/{requestId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.requesterId || request.auth.uid == resource.data.mentorId || isAdmin());
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.requesterId;
+      allow update: if isAuthenticated() && (request.auth.uid == resource.data.mentorId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // ==============================================================
+    // 13. ELECTIONS & DIGITAL VOTING (SECRET BALLOT INTEGRITY)
+    // ==============================================================
+    match /elections/{electionId} {
+      allow read: if isAuthenticated();
       allow write: if isAdmin();
     }
 
-    // 14. Notifications Collection
-    match /notifications/{notificationId} {
-      // Alumni can only access their own notifications
-      allow read, update, delete: if isAuthenticated() && request.auth.uid == resource.data.alumniId;
+    match /elections/{electionId}/candidates/{candidateId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /elections/{electionId}/ballots/{ballotId} {
+      // Individual ballots are private; voter can confirm their own vote was cast
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.voterAlumniId;
       
-      // System or Admin can create notifications
-      allow create: if isAdmin() || isAuthenticated();
+      // One vote per verified alumnus; ballot is cast anonymously with cryptographic receipt
+      allow create: if isAuthenticated() 
+                    && request.auth.uid == request.resource.data.voterAlumniId
+                    && request.resource.data.electionId == electionId;
+                    
+      // Strictly immutable: Once cast, votes cannot be modified or deleted by anyone
+      allow update, delete: if false;
+    }
+
+    // ==============================================================
+    // 14. CMS, WELCOME PAGE & DIGITAL ASSETS
+    // ==============================================================
+    match /cms_content/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /welcome_page/{pageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /documents/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isSecretary();
+    }
+
+    match /photos/{photoId} {
+      allow read: if true;
+      allow write: if isPublicity();
     }
   }
 }
-

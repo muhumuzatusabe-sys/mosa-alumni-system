@@ -143,20 +143,20 @@ const safeStorage = {
 
 // Default initial state
 const defaultSettings: SystemSettings = {
-  nextAlumniNumber: 3, // Since 0001 and 0002 are seeded
-  nextApplicationNumber: 125,
+  nextAlumniNumber: 1, // Clean baseline starts at 1 (MA. 0001)
+  nextApplicationNumber: 1,
   prefix: 'MA. ',
   padDigits: 4,
   systemName: 'MOSA Alumni Management System',
   schoolName: 'Mandela Secondary School Hoima (MASSH)',
   establishedYear: 1997,
-  usedMANumbersRegistry: ['MA. 0001', 'MA. 0002'],
+  usedMANumbersRegistry: [],
   mobileMoneySettings: {
     mtnNumber: '0782 123456',
     mtnName: 'Mandela Old Students Association',
     airtelNumber: '0701 654321',
     airtelName: 'MOSA National Treasury',
-    instructions: 'Enter your Alumni Number (e.g. MA. 0001) or Application Reference (e.g. MOSA-2026-00125) as the transaction reason.',
+    instructions: 'Enter your Alumni Number (e.g. MA. 0001) or Application Reference (e.g. MOSA-2026-00001) as the transaction reason.',
   },
   allowManualMANumberAssignment: true,
   autoApproveRegistrations: false,
@@ -358,495 +358,15 @@ const defaultWebsiteContent: WebsiteContent = {
   },
 };
 
-const defaultSeedDocuments: MOSADocument[] = [
-  {
-    id: 'doc-01',
-    title: 'MOSA Constitution & By-Laws (Official Ratified Edition)',
-    category: 'CONSTITUTION',
-    description: 'The supreme governing instrument of the Mandela Old Students Association, outlining aims, membership rights, executive structures, and operational covenants.',
-    fileSize: '2.4 MB',
-    publishedDate: '2025-10-15',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-02',
-    title: 'MOSA Annual General Meeting (AGM) Comprehensive Report',
-    category: 'AGM_REPORT',
-    description: 'Official record of the 2025 Annual General Meeting, featuring development reviews, executive elections, project ratifications, and member resolutions.',
-    fileSize: '4.8 MB',
-    publishedDate: '2025-12-28',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-03',
-    title: 'Executive Circular: 2026 Homecoming & Silver Jubilee Roadmap',
-    category: 'CIRCULAR',
-    description: 'Official dispatch from the Secretariat detailing dates, committee coordinators, sports gala program, and banquet arrangements for the alumni homecoming.',
-    fileSize: '820 KB',
-    publishedDate: '2026-02-10',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-04',
-    title: 'Annual Audited Financial Statements & Treasury Account',
-    category: 'FINANCIAL_REPORT',
-    description: 'Independent audit report on alumni subscriptions, bursary allocations, science laboratory donations, and bank account reconciliations.',
-    fileSize: '1.9 MB',
-    publishedDate: '2026-01-20',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: true,
-  },
-  {
-    id: 'doc-05',
-    title: 'MOSA University Chapter Guidelines & Accreditation Charter',
-    category: 'MEMBERSHIP_FORM',
-    description: 'Handbook for establishing, running, and getting accredited as an official MOSA campus chapter in universities across Uganda.',
-    fileSize: '650 KB',
-    publishedDate: '2026-01-05',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-06',
-    title: 'MOSA Mentorship Charter & Professional Guidance Protocol',
-    category: 'CIRCULAR',
-    description: 'Code of conduct, matching mechanisms, and professional milestones for senior MASSH alumni mentors and mentees.',
-    fileSize: '1.2 MB',
-    publishedDate: '2026-02-15',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-07',
-    title: 'Electoral Commission Guidelines & Digital Ballot Code of Conduct 2026-2028',
-    category: 'AGM_REPORT',
-    description: 'Statutory regulations governing the biennial national executive elections, secret digital balloting, nomination vetting, and certification protocols.',
-    fileSize: '2.1 MB',
-    publishedDate: '2026-03-01',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: false,
-  },
-  {
-    id: 'doc-08',
-    title: 'MOSA Strategic Plan 2025–2030 (Silver Jubilee Horizon)',
-    category: 'CONSTITUTION',
-    description: 'Five-year institutional blueprint focusing on campus infrastructure modernization, student bursary endowments, and regional chapter growth.',
-    fileSize: '3.6 MB',
-    publishedDate: '2025-11-20',
-    downloadUrl: '#',
-    fileType: 'PDF Document',
-    isRestrictedToMembers: true,
-  },
-];
+const defaultSeedDocuments: MOSADocument[] = [];
 
-const defaultSeedOpportunities: OpportunityItem[] = [
-  {
-    id: 'opp-01',
-    title: 'Senior Medical Officer & Clinical Specialist',
-    type: 'JOB',
-    organisation: 'Hoima Regional Referral Hospital',
-    description: 'Leading clinical department rounds, emergency diagnosis, and medical internship mentorship in Bunyoro sub-region.',
-    requirements: 'MBChB degree with minimum 3 years post-internship experience. Fully registered with Uganda Medical and Dental Practitioners Council (UMDPC).',
-    skills: ['Internal Medicine', 'Clinical Leadership', 'Emergency Care', 'Mentorship'],
-    location: 'Hoima City',
-    country: 'Uganda',
-    workplaceType: 'ON_SITE',
-    deadline: '2026-11-30',
-    contactPerson: 'Dr. Muhammad Z. (Class of 2002)',
-    contactEmail: 'clinical@hoimahospital.go.ug',
-    postedBy: {
-      name: 'Dr. Muhammad Z.',
-      email: 'muhammad.z@alumni.massh.ac.ug',
-      alumniNumber: 'MA. 0001',
-      role: 'ALUMNI',
-    },
-    visibility: 'PUBLIC',
-    status: 'PUBLISHED',
-    createdAt: '2026-09-15',
-    publishedAt: '2026-09-15',
-    viewsCount: 142,
-    applicationsCount: 8,
-  },
-  {
-    id: 'opp-02',
-    title: 'Civil Infrastructure & Road Systems Graduate Residency',
-    type: 'INTERNSHIP',
-    organisation: 'Uganda National Roads Authority (UNRA)',
-    description: 'Hands-on engineering residency working on the Albertine Region oil corridor network, bridge design, and drainage infrastructure.',
-    requirements: 'BSc in Civil Engineering or Construction Management. Recent MASSH graduate or final year university student.',
-    skills: ['AutoCAD', 'Topographical Surveying', 'Structural Design', 'Highway Engineering'],
-    location: 'Hoima - Butiaba Corridor',
-    country: 'Uganda',
-    workplaceType: 'ON_SITE',
-    deadline: '2026-12-15',
-    contactPerson: 'Eng. Grace Akiiki (Class of 2004)',
-    contactEmail: 'infrastructure@unra.go.ug',
-    postedBy: {
-      name: 'Eng. Grace Akiiki',
-      email: 'grace.akiiki@alumni.massh.ac.ug',
-      alumniNumber: 'MA. 0002',
-      role: 'ALUMNI',
-    },
-    visibility: 'MEMBERS_ONLY',
-    status: 'PUBLISHED',
-    createdAt: '2026-09-20',
-    publishedAt: '2026-09-20',
-    viewsCount: 215,
-    applicationsCount: 19,
-  },
-  {
-    id: 'opp-03',
-    title: 'Commonwealth Master’s & Doctoral Scholarships 2027',
-    type: 'SCHOLARSHIP',
-    organisation: 'Commonwealth Scholarship Commission (UK)',
-    description: 'Fully funded postgraduate scholarships for MASSH alumni seeking to undertake Master’s or PhD studies in top United Kingdom universities.',
-    requirements: 'Upper Second Class Bachelor’s degree or first class honours. Relevant fields in STEM, Public Policy, Healthcare, or Law.',
-    skills: ['Academic Research', 'Proposal Writing', 'English Proficiency'],
-    location: 'United Kingdom Universities',
-    country: 'United Kingdom',
-    workplaceType: 'ON_SITE',
-    deadline: '2026-12-31',
-    externalUrl: 'https://cscuk.fcdo.gov.uk/apply/',
-    applicationInstructions: 'Apply via the official CSCUK portal and contact MOSA Academic Committee for letter of recommendation.',
-    postedBy: {
-      name: 'MOSA Academic Committee',
-      email: 'admin@massh.ac.ug',
-      role: 'ADMIN',
-    },
-    visibility: 'PUBLIC',
-    status: 'PUBLISHED',
-    createdAt: '2026-10-01',
-    publishedAt: '2026-10-01',
-    viewsCount: 389,
-    applicationsCount: 34,
-  },
-  {
-    id: 'opp-04',
-    title: 'Senior Full-Stack TypeScript & Cloud Developer',
-    type: 'JOB',
-    organisation: 'NileTech Digital Solutions',
-    description: 'Building secure fintech and distributed cloud web platforms for East African financial institutions.',
-    requirements: 'Proficiency in React, TypeScript, Node.js, PostgreSQL, Docker, and AWS. Minimum 3 years building web applications.',
-    skills: ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Docker'],
-    location: 'Kampala / Remote',
-    country: 'Uganda',
-    workplaceType: 'HYBRID',
-    deadline: '2026-11-20',
-    contactPerson: 'Joan Asiimwe (Class of 2010)',
-    contactEmail: 'careers@niletech.ug',
-    postedBy: {
-      name: 'Joan Asiimwe',
-      email: 'joan.a@alumni.massh.ac.ug',
-      alumniNumber: 'MA. 0004',
-      role: 'ALUMNI',
-    },
-    visibility: 'MEMBERS_ONLY',
-    status: 'PUBLISHED',
-    createdAt: '2026-10-02',
-    publishedAt: '2026-10-02',
-    viewsCount: 178,
-    applicationsCount: 12,
-  },
-  {
-    id: 'opp-05',
-    title: 'Bunyoro Kitara Agribusiness Venture Incubation Fellowship',
-    type: 'ENTREPRENEURSHIP',
-    organisation: 'Bunyoro Agribusiness Innovation Trust',
-    description: 'Seed grant funding of up to UGX 15,000,000, laboratory testing, and 6 months mentorship for alumni founding agro-processing enterprises.',
-    requirements: 'Verified MOSA member with viable agribusiness concept in coffee, grain milling, honey, or horticulture.',
-    skills: ['Agribusiness', 'Financial Modeling', 'Value Addition', 'Supply Chain'],
-    location: 'Hoima / Masindi / Kikuube',
-    country: 'Uganda',
-    workplaceType: 'HYBRID',
-    deadline: '2026-12-10',
-    postedBy: {
-      name: 'Secretariat Team',
-      email: 'admin@massh.ac.ug',
-      role: 'ADMIN',
-    },
-    visibility: 'MEMBERS_ONLY',
-    status: 'PUBLISHED',
-    createdAt: '2026-10-06',
-    publishedAt: '2026-10-06',
-    viewsCount: 95,
-    applicationsCount: 7,
-  },
-];
+const defaultSeedOpportunities: OpportunityItem[] = [];
 
-const defaultSeedMentors: MentorProfile[] = [
-  {
-    id: 'mentor-01',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    fullName: 'Dr. Muhammad Zatusave',
-    photoUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=300&q=80',
-    email: 'muhammad.z@alumni.massh.ac.ug',
-    phone: '+256 782 111 222',
-    professionalField: 'Medicine & Surgery',
-    currentRole: 'Senior Consultant Surgeon',
-    organisation: 'Hoima Regional Referral Hospital',
-    yearsExperience: 18,
-    areasOfExpertise: ['Surgical Practice', 'Hospital Administration', 'Medical School Mentorship', 'Clinical Research'],
-    skills: ['Surgery', 'Clinical Diagnostics', 'Healthcare Leadership'],
-    mentorshipAreas: ['Career Guidance', 'Medical School Prep', 'Public Health Research'],
-    preferredMenteeInterests: ['Medical Students', 'Clinical Officers', 'Junior Doctors'],
-    availability: 'AVAILABLE',
-    maxMentees: 5,
-    currentMenteesCount: 2,
-    location: 'Hoima, Uganda',
-    format: 'HYBRID',
-    status: 'ACTIVE',
-    bio: 'MASSH Pioneer (Class of 2002). Passionate about mentoring the next generation of healthcare professionals across Uganda.',
-    createdAt: '2026-08-01',
-  },
-  {
-    id: 'mentor-02',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    fullName: 'Eng. Grace Akiiki',
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-    email: 'grace.akiiki@alumni.massh.ac.ug',
-    phone: '+256 772 333 444',
-    professionalField: 'Civil & Structural Engineering',
-    currentRole: 'Principal Infrastructure Engineer',
-    organisation: 'UNRA Albertine Corridor Project',
-    yearsExperience: 14,
-    areasOfExpertise: ['Highway Engineering', 'FIDIC Contracts', 'Project Management', 'Women in STEM'],
-    skills: ['Structural Design', 'Highway Engineering', 'Project Management'],
-    mentorshipAreas: ['ERB Professional Licensure', 'Women in Engineering', 'Graduate Transition'],
-    preferredMenteeInterests: ['Engineering Undergraduates', 'Junior Site Engineers', 'Surveyors'],
-    availability: 'AVAILABLE',
-    maxMentees: 4,
-    currentMenteesCount: 1,
-    location: 'Kampala / Hoima',
-    format: 'ONLINE',
-    status: 'ACTIVE',
-    bio: 'Class of 2004 (PEM). ERB registered civil engineer committed to advancing technical and infrastructure careers for alumni.',
-    createdAt: '2026-08-10',
-  },
-  {
-    id: 'mentor-03',
-    alumniId: 'alumni-0003',
-    alumniNumber: 'MA. 0003',
-    fullName: 'Adv. Emmanuel Byaruhanga',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    email: 'emmanuel.b@alumni.massh.ac.ug',
-    phone: '+256 701 555 666',
-    professionalField: 'Law & Corporate Governance',
-    currentRole: 'Managing Partner',
-    organisation: 'Byaruhanga & Advocates',
-    yearsExperience: 12,
-    areasOfExpertise: ['Corporate Law', 'Commercial Arbitration', 'Land Rights in Bunyoro', 'LDC Bar Coaching'],
-    skills: ['Advocacy', 'Legal Research', 'Arbitration', 'Contract Law'],
-    mentorshipAreas: ['LDC Bar Exam Strategy', 'Law Firm Practice', 'Judicial Clerkship'],
-    preferredMenteeInterests: ['Law Students (LLB)', 'LDC Bar Candidates', 'Pupils'],
-    availability: 'LIMITED',
-    maxMentees: 3,
-    currentMenteesCount: 2,
-    location: 'Kampala, Uganda',
-    format: 'HYBRID',
-    status: 'ACTIVE',
-    bio: 'Class of 2006 (HEL). Senior advocate dedicated to guiding aspiring lawyers through the rigors of bar exams and legal practice.',
-    createdAt: '2026-08-15',
-  },
-  {
-    id: 'mentor-04',
-    alumniId: 'alumni-0004',
-    alumniNumber: 'MA. 0004',
-    fullName: 'Joan Asiimwe',
-    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
-    email: 'joan.a@alumni.massh.ac.ug',
-    phone: '+256 788 777 888',
-    professionalField: 'Technology & Cloud Engineering',
-    currentRole: 'Head of Engineering',
-    organisation: 'AfriTech Digital Innovations',
-    yearsExperience: 10,
-    areasOfExpertise: ['Cloud Architecture', 'TypeScript/React', 'DevOps & CI/CD', 'Global Remote Careers'],
-    skills: ['TypeScript', 'Python', 'AWS', 'System Design'],
-    mentorshipAreas: ['Global Remote Job Search', 'GitHub Portfolio Review', 'Tech Interview Prep'],
-    preferredMenteeInterests: ['Software Developers', 'CS Undergraduates', 'Tech Career Switchers'],
-    availability: 'AVAILABLE',
-    maxMentees: 6,
-    currentMenteesCount: 3,
-    location: 'Nairobi / Remote',
-    format: 'ONLINE',
-    status: 'ACTIVE',
-    bio: 'Class of 2010 (PCB/M). Passionate about empowering African software engineers to excel in global engineering organizations.',
-    createdAt: '2026-09-01',
-  },
-];
+const defaultSeedMentors: MentorProfile[] = [];
 
-const defaultSeedElections: ElectionCycle[] = [
-  {
-    id: 'elec-2026',
-    title: 'MOSA National Executive Committee (NEC) General Elections 2026 – 2028',
-    theme: 'Consolidating 30 Years of Mandela Excellence • Integrity, Unity & Service',
-    description: 'Official biennial digital elections for the executive leadership of the Mandela Old Students Association. All verified alumni in good standing are entitled to cast one secret verifiable ballot for each executive portfolio.',
-    term: '2026 – 2028',
-    status: 'VOTING_ACTIVE',
-    nominationDeadline: '2026-10-01',
-    votingStartDate: '2026-10-05',
-    votingEndDate: '2026-10-31',
-    eligibleVotersCount: 450,
-    totalBallotsCast: 184,
-    quorumRequiredPercentage: 25,
-    positions: [
-      { id: 'pos-pres', title: 'MOSA Association President / Chairperson', description: 'Chief Executive Officer representing the alumni body to the MASSH Board of Governors, Headteacher, and national partners.', maxSelect: 1, order: 1 },
-      { id: 'pos-vp', title: 'Vice President', description: 'Deputizes the President and leads university and regional chapter liaison affairs.', maxSelect: 1, order: 2 },
-      { id: 'pos-sec', title: 'Secretary General', description: 'Custodian of the permanent registry, official communications, AGM records, and executive circulars.', maxSelect: 1, order: 3 },
-      { id: 'pos-tres', title: 'Honorary National Treasurer', description: 'Oversees membership dues treasury, annual audits, science lab campaigns, and financial integrity.', maxSelect: 1, order: 4 },
-      { id: 'pos-pub', title: 'Publicity & Communications Secretary', description: 'Leads digital platforms, media outreach, campus archives, and alumni spotlights.', maxSelect: 1, order: 5 },
-      { id: 'pos-ment', title: 'Academic & Mentorship Secretary', description: 'Coordinates scholarship funds, university chapter symposia, and graduate career placements.', maxSelect: 1, order: 6 },
-    ],
-    createdAt: '2026-09-01',
-  },
-];
+const defaultSeedElections: ElectionCycle[] = [];
 
-const defaultSeedCandidates: Candidate[] = [
-  {
-    id: 'cand-01',
-    electionId: 'elec-2026',
-    positionId: 'pos-pres',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    fullName: 'Dr. Muhammad Zatusave',
-    cohort: 'Class of 2002 (Pioneer)',
-    profession: 'Senior Consultant Surgeon',
-    photoUrl: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=300&q=80',
-    manifesto: 'Elevate MASSH infrastructure with a transparent UGX 500M Science Lab Fund, diaspora chapter alliances, and student healthcare schemes.',
-    seconderName: 'Adv. Emmanuel Byaruhanga (MA. 0003)',
-    seconderAlumniNumber: 'MA. 0003',
-    status: 'APPROVED',
-    votesCount: 104,
-    nominatedAt: '2026-09-12',
-  },
-  {
-    id: 'cand-02',
-    electionId: 'elec-2026',
-    positionId: 'pos-pres',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    fullName: 'Eng. Grace Akiiki',
-    cohort: 'Class of 2004 (PEM)',
-    profession: 'Principal Infrastructure Engineer',
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-    manifesto: 'Modernize STEM laboratories, establish incubator hubs for university chapters, and guarantee transparent audited financial governance.',
-    seconderName: 'Joan Asiimwe (MA. 0004)',
-    seconderAlumniNumber: 'MA. 0004',
-    status: 'APPROVED',
-    votesCount: 80,
-    nominatedAt: '2026-09-14',
-  },
-  {
-    id: 'cand-03',
-    electionId: 'elec-2026',
-    positionId: 'pos-vp',
-    alumniId: 'alumni-0003',
-    alumniNumber: 'MA. 0003',
-    fullName: 'Adv. Emmanuel Byaruhanga',
-    cohort: 'Class of 2006 (HEL)',
-    profession: 'Managing Partner, Byaruhanga & Advocates',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    manifesto: 'Expand chapter mobilization across East Africa and establish a free legal advisory desk for alumni entrepreneurs and innovators.',
-    seconderName: 'Dr. Muhammad Zatusave (MA. 0001)',
-    seconderAlumniNumber: 'MA. 0001',
-    status: 'APPROVED',
-    votesCount: 112,
-    nominatedAt: '2026-09-15',
-  },
-  {
-    id: 'cand-04',
-    electionId: 'elec-2026',
-    positionId: 'pos-vp',
-    alumniId: 'alumni-0006',
-    alumniNumber: 'MA. 0006',
-    fullName: 'Robert Magezi',
-    cohort: 'Class of 2008 (MEG)',
-    profession: 'Senior Regional Planner',
-    manifesto: 'Strengthen grassroots Bunyoro regional chapters, revive inter-house sports galas, and mobilize rural alumni networks.',
-    seconderName: 'Eng. Grace Akiiki (MA. 0002)',
-    seconderAlumniNumber: 'MA. 0002',
-    status: 'APPROVED',
-    votesCount: 72,
-    nominatedAt: '2026-09-16',
-  },
-  {
-    id: 'cand-05',
-    electionId: 'elec-2026',
-    positionId: 'pos-sec',
-    alumniId: 'alumni-0004',
-    alumniNumber: 'MA. 0004',
-    fullName: 'Joan Asiimwe',
-    cohort: 'Class of 2010 (PCB/M)',
-    profession: 'Head of Engineering, AfriTech',
-    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80',
-    manifesto: '100% digital registry automation, instant QR membership cards, real-time AGM broadcasts, and tamper-proof archival records.',
-    seconderName: 'Dr. Muhammad Zatusave (MA. 0001)',
-    seconderAlumniNumber: 'MA. 0001',
-    status: 'APPROVED',
-    votesCount: 138,
-    nominatedAt: '2026-09-18',
-  },
-  {
-    id: 'cand-06',
-    electionId: 'elec-2026',
-    positionId: 'pos-tres',
-    alumniId: 'alumni-0005',
-    alumniNumber: 'MA. 0005',
-    fullName: 'Caleb Mbabazi',
-    cohort: 'Class of 2005 (BCM)',
-    profession: 'Senior Audit Manager (CPA)',
-    manifesto: 'Zero-loss treasury controls, instant Mobile Money automated receipts, quarterly public financial dashboards, and high treasury bond returns.',
-    seconderName: 'Adv. Emmanuel Byaruhanga (MA. 0003)',
-    seconderAlumniNumber: 'MA. 0003',
-    status: 'APPROVED',
-    votesCount: 156,
-    nominatedAt: '2026-09-18',
-  },
-  {
-    id: 'cand-07',
-    electionId: 'elec-2026',
-    positionId: 'pos-pub',
-    alumniId: 'alumni-0007',
-    alumniNumber: 'MA. 0007',
-    fullName: 'Gloria Kemigisa',
-    cohort: 'Class of 2014 (Arts)',
-    profession: 'Broadcast Media Specialist',
-    manifesto: 'Elevate the MOSA brand through national media partnerships, monthly alumni spotlight videos, and interactive digital circulars.',
-    seconderName: 'Joan Asiimwe (MA. 0004)',
-    seconderAlumniNumber: 'MA. 0004',
-    status: 'APPROVED',
-    votesCount: 149,
-    nominatedAt: '2026-09-20',
-  },
-  {
-    id: 'cand-08',
-    electionId: 'elec-2026',
-    positionId: 'pos-ment',
-    alumniId: 'alumni-0009',
-    alumniNumber: 'MA. 0009',
-    fullName: 'Dr. Andrew Kasaija',
-    cohort: 'Class of 2007 (PCB)',
-    profession: 'Senior University Lecturer',
-    manifesto: 'Place 500 MASSH graduates in vetted internships, organize annual career symposia, and secure international postgraduate scholarships.',
-    seconderName: 'Dr. Muhammad Zatusave (MA. 0001)',
-    seconderAlumniNumber: 'MA. 0001',
-    status: 'APPROVED',
-    votesCount: 161,
-    nominatedAt: '2026-09-21',
-  },
-];
-
+const defaultSeedCandidates: Candidate[] = [];
 
 const defaultSeedUsers: AuthUser[] = [
   {
@@ -866,14 +386,6 @@ const defaultSeedUsers: AuthUser[] = [
   { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true, officeId: 'off-registry', officeTitle: 'Membership, Registry & Verification' },
   { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true, officeId: 'off-treasury', officeTitle: 'Honorary Treasury & Finance' },
   { uid: 'staff-publicity-01', email: 'publicity@massh.ac.ug', role: 'PUBLICITY', displayName: 'MOSA Publicity Secretary', active: true, officeId: 'off-comms', officeTitle: 'Communications, Media & Heritage' },
-  {
-    uid: 'alumni-user-0001',
-    email: 'muhammad.z@alumni.massh.ac.ug',
-    role: 'ALUMNI',
-    displayName: 'Muhammad Zatusave',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-  },
 ];
 
 const defaultSeedOffices: LeadershipOffice[] = [
@@ -882,9 +394,6 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Honorary Treasury & Finance',
     description: 'Management of voluntary alumni contributions, audited accounts, verified receipts, and financial reporting.',
     category: 'EXECUTIVE',
-    assignedAlumniId: 'alumni-0002',
-    assignedAlumniNumber: 'MA. 0002',
-    assignedAlumniName: 'Grace Mary Akiiki',
     assignedEmail: 'treasurer@massh.ac.ug',
     appointmentStartDate: '2026-01-01',
     appointmentEndDate: '2028-12-31',
@@ -904,9 +413,6 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Membership, Registry & Verification',
     description: 'Custodian of the alumni register, membership application verification, and MA sequence integrity.',
     category: 'SECRETARIAT',
-    assignedAlumniId: 'alumni-0001',
-    assignedAlumniNumber: 'MA. 0001',
-    assignedAlumniName: 'Muhammad Zatusave',
     assignedEmail: 'secretary@massh.ac.ug',
     appointmentStartDate: '2026-01-01',
     appointmentEndDate: '2028-12-31',
@@ -942,7 +448,8 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Communications, Media & Heritage',
     description: 'Official circulars, newsletters, press briefings, and digital heritage archive.',
     category: 'COMMITTEE',
-    status: 'VACANT',
+    assignedEmail: 'publicity@massh.ac.ug',
+    status: 'ACTIVE',
     modules: ['COMMUNICATIONS', 'WELCOME_PAGE', 'DOCUMENTS'],
     granularPermissions: {
       COMMUNICATIONS: ['VIEW', 'ADD', 'EDIT', 'PUBLISH', 'MANAGE'],
@@ -1034,872 +541,155 @@ const defaultWelcomePageConfig: WelcomePageConfig = {
   lastPublishedBy: 'admin@massh.ac.ug'
 };
 
-const defaultSeedAlumni: AlumniProfile[] = [
-  {
-    internalId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    firstName: 'Muhammad',
-    middleName: 'K.',
-    lastName: 'Zatusave',
-    nickname: 'Bulldozer',
-    gender: 'Male',
-    dateOfBirth: '2001-05-14',
-    photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    phone: '+256 701 234567',
-    email: 'muhammad.z@alumni.massh.ac.ug',
-    country: 'Uganda',
-    city: 'Kampala',
-    address: 'Plot 14, Kololo Heights',
-    linkedIn: 'https://linkedin.com/in/muhammad-zatusave',
-    socialLink: 'https://twitter.com/zatusave',
-    currentInstitution: 'Makerere University (Alum)',
-    programme: 'BSc. Civil Engineering',
-    highestQualification: "Bachelor's Degree",
-    occupation: 'Lead Infrastructure Engineer',
-    organisation: 'Uganda National Roads Authority (UNRA)',
-    position: 'Senior Project Engineer',
-    bio: 'Proud MASSH alumnus. Passionate about road infrastructure development, student mentorship, and Hoima community initiatives.',
-    schoolHistory: {
-      attendedOLevel: true,
-      oLevel: {
-        yearJoined: 2017,
-        yearCompleted: 2020,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 4',
-        stream: 'Blue Stream',
-      },
-      attendedALevel: true,
-      aLevel: {
-        yearJoined: 2021,
-        yearCompleted: 2022,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 6',
-        combination: 'PCM/ICT (Physics, Chemistry, Maths, ICT)',
-      },
-    },
-    privacySettings: {
-      showName: true,
-      showNickname: true,
-      showProfession: true,
-      showOrganisation: true,
-      showCountry: true,
-      showPhone: false,
-      showEmail: false,
-    },
-    membershipStatus: 'ACTIVE',
-    createdAt: '2023-01-15T09:00:00.000Z',
-    updatedAt: '2023-01-15T09:00:00.000Z',
-    verifiedAt: '2023-01-15T10:30:00.000Z',
-    verifiedBy: 'admin@massh.ac.ug',
-    applicationId: 'seed-app-0001',
-  },
-  {
-    internalId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    firstName: 'Grace',
-    middleName: 'Mary',
-    lastName: 'Akiiki',
-    nickname: 'Queen of Science',
-    gender: 'Female',
-    dateOfBirth: '2002-09-19',
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-    phone: '+256 772 987654',
-    email: 'grace.akiiki@alumni.massh.ac.ug',
-    country: 'Uganda',
-    city: 'Hoima',
-    address: 'Hospital Road, Hoima City',
-    linkedIn: 'https://linkedin.com/in/grace-akiiki',
-    currentInstitution: 'Mbarara University of Science & Technology',
-    programme: 'Bachelor of Medicine & Surgery (MBChB)',
-    highestQualification: 'Medical Degree',
-    occupation: 'Medical Doctor',
-    organisation: 'Hoima Regional Referral Hospital',
-    position: 'Medical Officer',
-    bio: 'Dedicated to rural maternal healthcare in Bunyoro sub-region. MASSH gave me the discipline to pursue medicine.',
-    schoolHistory: {
-      attendedOLevel: true,
-      oLevel: {
-        yearJoined: 2018,
-        yearCompleted: 2021,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 4',
-        stream: 'Green Stream',
-      },
-      attendedALevel: true,
-      aLevel: {
-        yearJoined: 2022,
-        yearCompleted: 2023,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 6',
-        combination: 'BCM/Sub-Maths (Biology, Chemistry, Maths)',
-      },
-    },
-    privacySettings: {
-      showName: true,
-      showNickname: true,
-      showProfession: true,
-      showOrganisation: true,
-      showCountry: true,
-      showPhone: true,
-      showEmail: false,
-    },
-    membershipStatus: 'ACTIVE',
-    createdAt: '2024-02-10T11:00:00.000Z',
-    updatedAt: '2024-02-10T11:00:00.000Z',
-    verifiedAt: '2024-02-10T14:20:00.000Z',
-    verifiedBy: 'admin@massh.ac.ug',
-    applicationId: 'seed-app-0002',
-  },
-];
+const defaultSeedAlumni: AlumniProfile[] = [];
 
-const defaultSeedApplications: AlumniApplication[] = [
-  {
-    id: 'app-pending-01',
-    firstName: 'Patrick',
-    middleName: 'Bagonza',
-    lastName: 'Mugisa',
-    nickname: 'Speedy',
-    gender: 'Male',
-    dateOfBirth: '2003-02-10',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    phone: '+256 788 112233',
-    email: 'pmugisa.tech@gmail.com',
-    country: 'Uganda',
-    city: 'Kampala',
-    address: 'Ntinda, Kampala',
-    linkedIn: 'https://linkedin.com/in/pmugisa',
-    currentInstitution: 'Kyambogo University',
-    programme: 'BSc. Computer Science',
-    highestQualification: "Bachelor's Degree",
-    occupation: 'Software Developer',
-    organisation: 'FinTech Africa Hoima Branch',
-    position: 'Full-stack Engineer',
-    bio: 'Software engineer passionate about building community software for Hoima youth. MASSH S4 & S6 alum.',
-    schoolHistory: {
-      attendedOLevel: true,
-      oLevel: {
-        yearJoined: 2016,
-        yearCompleted: 2019,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 4',
-        stream: 'Yellow Stream',
-      },
-      attendedALevel: true,
-      aLevel: {
-        yearJoined: 2020,
-        yearCompleted: 2021,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 6',
-        combination: 'MEG (Mathematics, Economics, Geography)',
-      },
-    },
-    privacySettings: {
-      showName: true,
-      showNickname: true,
-      showProfession: true,
-      showOrganisation: true,
-      showCountry: true,
-      showPhone: false,
-      showEmail: false,
-    },
-    status: 'PENDING',
-    submittedAt: '2026-10-01T08:30:00.000Z',
-    updatedAt: '2026-10-01T08:30:00.000Z',
-  },
-  {
-    id: 'app-underreview-02',
-    firstName: 'Daphne',
-    lastName: 'Kembabazi',
-    nickname: 'DJ Daph',
-    gender: 'Female',
-    dateOfBirth: '2004-11-05',
-    phone: '+256 755 443322',
-    email: 'daphnekembabazi@gmail.com',
-    country: 'Uganda',
-    city: 'Entebbe',
-    occupation: 'Financial Analyst',
-    organisation: 'Stanbic Bank Uganda',
-    position: 'Graduate Associate',
-    schoolHistory: {
-      attendedOLevel: false,
-      attendedALevel: true,
-      aLevel: {
-        yearJoined: 2021,
-        yearCompleted: 2022,
-        campus: 'Main Campus Hoima',
-        class: 'Senior 6',
-        combination: 'HEL/Div (History, Economics, Literature)',
-      },
-    },
-    privacySettings: {
-      showName: true,
-      showNickname: true,
-      showProfession: true,
-      showOrganisation: true,
-      showCountry: true,
-      showPhone: false,
-      showEmail: false,
-    },
-    status: 'UNDER_REVIEW',
-    reviewNotes: 'Verified with MASSH 2022 A-Level class registers. Ready for final committee approval.',
-    submittedAt: '2026-10-02T11:15:00.000Z',
-    updatedAt: '2026-10-02T15:45:00.000Z',
-    reviewedBy: 'admin@massh.ac.ug',
-  },
-];
+const defaultSeedApplications: AlumniApplication[] = [];
 
-const defaultSeedAuditLogs: AuditLog[] = [
-  {
-    id: 'log-001',
-    action: 'SYSTEM_INITIALIZED',
-    performedBy: 'SYSTEM',
-    affectedRecord: 'SYSTEM_SETTINGS',
-    timestamp: '2026-10-01T00:00:00.000Z',
-    metadata: { note: 'Mandela Old Students Association (MOSA) portal initialized for MASSH (Est. 1997).' },
-  },
-  {
-    id: 'log-002',
-    action: 'APPLICATION_APPROVED',
-    performedBy: 'admin@massh.ac.ug',
-    affectedRecord: 'MA. 0001',
-    timestamp: '2023-01-15T10:30:00.000Z',
-    metadata: { applicant: 'Muhammad Zatusave', alumniNumber: 'MA. 0001' },
-  },
-  {
-    id: 'log-003',
-    action: 'APPLICATION_APPROVED',
-    performedBy: 'admin@massh.ac.ug',
-    affectedRecord: 'MA. 0002',
-    timestamp: '2024-02-10T14:20:00.000Z',
-    metadata: { applicant: 'Grace Mary Akiiki', alumniNumber: 'MA. 0002' },
-  },
-];
+const defaultSeedAuditLogs: AuditLog[] = [];
 
-const defaultSeedChapters: Chapter[] = [
+const defaultSeedChapters: Chapter[] = [];
+
+const defaultSeedChapterMembers: ChapterMember[] = [];
+
+const defaultSeedEvents: MOSAEvent[] = [];
+
+const defaultSeedEventRegistrations: EventRegistration[] = [];
+
+const defaultSeedEventAttendance: EventAttendance[] = [];
+
+const defaultSeedCampaigns: DonationCampaign[] = [];
+
+const defaultSeedPayments: PaymentTransaction[] = [];
+
+const defaultSeedAnnouncements: Announcement[] = [];
+
+const defaultSeedNotifications: AlumniNotification[] = [];
+
+const defaultSeedPhotos: CampusPhoto[] = [];
+
+const defaultSeedSecretariatContacts: SecretariatContact[] = [
   {
-    id: 'chap-01',
-    code: 'MUMASA',
-    name: 'Makerere University Mandela Old Students Association',
-    institution: 'Makerere University',
-    location: 'Kampala',
-    country: 'Uganda',
+    id: 'sec-01',
+    name: 'MOSA National Secretariat',
+    title: 'National Executive Secretariat',
+    publishedPhone: '+256 782 123456',
+    whatsAppNumber: '256782123456',
+    email: 'secretariat@massh.ac.ug',
+    officeCategory: 'EXECUTIVE',
     status: 'ACTIVE',
-    description: 'The premier university chapter uniting MASSH alumni pursuing undergraduate and postgraduate programmes at Makerere University.',
-    adminEmails: ['admin@massh.ac.ug', 'muhammad.z@alumni.massh.ac.ug'],
-    leaderName: 'Muhammad Zatusave',
-    leaderContact: '+256 701 234567',
-    memberCount: 1,
-    createdAt: '2023-02-01T10:00:00.000Z',
-    updatedAt: '2023-02-01T10:00:00.000Z',
+    displayOrder: 1,
+    notes: 'National Executive Secretariat Office, MASSH Hoima Main Campus'
   },
   {
-    id: 'chap-02',
-    code: 'KYUMASA',
-    name: 'Kyambogo University Mandela Old Students Association',
-    institution: 'Kyambogo University',
-    location: 'Kampala',
-    country: 'Uganda',
+    id: 'sec-02',
+    name: 'MOSA Secretary General Office',
+    title: 'Secretary General',
+    publishedPhone: '+256 701 234567',
+    whatsAppNumber: '256701234567',
+    email: 'secretary@massh.ac.ug',
+    officeCategory: 'SECRETARIAT',
     status: 'ACTIVE',
-    description: 'Active chapter supporting engineering, education, and vocational sciences students from MASSH at Kyambogo University.',
-    adminEmails: ['admin@massh.ac.ug'],
-    leaderName: 'Patrick Mugisa',
-    leaderContact: '+256 788 112233',
-    memberCount: 0,
-    createdAt: '2023-02-15T11:00:00.000Z',
-    updatedAt: '2023-02-15T11:00:00.000Z',
+    displayOrder: 2,
+    notes: 'Official correspondence and alumni registry records'
   },
   {
-    id: 'chap-03',
-    code: 'MBUMASA',
-    name: 'Mbarara University Mandela Old Students Association',
-    institution: 'Mbarara University of Science & Technology (MUST)',
-    location: 'Mbarara',
-    country: 'Uganda',
+    id: 'sec-03',
+    name: 'MOSA Honorary Treasury',
+    title: 'Honorary Treasurer',
+    publishedPhone: '+256 782 345678',
+    whatsAppNumber: '256782345678',
+    email: 'treasurer@massh.ac.ug',
+    officeCategory: 'EXECUTIVE',
     status: 'ACTIVE',
-    description: 'Chapter for MASSH alumni in western Uganda pursuing medicine, pharmacy, nursing, and science degrees at MUST.',
-    adminEmails: ['admin@massh.ac.ug', 'grace.akiiki@alumni.massh.ac.ug'],
-    leaderName: 'Dr. Grace Mary Akiiki',
-    leaderContact: '+256 772 987654',
-    memberCount: 1,
-    createdAt: '2024-03-01T09:00:00.000Z',
-    updatedAt: '2024-03-01T09:00:00.000Z',
+    displayOrder: 3,
+    notes: 'National treasury, contributions and project funds'
   },
   {
-    id: 'chap-04',
-    code: 'GUMASA',
-    name: 'Gulu University Mandela Old Students Association',
-    institution: 'Gulu University',
-    location: 'Gulu',
-    country: 'Uganda',
+    id: 'sec-04',
+    name: 'MOSA Publicity & Media Desk',
+    title: 'Publicity & Mobilisation Secretary',
+    publishedPhone: '+256 752 456789',
+    whatsAppNumber: '256752456789',
+    email: 'publicity@massh.ac.ug',
+    officeCategory: 'SECRETARIAT',
     status: 'ACTIVE',
-    description: 'Northern Uganda chapter for MASSH alumni pursuing biosystems, business, and medicine at Gulu University.',
-    adminEmails: ['admin@massh.ac.ug'],
-    memberCount: 0,
-    createdAt: '2024-04-10T12:00:00.000Z',
-    updatedAt: '2024-04-10T12:00:00.000Z',
-  },
-  {
-    id: 'chap-05',
-    code: 'NKUMASA',
-    name: 'Nkumba University Mandela Old Students Association',
-    institution: 'Nkumba University',
-    location: 'Entebbe',
-    country: 'Uganda',
-    status: 'ACTIVE',
-    description: 'Entebbe / Wakiso chapter connecting MASSH alumni pursuing law, business, and applied sciences.',
-    adminEmails: ['admin@massh.ac.ug'],
-    memberCount: 0,
-    createdAt: '2024-05-20T14:00:00.000Z',
-    updatedAt: '2024-05-20T14:00:00.000Z',
-  },
+    displayOrder: 4,
+    notes: 'Media relations, public communications and cohort mobilisation'
+  }
 ];
 
-const defaultSeedChapterMembers: ChapterMember[] = [
-  {
-    id: 'cm-01',
-    chapterId: 'chap-01',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    alumniName: 'Muhammad Zatusave',
-    alumniEmail: 'muhammad.z@alumni.massh.ac.ug',
-    roleInChapter: 'LEADER',
-    joinedAt: '2023-02-01T10:00:00.000Z',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'cm-02',
-    chapterId: 'chap-03',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    alumniName: 'Grace Mary Akiiki',
-    alumniEmail: 'grace.akiiki@alumni.massh.ac.ug',
-    roleInChapter: 'LEADER',
-    joinedAt: '2024-03-01T09:00:00.000Z',
-    status: 'ACTIVE',
-  },
-];
+const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [];
 
-const defaultSeedEvents: MOSAEvent[] = [
-  {
-    id: 'evt-01',
-    title: 'MASSH Grand Alumni Convention & Dinner 2026',
-    description: 'The annual flagship gathering of all Mandela Secondary School Hoima alumni, celebrating school traditions, presenting alumni awards, and inaugurating new development projects.',
-    eventType: 'ANNUAL_CONVENTION',
-    date: '2026-12-18',
-    startTime: '14:00',
-    endTime: '22:00',
-    venue: 'Main Campus Hall & Sports Grounds, MASSH Hoima',
-    registrationDeadline: '2026-12-15',
-    registrationRequirement: 'REGISTRATION_REQUIRED',
-    eventImage: '/images/massh-courtyard-briefing.jpg',
-    status: 'UPCOMING',
-    registeredCount: 2,
-    attendedCount: 0,
-    createdAt: '2026-09-01T08:00:00.000Z',
-    updatedAt: '2026-09-01T08:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'evt-02',
-    title: 'Silver Jubilee Cohort Reunion (2000–2010)',
-    description: 'Special reunion commemorating the pioneer classes of MASSH. An evening of nostalgia, networking, and memory sharing.',
-    eventType: 'REUNION',
-    date: '2026-11-28',
-    startTime: '16:00',
-    endTime: '21:00',
-    venue: 'Miika Eco Resort Hotel, Hoima',
-    registrationDeadline: '2026-11-25',
-    registrationRequirement: 'REGISTRATION_REQUIRED',
-    eventImage: '/images/massh-gate-welcoming.jpg',
-    status: 'UPCOMING',
-    registeredCount: 1,
-    attendedCount: 0,
-    createdAt: '2026-09-10T10:00:00.000Z',
-    updatedAt: '2026-09-10T10:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'evt-03',
-    title: 'Bunyoro Youth STEM & Career Mentorship Day',
-    description: 'MOSA professionals return to MASSH to mentor current S4 and S6 students in engineering, medicine, ICT, law, and entrepreneurship.',
-    eventType: 'MENTORSHIP',
-    date: '2026-10-24',
-    startTime: '09:00',
-    endTime: '15:00',
-    venue: 'MASSH Science Complex & ICT Laboratories',
-    registrationRequirement: 'OPEN',
-    eventImage: '/images/massh-science-lab-inspection.jpg',
-    status: 'UPCOMING',
-    registeredCount: 1,
-    attendedCount: 0,
-    createdAt: '2026-09-15T12:00:00.000Z',
-    updatedAt: '2026-09-15T12:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'evt-04',
-    title: 'MOSA 2025 Annual Homecoming & Silver Jubilee Assembly',
-    description: 'The commemorative homecoming session bringing together alumni cohorts from 1997 to 2024 at MASSH Main Campus.',
-    eventType: 'GENERAL_MEETING',
-    date: '2025-12-20',
-    startTime: '10:00',
-    endTime: '17:00',
-    venue: 'MASSH Main Assembly Hall, Hoima',
-    registrationRequirement: 'REGISTRATION_REQUIRED',
-    eventImage: '/images/massh-vip-convoy-arrival.jpg',
-    status: 'COMPLETED',
-    registeredCount: 38,
-    attendedCount: 32,
-    createdAt: '2025-11-01T08:00:00.000Z',
-    updatedAt: '2025-12-21T09:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-];
+const defaultSeedBroadcasts: BroadcastMessage[] = [];
 
-const defaultSeedEventRegistrations: EventRegistration[] = [
-  {
-    id: 'reg-01',
-    eventId: 'evt-01',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    alumniName: 'Muhammad Zatusave',
-    alumniEmail: 'muhammad.z@alumni.massh.ac.ug',
-    registeredAt: '2026-09-05T09:00:00.000Z',
-    qrCheckInToken: 'QR-evt-01-MA. 0001-1725526800000',
-    status: 'REGISTERED',
-  },
-  {
-    id: 'reg-02',
-    eventId: 'evt-01',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    alumniName: 'Grace Mary Akiiki',
-    alumniEmail: 'grace.akiiki@alumni.massh.ac.ug',
-    registeredAt: '2026-09-06T11:00:00.000Z',
-    qrCheckInToken: 'QR-evt-01-MA. 0002-1725620400000',
-    status: 'REGISTERED',
-  },
-  {
-    id: 'reg-03',
-    eventId: 'evt-02',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    alumniName: 'Muhammad Zatusave',
-    alumniEmail: 'muhammad.z@alumni.massh.ac.ug',
-    registeredAt: '2026-09-12T14:00:00.000Z',
-    qrCheckInToken: 'QR-evt-02-MA. 0001-1726150000000',
-    status: 'REGISTERED',
-  },
-];
+const CLEAN_BASELINE_KEY = 'mosa_clean_baseline_2026';
 
-const defaultSeedEventAttendance: EventAttendance[] = [
-  {
-    id: 'att-01',
-    eventId: 'evt-04',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    alumniName: 'Muhammad Zatusave',
-    checkedInAt: '2025-12-20T10:15:00.000Z',
-    checkedInBy: 'admin@massh.ac.ug',
-    checkInMethod: 'QR_SCAN',
-  },
-  {
-    id: 'att-02',
-    eventId: 'evt-04',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    alumniName: 'Grace Mary Akiiki',
-    checkedInAt: '2025-12-20T10:28:00.000Z',
-    checkedInBy: 'admin@massh.ac.ug',
-    checkInMethod: 'MANUAL_ADMIN',
-  },
-];
-
-const defaultSeedCampaigns: DonationCampaign[] = [
-  {
-    id: 'camp-01',
-    title: 'MASSH Science Laboratory Complex Expansion',
-    description: 'Upgrading physics, chemistry, and biology laboratories with modern digital apparatus, spectrophotometers, and reagents for O & A-Level candidates. Foundation stone laid by Hon. Fred Byamukama, MP & Minister of Works on 26th Sept, 2026.',
-    targetAmount: 45000000,
-    raisedAmount: 18500000,
-    donorCount: 38,
-    category: 'INFRASTRUCTURE',
-    status: 'ACTIVE',
-    coverImage: '/images/massh-foundation-stone-unveiled.jpg',
-    startDate: '2026-01-10T00:00:00.000Z',
-    createdAt: '2026-01-10T00:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'camp-02',
-    title: 'MOSA Needy & Brilliant Student Bursary Endowment',
-    description: 'Sponsoring school fees, uniforms, and scholastic materials for orphans and underprivileged students from Bunyoro sub-region admitted to MASSH.',
-    targetAmount: 25000000,
-    raisedAmount: 12000000,
-    donorCount: 52,
-    category: 'BURSARY',
-    status: 'ACTIVE',
-    coverImage: '/images/massh-flag-unveiling-ceremony.jpg',
-    startDate: '2026-02-01T00:00:00.000Z',
-    createdAt: '2026-02-01T00:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'camp-03',
-    title: 'Silver Jubilee Pioneer Monument & Sports Pavilion',
-    description: 'Constructing a covered spectator pavilion at the main football pitch to honor the pioneer class of 1997.',
-    targetAmount: 35000000,
-    raisedAmount: 8750000,
-    donorCount: 19,
-    category: 'SPORTS',
-    status: 'ACTIVE',
-    coverImage: '/images/massh-science-lab-inspection.jpg',
-    startDate: '2026-03-01T00:00:00.000Z',
-    createdAt: '2026-03-01T00:00:00.000Z',
-    createdBy: 'admin@massh.ac.ug',
-  },
-];
-
-const defaultSeedPayments: PaymentTransaction[] = [
-  {
-    id: 'pay-01',
-    receiptNumber: 'MOSA-RCP-2026-0001',
-    alumniId: 'alumni-0001',
-    alumniNumber: 'MA. 0001',
-    alumniName: 'Muhammad Zatusave',
-    alumniEmail: 'muhammad.z@alumni.massh.ac.ug',
-    alumniPhone: '+256 701 234567',
-    category: 'ANNUAL_MEMBERSHIP',
-    subscriptionYear: 2026,
-    amount: 50000,
-    currency: 'UGX',
-    paymentMethod: 'MTN_MOMO',
-    transactionReference: 'MP260115.1120.M00123',
-    payerPhoneOrAccount: '0772123456',
-    notes: 'Annual MOSA membership subscription 2026',
-    status: 'VERIFIED',
-    submittedAt: '2026-01-15T11:20:00.000Z',
-    verifiedAt: '2026-01-15T14:00:00.000Z',
-    verifiedBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'pay-02',
-    receiptNumber: 'MOSA-RCP-2026-0002',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    alumniName: 'Grace Mary Akiiki',
-    alumniEmail: 'grace.akiiki@alumni.massh.ac.ug',
-    alumniPhone: '+256 701 445566',
-    category: 'PROJECT_DONATION',
-    campaignId: 'camp-01',
-    campaignTitle: 'MASSH Science Laboratory Complex Expansion',
-    amount: 500000,
-    currency: 'UGX',
-    paymentMethod: 'BANK_TRANSFER',
-    transactionReference: 'STB-UG-99887766',
-    payerPhoneOrAccount: 'Stanbic Bank Hoima',
-    notes: 'Donation towards Chemistry titration glassware',
-    status: 'VERIFIED',
-    submittedAt: '2026-02-10T09:15:00.000Z',
-    verifiedAt: '2026-02-10T12:00:00.000Z',
-    verifiedBy: 'admin@massh.ac.ug',
-  },
-  {
-    id: 'pay-03',
-    alumniId: 'alumni-0002',
-    alumniNumber: 'MA. 0002',
-    alumniName: 'Grace Mary Akiiki',
-    alumniEmail: 'grace.akiiki@alumni.massh.ac.ug',
-    alumniPhone: '+256 701 445566',
-    category: 'ANNUAL_MEMBERSHIP',
-    subscriptionYear: 2026,
-    amount: 50000,
-    currency: 'UGX',
-    paymentMethod: 'AIRTEL_MONEY',
-    transactionReference: 'AIR261002.1645.K8899',
-    payerPhoneOrAccount: '0701445566',
-    notes: 'Annual dues payment via Airtel Money',
-    status: 'PENDING_VERIFICATION',
-    submittedAt: '2026-10-02T16:45:00.000Z',
-  },
-];
-
-const defaultSeedAnnouncements: Announcement[] = [
-  {
-    id: 'ann-01',
-    title: 'Official Circular: 2026 MOSA Annual General Meeting (AGM) & Election Notice',
-    summary: 'Formal notice for the 2026 Elective AGM convening at the MASSH Main Hall and virtually via Zoom for all diaspora alumni.',
-    content: 'Pursuant to Article 9 of the Mandela Old Students Association (MOSA) Constitution, all verified alumni are formally invited to the 2026 Annual General Meeting. Agenda includes: (1) Presentation of the Annual Executive Report by the President, (2) Audited Financial Statements by the Treasurer, (3) Commissioning of the new Science Complex project, and (4) Election of Executive Committee members for the 2026–2028 tenure. Paid-up alumni with active dues for 2026 are entitled to full voting and candidacy privileges.',
-    category: 'CIRCULAR',
-    audienceScope: 'ALL_ALUMNI',
-    isPinned: true,
-    channels: ['PORTAL_FEED', 'SMS_BROADCAST', 'EMAIL_DIGEST'],
-    viewsCount: 245,
-    smsRecipientsCount: 180,
-    emailRecipientsCount: 310,
-    publishedAt: '2026-09-20T08:00:00.000Z',
-    publishedBy: 'admin@massh.ac.ug',
-    authorName: 'Dr. Patrick Mugisa',
-    authorRole: 'MOSA Secretary General',
-    coverImage: '/images/massh-flag-unveiling-ceremony.jpg',
-  },
-  {
-    id: 'ann-02',
-    title: 'Headteacher’s Termly Address: 29 Years of Academic & Co-Curricular Distinction',
-    summary: 'MASSH administration congratulates alumni on national leadership and reports 98.4% Division 1 pass rate in recent mock exams.',
-    content: 'Dear Old Students, On behalf of the Board of Governors, teaching staff, and students of Mandela Secondary School Hoima, I warmly greet you. Since 1997, our institution has stood as an academic beacon in the Albertine region. We are pleased to report steady progress on our STEM laboratories and thank the diaspora and university chapters for their continuous mentorship.',
-    category: 'NEWSLETTER',
-    audienceScope: 'ALL_ALUMNI',
-    isPinned: false,
-    channels: ['PORTAL_FEED', 'EMAIL_DIGEST'],
-    viewsCount: 188,
-    publishedAt: '2026-09-25T10:30:00.000Z',
-    publishedBy: 'admin@massh.ac.ug',
-    authorName: 'Mr. Lawrence Bagonza',
-    authorRole: 'Headteacher, MASSH Hoima',
-    coverImage: '/images/massh-headteacher-dignitary.jpg',
-  },
-  {
-    id: 'ann-03',
-    title: 'MUMASA Makerere Chapter: Freshers Welcome & Career Mentorship Fellowship',
-    summary: 'Makerere University chapter hosts welcome dinner for MASSH Class of 2024 joining Makerere undergraduate programmes.',
-    content: 'The executive of Makerere University Mandela Old Students Association (MUMASA) cordially invites all MASSH alumni at Makerere to our annual Welcome & Mentorship Fellowship at the University Main Hall. Connect with senior alumni in medicine, engineering, law, and business.',
-    category: 'EVENT_ALERT',
-    audienceScope: 'CHAPTER_ONLY',
-    targetChapterId: 'chap-01',
-    targetChapterCode: 'MUMASA',
-    isPinned: false,
-    channels: ['PORTAL_FEED', 'SMS_BROADCAST'],
-    viewsCount: 92,
-    smsRecipientsCount: 64,
-    publishedAt: '2026-09-28T14:00:00.000Z',
-    publishedBy: 'muhammad.z@alumni.massh.ac.ug',
-    authorName: 'Muhammad Zatusave (Bulldozer)',
-    authorRole: 'MUMASA Chapter President',
-    coverImage: '/images/massh-courtyard-briefing.jpg',
-  },
-  {
-    id: 'ann-04',
-    title: 'Condolence Message: Passing of Pioneer Mathematics Teacher Mr. Stephen Isingoma',
-    summary: 'MOSA extends heartfelt condolences to the family of our beloved pioneer teacher Mr. Stephen Isingoma (1997–2012).',
-    content: 'With deep sorrow, we announce the passing of Mr. Stephen Isingoma, who served as Head of the Mathematics Department from our founding year in 1997 until 2012. A vigil will be held in Hoima City followed by funeral services. Contributions to the condolence fund can be made via the MOSA Welfare Portal.',
-    category: 'OBITUARY',
-    audienceScope: 'ALL_ALUMNI',
-    isPinned: false,
-    channels: ['PORTAL_FEED', 'SMS_BROADCAST', 'EMAIL_DIGEST'],
-    viewsCount: 312,
-    publishedAt: '2026-09-30T09:00:00.000Z',
-    publishedBy: 'admin@massh.ac.ug',
-    authorName: 'MOSA Executive Committee',
-    authorRole: 'Welfare & Secretariat',
-  },
-];
-
-const defaultSeedNotifications: AlumniNotification[] = [
-  {
-    id: 'notif-01',
-    alumniId: 'alumni-0001',
-    title: 'Attendance Sign-In Now Open',
-    message: 'Attendance roll call for the MOSA National General Assembly is now open for member check-in.',
-    type: 'ATTENDANCE_OPEN',
-    linkTab: 'attendance',
-    isRead: false,
-    createdAt: '2026-10-04T08:00:00.000Z',
-  },
-  {
-    id: 'notif-02',
-    alumniId: 'alumni-0001',
-    title: 'Membership Application Approved',
-    message: 'Your official MOSA membership application has been approved and permanent number MASSH-00109 has been issued.',
-    type: 'MEMBERSHIP_APPROVED',
-    linkTab: 'my-profile',
-    isRead: false,
-    createdAt: '2026-10-02T10:15:00.000Z',
-  },
-  {
-    id: 'notif-03',
-    alumniId: 'alumni-0001',
-    title: 'Contribution Verified',
-    message: 'Your contribution of UGX 150,000 to the MASSH Science Laboratory Fund has been verified and recorded.',
-    type: 'PAYMENT_VERIFIED',
-    linkTab: 'payments',
-    isRead: false,
-    createdAt: '2026-09-28T14:30:00.000Z',
-  },
-  {
-    id: 'notif-04',
-    alumniId: 'alumni-0001',
-    title: 'New MOSA Event Announced',
-    message: 'Registration is now open for the 2026 MASSH Annual Grand Reunion & Sports Gala in Hoima.',
-    type: 'EVENT_ANNOUNCED',
-    linkTab: 'events',
-    isRead: true,
-    createdAt: '2026-09-22T09:00:00.000Z',
-  },
-  {
-    id: 'notif-05',
-    alumniId: 'alumni-0001',
-    title: 'Registry Profile Updated',
-    message: 'Your alumni record in the MOSA Official Registry was updated with your current chapter details.',
-    type: 'REGISTRY_UPDATED',
-    linkTab: 'directory',
-    isRead: true,
-    createdAt: '2026-09-15T11:45:00.000Z',
-  },
-];
-
-const defaultSeedPhotos: CampusPhoto[] = [
-  {
-    id: 'photo-01',
-    title: 'Foundation Stone Laid by Hon. Fred Byamukama (MP & Minister of Works)',
-    caption: 'Official commemorative foundation stone laid on 26th September 2026 by Hon. Fred Byamukama, Minister of State for Works and Transport, marking the new infrastructural expansion at Mandela Secondary School Hoima.',
-    category: 'FOUNDATION',
-    imageUrl: '/images/massh-foundation-stone-unveiled.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Main Campus, Hoima',
-    featured: true,
-  },
-  {
-    id: 'photo-02',
-    title: 'MASSH Flag Unveiling Ceremony — Caring to Achieve',
-    caption: 'Dignitaries and school leaders unveil the official Mandela Secondary School flag bearing the Kob emblem and school motto "Caring to Achieve" during the foundation ceremony.',
-    category: 'FOUNDATION',
-    imageUrl: '/images/massh-flag-unveiling-ceremony.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Campus Courtyard',
-    featured: true,
-  },
-  {
-    id: 'photo-03',
-    title: 'Chemistry & Science Laboratory Inspection',
-    caption: 'Touring the MASSH Science Complex with laboratory glassware and equipment, supporting O & A-Level practical science training.',
-    category: 'ACADEMICS',
-    imageUrl: '/images/massh-science-lab-inspection.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Science Complex',
-    featured: true,
-  },
-  {
-    id: 'photo-04',
-    title: 'Headteacher Mr. Lawrence Bagonza with School Lapel Badge',
-    caption: 'MASSH Headteacher proudly displaying his official school lapel pin alongside guests in the science laboratory.',
-    category: 'ACADEMICS',
-    imageUrl: '/images/massh-headteacher-dignitary.jpg',
-    date: '2026-09-26',
-    location: 'Chemistry Lab, MASSH',
-    featured: false,
-  },
-  {
-    id: 'photo-05',
-    title: 'VIP Ministerial Convoy Arrival at School Gate',
-    caption: 'Official Toyota Land Cruiser convoy with national ministerial flag arriving at Mandela Secondary School Hoima under security escort.',
-    category: 'VIP_VISIT',
-    imageUrl: '/images/massh-vip-convoy-arrival.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Main Entrance Gate',
-    featured: true,
-  },
-  {
-    id: 'photo-06',
-    title: 'Leadership & Delegation Discussions at School Courtyard',
-    caption: 'Senior administrators and delegation members discussing academic expansion and community partnership at MASSH.',
-    category: 'CAMPUS_LIFE',
-    imageUrl: '/images/massh-courtyard-briefing.jpg',
-    date: '2026-09-26',
-    location: 'Campus Administration Block',
-    featured: false,
-  },
-  {
-    id: 'photo-07',
-    title: 'Official Report Handover to Dignitaries',
-    caption: 'Handing over the MASSH Institutional Development and Alumni Progress Report to visiting guests.',
-    category: 'VIP_VISIT',
-    imageUrl: '/images/massh-official-handover.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Main Campus',
-    featured: false,
-  },
-  {
-    id: 'photo-08',
-    title: 'Warm Reception at School Gate Entrance',
-    caption: 'Welcoming alumni leaders and state officials at the MASSH blue gates.',
-    category: 'ALUMNI_COMMUNITY',
-    imageUrl: '/images/massh-gate-welcoming.jpg',
-    date: '2026-09-26',
-    location: 'Main School Gates',
-    featured: false,
-  },
-  {
-    id: 'photo-09',
-    title: 'Welcoming Guest of Honour with Event Literature',
-    caption: 'School leadership presenting the commemorative program to guests upon arrival at the school.',
-    category: 'VIP_VISIT',
-    imageUrl: '/images/massh-dignitary-arrival.jpg',
-    date: '2026-09-26',
-    location: 'School Compound',
-    featured: false,
-  },
-  {
-    id: 'photo-10',
-    title: 'Ministerial Delegation Reception',
-    caption: 'Welcoming guests as they arrive for the school assembly and project inspection.',
-    category: 'VIP_VISIT',
-    imageUrl: '/images/massh-vip-vehicle-reception.jpg',
-    date: '2026-09-26',
-    location: 'MASSH Parking Pavilion',
-    featured: false,
-  },
-];
-
-// Helper to initialize local storage
+// Helper to initialize local storage with clean baseline
 function initLocalStore() {
-  if (!safeStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+  const needsBaselineSanitize = safeStorage.getItem(CLEAN_BASELINE_KEY) !== 'v2';
+
+  if (!safeStorage.getItem(STORAGE_KEYS.SETTINGS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(defaultSettings));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.USERS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.USERS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultSeedUsers));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.ALUMNI)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.ALUMNI) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify(defaultSeedAlumni));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.APPLICATIONS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.APPLICATIONS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(defaultSeedApplications));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(defaultSeedAuditLogs));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.CHAPTERS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.CHAPTERS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.CHAPTERS, JSON.stringify(defaultSeedChapters));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.CHAPTER_MEMBERS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.CHAPTER_MEMBERS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.CHAPTER_MEMBERS, JSON.stringify(defaultSeedChapterMembers));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.EVENTS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.EVENTS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(defaultSeedEvents));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.EVENT_REGISTRATIONS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.EVENT_REGISTRATIONS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.EVENT_REGISTRATIONS, JSON.stringify(defaultSeedEventRegistrations));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.EVENT_ATTENDANCE)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.EVENT_ATTENDANCE) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.EVENT_ATTENDANCE, JSON.stringify(defaultSeedEventAttendance));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.CAMPAIGNS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.CAMPAIGNS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(defaultSeedCampaigns));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.PAYMENTS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.PAYMENTS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(defaultSeedPayments));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(defaultSeedAnnouncements));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(defaultSeedNotifications));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.PHOTOS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.PHOTOS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.PHOTOS, JSON.stringify(defaultSeedPhotos));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.BROADCASTS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.BROADCASTS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify(defaultSeedBroadcasts));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.DOCUMENTS) || needsBaselineSanitize) {
+    safeStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(defaultSeedDocuments));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.OPPORTUNITIES) || needsBaselineSanitize) {
+    safeStorage.setItem(STORAGE_KEYS.OPPORTUNITIES, JSON.stringify(defaultSeedOpportunities));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.MENTORS) || needsBaselineSanitize) {
+    safeStorage.setItem(STORAGE_KEYS.MENTORS, JSON.stringify(defaultSeedMentors));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.ELECTIONS) || needsBaselineSanitize) {
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(defaultSeedElections));
+  }
+  if (!safeStorage.getItem(STORAGE_KEYS.CANDIDATES) || needsBaselineSanitize) {
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(defaultSeedCandidates));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.WELCOME_PAGE)) {
     safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(defaultWelcomePageConfig));
@@ -1910,174 +700,16 @@ function initLocalStore() {
   if (!safeStorage.getItem(STORAGE_KEYS.SECRETARIAT_CONTACTS)) {
     safeStorage.setItem(STORAGE_KEYS.SECRETARIAT_CONTACTS, JSON.stringify(defaultSeedSecretariatContacts));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.LEGACY_ALUMNI)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.LEGACY_ALUMNI) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(defaultSeedLegacyAlumni));
   }
+
+  // Clear credentials when baseline sanitizing so old demo users don't linger
+  if (needsBaselineSanitize) {
+    safeStorage.removeItem(STORAGE_KEYS.CREDENTIALS);
+    safeStorage.setItem(CLEAN_BASELINE_KEY, 'v2');
+  }
 }
-
-const defaultSeedSecretariatContacts: SecretariatContact[] = [
-  {
-    id: 'sec-01',
-    name: 'Dr. Muhammad Zatusave',
-    title: 'MOSA National President',
-    publishedPhone: '+256 772 123 456',
-    whatsAppNumber: '256772123456',
-    email: 'president@massh.ac.ug',
-    officeCategory: 'EXECUTIVE',
-    status: 'ACTIVE',
-    displayOrder: 1,
-    notes: 'Head of National Executive Committee'
-  },
-  {
-    id: 'sec-02',
-    name: 'Ms. Joan Kemigisa',
-    title: 'Secretary General',
-    publishedPhone: '+256 701 234 567',
-    whatsAppNumber: '256701234567',
-    email: 'secretary@massh.ac.ug',
-    officeCategory: 'SECRETARIAT',
-    status: 'ACTIVE',
-    displayOrder: 2,
-    notes: 'Official correspondence and general registry'
-  },
-  {
-    id: 'sec-03',
-    name: 'Mr. Patrick Asaba',
-    title: 'Honorary Treasurer',
-    publishedPhone: '+256 782 345 678',
-    whatsAppNumber: '256782345678',
-    email: 'treasurer@massh.ac.ug',
-    officeCategory: 'EXECUTIVE',
-    status: 'ACTIVE',
-    displayOrder: 3,
-    notes: 'National treasury, contributions and projects'
-  },
-  {
-    id: 'sec-04',
-    name: 'Mr. David Bright',
-    title: 'Publicity & Mobilisation Secretary',
-    publishedPhone: '+256 752 456 789',
-    whatsAppNumber: '256752456789',
-    email: 'publicity@massh.ac.ug',
-    officeCategory: 'SECRETARIAT',
-    status: 'ACTIVE',
-    displayOrder: 4,
-    notes: 'Media relations, public communications and cohort mobilisation'
-  }
-];
-
-const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [
-  {
-    id: 'leg-001',
-    membershipNumber: 'MA. 0001',
-    fullName: 'Dr. Muhammad Zatusave',
-    cohortYear: 2002,
-    phone: '+256 772 123 456',
-    email: 'muhammad.z@alumni.massh.ac.ug',
-    physicalRegisterPage: 'Book 1, Page 4, Entry 01',
-    verifiedStatus: 'LINKED',
-    importedAt: '2026-01-10T10:00:00.000Z'
-  },
-  {
-    id: 'leg-002',
-    membershipNumber: 'MA. 0002',
-    fullName: 'Ms. Joan Kemigisa',
-    cohortYear: 2008,
-    phone: '+256 701 234 567',
-    email: 'joan.k@alumni.massh.ac.ug',
-    physicalRegisterPage: 'Book 1, Page 6, Entry 14',
-    verifiedStatus: 'LINKED',
-    importedAt: '2026-01-10T10:00:00.000Z'
-  },
-  {
-    id: 'leg-003',
-    membershipNumber: 'MA. 0003',
-    fullName: 'Mr. Patrick Asaba',
-    cohortYear: 2005,
-    phone: '+256 782 345 678',
-    email: 'patrick.a@alumni.massh.ac.ug',
-    physicalRegisterPage: 'Book 1, Page 9, Entry 22',
-    verifiedStatus: 'TRUSTED',
-    importedAt: '2026-01-10T10:00:00.000Z'
-  },
-  {
-    id: 'leg-004',
-    membershipNumber: 'MA. 0004',
-    fullName: 'Hon. Grace Mugisa',
-    cohortYear: 1999,
-    phone: '+256 774 999 111',
-    physicalRegisterPage: 'Book 1, Page 1, Entry 04',
-    verifiedStatus: 'TRUSTED',
-    importedAt: '2026-01-10T10:00:00.000Z'
-  },
-  {
-    id: 'leg-005',
-    membershipNumber: 'MA. 0005',
-    fullName: 'Eng. Robert Tinkamanyire',
-    cohortYear: 2001,
-    phone: '+256 755 888 222',
-    physicalRegisterPage: 'Book 1, Page 2, Entry 11',
-    verifiedStatus: 'TRUSTED',
-    importedAt: '2026-01-10T10:00:00.000Z'
-  }
-];
-
-const defaultSeedBroadcasts: BroadcastMessage[] = [
-  {
-    id: 'bcast-01',
-    title: 'Grand Alumni Homecoming & Silver Jubilee Gala 2026',
-    channel: 'SMS',
-    senderName: 'Dr. Patrick Mugisa',
-    senderRole: 'Secretary General, MOSA',
-    senderContact: '+256 772 100 200',
-    content: 'Dear {{fullName}} ({{alumniNumber}}), MOSA cordially invites you to the Grand Homecoming on Dec 12th at Mandela SS Hoima Main Campus. Celebrate 29 years of excellence! Confirm attendance: mosa.massh.ac.ug',
-    templateVariables: ['fullName', 'alumniNumber', 'cohort'],
-    targetAudience: { scope: 'ALL_ALUMNI' },
-    recipientCount: 342,
-    status: 'SENT',
-    estimatedCostUgx: 10260,
-    deliverySummary: { sent: 342, delivered: 338, failed: 4 },
-    createdAt: '2026-10-01T08:00:00.000Z',
-    sentAt: '2026-10-01T08:05:00.000Z',
-    gatewayProvider: 'MTN Uganda Bulk SMS Gateway (Shortcode: MOSA-MASSH)',
-  },
-  {
-    id: 'bcast-02',
-    title: 'Biennial NEC General Elections: Secret Ballot Casting Open',
-    channel: 'WHATSAPP',
-    senderName: 'Muhammad Zatusave',
-    senderRole: 'Electoral Commission ICT Lead',
-    senderContact: '+256 701 445 566',
-    content: '🗳️ *MOSA Biennial Elections (2026-2028)*\n\nGreetings {{fullName}} (Cohort: {{cohort}}).\nVoting is officially active for Executive Committee positions.\nYour verified voter token is ready.\n\nCast your verifiable secret ballot now:\n👉 https://mosa.massh.ac.ug/elections\n\n_Every vote counts toward transparent governance!_',
-    templateVariables: ['fullName', 'cohort', 'alumniNumber'],
-    targetAudience: { scope: 'VERIFIED_ONLY' },
-    recipientCount: 285,
-    status: 'SENT',
-    estimatedCostUgx: 14250,
-    deliverySummary: { sent: 285, delivered: 281, failed: 4 },
-    createdAt: '2026-10-04T09:30:00.000Z',
-    sentAt: '2026-10-04T09:32:00.000Z',
-    gatewayProvider: 'Meta WhatsApp Cloud Business API (Official Green Tick)',
-  },
-  {
-    id: 'bcast-03',
-    title: 'Formal Notice of 2026 Annual General Meeting & Audited Accounts',
-    channel: 'EMAIL',
-    senderName: 'Sarah Mbabazi, CPA',
-    senderRole: 'Honorary Treasurer, MOSA',
-    senderContact: 'treasurer@massh.ac.ug',
-    content: 'Dear {{fullName}},\n\nNotice is hereby given that the 2026 MOSA Annual General Meeting (AGM) will convene in Hoima City on Saturday, 12th December 2026.\n\nKey Agenda:\n1. Consideration of 2025/2026 Audited Financial Statements\n2. STEM Science Laboratory Trust Fund Progress\n3. Regional Chapter Charters Ratification\n\nDownload the full AGM booklet and financial statements on your member dashboard.',
-    templateVariables: ['fullName', 'cohort'],
-    targetAudience: { scope: 'ALL_ALUMNI' },
-    recipientCount: 310,
-    status: 'SENT',
-    estimatedCostUgx: 0,
-    deliverySummary: { sent: 310, delivered: 308, failed: 2 },
-    createdAt: '2026-09-28T10:00:00.000Z',
-    sentAt: '2026-09-28T10:02:00.000Z',
-    gatewayProvider: 'AWS SES Dedicated SMTP Cluster',
-  }
-];
 
 initLocalStore();
 
@@ -2160,10 +792,10 @@ export const dataService = {
       const now = new Date().toISOString();
       const currentYear = new Date().getFullYear();
 
-      // Generate Reference ID (e.g. MOSA-2026-00125)
+      // Generate Reference ID (e.g. MOSA-2026-00001)
       const settingsRaw = safeStorage.getItem(STORAGE_KEYS.SETTINGS);
       const settings: SystemSettings = settingsRaw ? JSON.parse(settingsRaw) : defaultSettings;
-      const appSeq = settings.nextApplicationNumber || 125;
+      const appSeq = settings.nextApplicationNumber || 1;
       const referenceId = `MOSA-${currentYear}-${String(appSeq).padStart(5, '0')}`;
       settings.nextApplicationNumber = appSeq + 1;
 
@@ -2220,7 +852,7 @@ export const dataService = {
 
         // If no existing number, generate unique sequential number
         if (!generatedNumber) {
-          let currentCounter = settings.nextAlumniNumber || 3;
+          let currentCounter = settings.nextAlumniNumber || 1;
           generatedNumber = this.formatAlumniNumber(currentCounter, prefix, pad);
           while (usedRegistry.has(this.normalizeAlumniNumber(generatedNumber))) {
             currentCounter += 1;
@@ -2361,16 +993,16 @@ export const dataService = {
       }
 
       // Update logged-in AuthUser's onboarding decision so they don't get prompted repeatedly
-      const activeUser = this.getCurrentUser();
+      const currentSessionUser = this.getCurrentUser();
       const applicantEmail = (appData.email || '').toLowerCase().trim();
-      if (activeUser && (activeUser.email.toLowerCase() === applicantEmail || appData.registrationMode === 'SELF')) {
-        activeUser.alumniOnboardingDecision = 'COMPLETED';
+      if (currentSessionUser && (currentSessionUser.email.toLowerCase() === applicantEmail || appData.registrationMode === 'SELF')) {
+        currentSessionUser.alumniOnboardingDecision = 'COMPLETED';
         if (newProfile?.internalId) {
-          activeUser.alumniId = newProfile.internalId;
-          activeUser.alumniNumber = generatedNumber;
-          activeUser.role = 'ALUMNI';
+          currentSessionUser.alumniId = newProfile.internalId;
+          currentSessionUser.alumniNumber = generatedNumber;
+          currentSessionUser.role = 'ALUMNI';
         }
-        safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(activeUser));
+        safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentSessionUser));
       }
 
       const storedUsers: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
@@ -2610,7 +1242,7 @@ export const dataService = {
         generatedNumber = cleaned;
       } else {
         // Safe automatic generator skipping any reserved/manual numbers
-        let currentCounter = settings.nextAlumniNumber || 3;
+        let currentCounter = settings.nextAlumniNumber || 1;
         while (usedRegistry.has(this.formatAlumniNumber(currentCounter, settings.prefix || 'MA. ', settings.padDigits || 4))) {
           currentCounter++;
         }
@@ -3225,6 +1857,149 @@ export const dataService = {
     return JSON.parse(safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || '[]');
   },
 
+  // Activity & Audit History Management Controls
+  async deleteAuditLog(id: string, actorEmail: string): Promise<boolean> {
+    const logs: AuditLog[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || '[]');
+    const target = logs.find(l => l.id === id);
+    const updated = logs.filter(l => l.id !== id);
+    safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(updated));
+
+    if (isFirebaseConfigured() && db) {
+      try {
+        await deleteDoc(doc(db, 'audit_logs', id));
+      } catch (e) {
+        console.warn('Failed to delete audit log in Firebase:', e);
+      }
+    }
+
+    if (target) {
+      await this.logAudit({
+        action: 'AUDIT_LOG_DELETED',
+        performedBy: actorEmail,
+        affectedRecord: id,
+        metadata: { deletedAction: target.action, deletedTarget: target.affectedRecord }
+      });
+    }
+    return true;
+  },
+
+  async deleteAuditLogs(ids: string[], actorEmail: string): Promise<{ deletedCount: number }> {
+    const idSet = new Set(ids);
+    const logs: AuditLog[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || '[]');
+    const countBefore = logs.length;
+    const updated = logs.filter(l => !idSet.has(l.id));
+    const deletedCount = countBefore - updated.length;
+    safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(updated));
+
+    if (isFirebaseConfigured() && db) {
+      for (const id of ids) {
+        try {
+          await deleteDoc(doc(db, 'audit_logs', id));
+        } catch (e) {
+          console.warn('Firebase batch delete error:', e);
+        }
+      }
+    }
+
+    await this.logAudit({
+      action: 'AUDIT_LOGS_BULK_DELETED',
+      performedBy: actorEmail,
+      affectedRecord: `BATCH_${ids.length}_RECORDS`,
+      metadata: { deletedCount, requestedCount: ids.length }
+    });
+
+    return { deletedCount };
+  },
+
+  async pruneAuditLogs(actorEmail: string, olderThanDays?: number, actionType?: string): Promise<{ deletedCount: number }> {
+    const logs: AuditLog[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || '[]');
+    const countBefore = logs.length;
+    const now = Date.now();
+
+    const updated = logs.filter(l => {
+      // Check action filter
+      if (actionType && actionType !== 'ALL' && l.action !== actionType) {
+        return true; // Keep
+      }
+      // Check date filter
+      if (olderThanDays !== undefined && olderThanDays > 0) {
+        const logTime = new Date(l.timestamp).getTime();
+        const ageInDays = (now - logTime) / (1000 * 60 * 60 * 24);
+        if (ageInDays > olderThanDays) {
+          return false; // Prune (delete)
+        }
+        return true; // Keep
+      }
+      // If olderThanDays is 0 or undefined, delete matching records
+      return false;
+    });
+
+    const deletedCount = countBefore - updated.length;
+    safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(updated));
+
+    await this.logAudit({
+      action: 'AUDIT_LOGS_PRUNED',
+      performedBy: actorEmail,
+      affectedRecord: `PRUNED_${deletedCount}_RECORDS`,
+      metadata: { deletedCount, olderThanDays, actionType }
+    });
+
+    return { deletedCount };
+  },
+
+  exportAuditLogs(format: 'csv' | 'json', logsToExport?: AuditLog[]): string {
+    const logs: AuditLog[] = logsToExport || JSON.parse(safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || '[]');
+    if (format === 'json') {
+      return JSON.stringify(logs, null, 2);
+    }
+    // CSV export
+    const headers = ['ID', 'Timestamp', 'Action', 'Performed By', 'Affected Record', 'Metadata'];
+    const rows = logs.map((l: AuditLog) => [
+      `"${l.id}"`,
+      `"${l.timestamp}"`,
+      `"${l.action}"`,
+      `"${l.performedBy}"`,
+      `"${(l.affectedRecord || '').replace(/"/g, '""')}"`,
+      `"${JSON.stringify(l.metadata || {}).replace(/"/g, '""')}"`
+    ]);
+    return [headers.join(','), ...rows.map((r: string[]) => r.join(','))].join('\n');
+  },
+
+  // Purge all residual test and demo entries to establish clean production baseline
+  async purgeDemoData(actorEmail = 'admin@massh.ac.ug'): Promise<{ success: boolean; message: string }> {
+    safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.CHAPTERS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.CHAPTER_MEMBERS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.EVENT_REGISTRATIONS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.EVENT_ATTENDANCE, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.PHOTOS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.OPPORTUNITIES, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.MENTORS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify([]));
+    safeStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(defaultSettings));
+    safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultSeedUsers));
+    safeStorage.removeItem(STORAGE_KEYS.CREDENTIALS);
+
+    await this.logAudit({
+      action: 'SYSTEM_PURGE_DEMO_DATA',
+      performedBy: actorEmail,
+      affectedRecord: 'ALL_MODULES_RESET_TO_BASELINE',
+      metadata: { timestamp: new Date().toISOString(), cleanBaseline: true }
+    });
+
+    return { success: true, message: 'All test and demo entries have been successfully purged. System baseline reset.' };
+  },
+
   // Settings
   async getSystemSettings(): Promise<SystemSettings> {
     if (isFirebaseConfigured() && db) {
@@ -3301,6 +2076,13 @@ export const dataService = {
         displayName: 'Head of ICT / MOSA Admin',
         updatedAt: new Date().toISOString()
       },
+      'superadmin@mosa.org': {
+        email: 'superadmin@mosa.org',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'Executive Super Admin',
+        updatedAt: new Date().toISOString()
+      },
       'secretary@massh.ac.ug': {
         email: 'secretary@massh.ac.ug',
         password: 'admin123',
@@ -3320,15 +2102,6 @@ export const dataService = {
         password: 'admin123',
         role: 'PUBLICITY',
         displayName: 'MOSA Publicity Secretary',
-        updatedAt: new Date().toISOString()
-      },
-      'muhammad.z@alumni.massh.ac.ug': {
-        email: 'muhammad.z@alumni.massh.ac.ug',
-        password: 'alumni123',
-        role: 'ALUMNI',
-        displayName: 'Muhammad Zatusave',
-        alumniId: 'alumni-0001',
-        alumniNumber: 'MA. 0001',
         updatedAt: new Date().toISOString()
       }
     };

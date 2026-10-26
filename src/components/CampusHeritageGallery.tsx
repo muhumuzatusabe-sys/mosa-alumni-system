@@ -13,7 +13,8 @@ import {
   Maximize2,
   Filter,
   CheckCircle2,
-  ArrowLeft
+  ArrowLeft,
+  Upload
 } from 'lucide-react';
 import { CampusPhoto, PhotoCategory, AuthUser } from '../types';
 import { dataService } from '../services/dataService';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }) => {
+  const isAdmin = currentUser?.role === 'SUPER_ADMIN' || currentUser?.role === 'ADMIN';
   const [photos, setPhotos] = useState<CampusPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<'ALL' | PhotoCategory>('ALL');
@@ -249,9 +251,25 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
           <p style={{ color: '#64748B' }}>Loading campus heritage gallery...</p>
         </div>
       ) : filteredPhotos.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', background: '#F8FAFC', borderRadius: '12px' }}>
-          <ImageIcon size={36} color="#94A3B8" style={{ margin: '0 auto 0.5rem auto' }} />
-          <p style={{ color: '#64748B' }}>No photos found in this category.</p>
+        <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+          <ImageIcon size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />
+          <h3 style={{ fontSize: '1.25rem', color: '#0B203E', marginBottom: '0.5rem' }}>
+            {photos.length === 0 ? 'No media added yet' : 'No photos found in this category'}
+          </h3>
+          <p style={{ color: '#64748B', maxWidth: '420px', margin: '0 auto 1.5rem auto', fontSize: '0.9rem' }}>
+            {photos.length === 0 
+              ? 'The campus heritage gallery is currently empty. Authorized administrators can upload the first photograph or historical milestone.' 
+              : 'Try selecting a different category or clearing your filter to view photos.'}
+          </p>
+          {isAdmin && (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="btn btn-gold"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <Upload size={16} /> Upload First Photo
+            </button>
+          )}
         </div>
       ) : (
         <div style={{ 

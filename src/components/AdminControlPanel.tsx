@@ -28,6 +28,9 @@ import {
   KeyRound,
   UserCheck,
   CheckSquare,
+  Square,
+  Filter,
+  AlertTriangle,
   Globe,
   ChevronDown,
   Clock,
@@ -210,9 +213,25 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [newDocSize, setNewDocSize] = useState('1.2 MB');
   const [newDocRestricted, setNewDocRestricted] = useState(false);
 
-  // Audit Logs State
+  // Audit Logs State & Controls
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loadingAudits, setLoadingAudits] = useState(false);
+  const [auditSearchQuery, setAuditSearchQuery] = useState('');
+  const [auditActionFilter, setAuditActionFilter] = useState('ALL');
+  const [auditActorFilter, setAuditActorFilter] = useState('ALL');
+  const [auditDateFrom, setAuditDateFrom] = useState('');
+  const [auditDateTo, setAuditDateTo] = useState('');
+  const [selectedAuditIds, setSelectedAuditIds] = useState<string[]>([]);
+  const [auditConfirmModal, setAuditConfirmModal] = useState<{
+    isOpen: boolean;
+    type: 'single' | 'selected' | 'prune' | 'purge_test_data';
+    targetId?: string;
+    pruneDays?: number;
+    title: string;
+    description: string;
+  } | null>(null);
+  const [auditActionNotice, setAuditActionNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [isProcessingAudit, setIsProcessingAudit] = useState(false);
 
   // Permissions helper
   const canAccessRegistry = governanceService.can(currentUser, 'REGISTRY', 'VIEW');
@@ -303,6 +322,88 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       setRecentApplications(applicationsList.slice(0, 6));
     } catch (err) {
       console.error('Failed to load admin data:', err);
+    }
+  };
+
+  // Activity / Audit History Controls
+  const executeDeleteSingleAudit = async (id: string) => {
+    setIsProcessingAudit(true);
+    try {
+      await dataService.deleteAuditLog(id, currentUser.email);
+      setSelectedAuditIds(prev => prev.filter(x => x !== id));
+      await loadAllAdminData();
+      setAuditActionNotice({ text: 'Activity record successfully deleted.', type: 'success' });
+    } catch (err: any) {
+      setAuditActionNotice({ text: err.message || 'Failed to delete activity log.', type: 'error' });
+    } finally {
+      setIsProcessingAudit(false);
+      setAuditConfirmModal(null);
+    }
+  };
+
+  const executeDeleteSelectedAudits = async () => {
+    if (selectedAuditIds.length === 0) return;
+    setIsProcessingAudit(true);
+    try {
+      const res = await dataService.deleteAuditLogs(selectedAuditIds, currentUser.email);
+      setSelectedAuditIds([]);
+      await loadAllAdminData();
+      setAuditActionNotice({ text: `${res.deletedCount} activity records deleted.`, type: 'success' });
+    } catch (err: any) {
+      setAuditActionNotice({ text: err.message || 'Failed to delete records.', type: 'error' });
+    } finally {
+      setIsProcessingAudit(false);
+      setAuditConfirmModal(null);
+    }
+  };
+
+  const executePruneAudits = async (days?: number) => {
+    setIsProcessingAudit(true);
+    try {
+      const res = await dataService.pruneAuditLogs(currentUser.email, days, auditActionFilter);
+      setSelectedAuditIds([]);
+      await loadAllAdminData();
+      setAuditActionNotice({ text: `Activity history successfully pruned (${res.deletedCount} entries removed).`, type: 'success' });
+    } catch (err: any) {
+      setAuditActionNotice({ text: err.message || 'Failed to prune logs.', type: 'error' });
+    } finally {
+      setIsProcessingAudit(false);
+      setAuditConfirmModal(null);
+    }
+  };
+
+  const executePurgeTestData = async () => {
+    setIsProcessingAudit(true);
+    try {
+      const res = await dataService.purgeDemoData(currentUser.email);
+      setSelectedAuditIds([]);
+      await loadAllAdminData();
+      setAuditActionNotice({ text: res.message, type: 'success' });
+    } catch (err: any) {
+      setAuditActionNotice({ text: err.message || 'Failed to purge test data.', type: 'error' });
+    } finally {
+      setIsProcessingAudit(false);
+      setAuditConfirmModal(null);
+    }
+  };
+
+  const handleExportAudits = (format: 'csv' | 'json', logsToExport: AuditLog[]) => {
+    try {
+      const content = dataService.exportAuditLogs(format, logsToExport);
+      const mime = format === 'json' ? 'application/json' : 'text/csv';
+      const ext = format === 'json' ? 'json' : 'csv';
+      const blob = new Blob([content], { type: `${mime};charset=utf-8;` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mosa_activity_history_${new Date().toISOString().split('T')[0]}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setAuditActionNotice({ text: `Activity history exported as ${format.toUpperCase()}.`, type: 'success' });
+    } catch (err: any) {
+      setAuditActionNotice({ text: 'Export failed: ' + err.message, type: 'error' });
     }
   };
 
@@ -2679,71 +2780,479 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           </div>
         )}
 
-        {/* SECTION 2: MEMBERS & APPROVALS (AUDIT TRAIL) */}
-        {activeSection === 'approvals' && approvalsSubTab === 'audit' && canAccessAudit && (
-          <div className="mosa-card" style={{ padding: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <div>
-                <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: 0 }}>System Governance Audit Trail</h2>
-                <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0 }}>
-                  Tamper-evident record of all administrative operations, membership number changes, status updates, and module configurations.
-                </p>
-              </div>
-              <button 
-                onClick={loadAllAdminData}
-                className="btn btn-secondary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.9rem', fontSize: '0.85rem' }}
-              >
-                <RefreshCw size={14} /> Refresh Logs
-              </button>
-            </div>
+        {/* SECTION 2: MEMBERS & APPROVALS (AUDIT & ACTIVITY HISTORY) */}
+        {activeSection === 'approvals' && approvalsSubTab === 'audit' && canAccessAudit && (() => {
+          const uniqueActions = Array.from(new Set(auditLogs.map(l => l.action))).sort();
+          const uniqueActors = Array.from(new Set(auditLogs.map(l => l.performedBy))).sort();
 
-            {auditLogs.length === 0 ? (
-              <p style={{ color: '#94A3B8', textAlign: 'center', padding: '3rem 0' }}>No audit logs recorded yet.</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {auditLogs.slice(0, 50).map(log => (
-                  <div 
-                    key={log.id}
-                    style={{
-                      padding: '1rem',
-                      background: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      gap: '1rem',
-                    }}
+          const filteredLogs = auditLogs.filter(log => {
+            if (auditSearchQuery.trim()) {
+              const q = auditSearchQuery.toLowerCase();
+              const matchAction = (log.action || '').toLowerCase().includes(q);
+              const matchActor = (log.performedBy || '').toLowerCase().includes(q);
+              const matchTarget = (log.affectedRecord || '').toLowerCase().includes(q);
+              const matchMeta = log.metadata ? JSON.stringify(log.metadata).toLowerCase().includes(q) : false;
+              if (!matchAction && !matchActor && !matchTarget && !matchMeta) return false;
+            }
+            if (auditActionFilter !== 'ALL' && log.action !== auditActionFilter) return false;
+            if (auditActorFilter !== 'ALL' && log.performedBy !== auditActorFilter) return false;
+            if (auditDateFrom) {
+              const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+              if (logDate < auditDateFrom) return false;
+            }
+            if (auditDateTo) {
+              const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+              if (logDate > auditDateTo) return false;
+            }
+            return true;
+          });
+
+          const isAllFilteredSelected = filteredLogs.length > 0 && filteredLogs.every(l => selectedAuditIds.includes(l.id));
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* Notification Banner */}
+              {auditActionNotice && (
+                <div 
+                  style={{
+                    padding: '0.9rem 1.25rem',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: auditActionNotice.type === 'success' ? '#ECFDF5' : '#FEF2F2',
+                    border: auditActionNotice.type === 'success' ? '1px solid #10B981' : '1px solid #EF4444',
+                    color: auditActionNotice.type === 'success' ? '#065F46' : '#991B1B',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {auditActionNotice.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                    <span>{auditActionNotice.text}</span>
+                  </div>
+                  <button 
+                    onClick={() => setAuditActionNotice(null)} 
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
                   >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+
+              {/* Header Card */}
+              <div className="mosa-card" style={{ padding: '1.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: '0 0 0.35rem 0', fontWeight: 800 }}>
+                      Activity History &amp; System Audit Trail
+                    </h2>
+                    <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0, maxWidth: '650px' }}>
+                      Comprehensive, searchable record of member actions, registrations, approvals, and administrative operations. Filter, bulk-manage, export, or prune historical records.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button 
+                      onClick={loadAllAdminData}
+                      className="btn btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', fontSize: '0.82rem' }}
+                    >
+                      <RefreshCw size={14} /> Refresh
+                    </button>
+                    <button
+                      onClick={() => handleExportAudits('csv', filteredLogs)}
+                      className="btn btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', fontSize: '0.82rem' }}
+                    >
+                      <Download size={14} /> Export CSV
+                    </button>
+                    <button
+                      onClick={() => handleExportAudits('json', filteredLogs)}
+                      className="btn btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', fontSize: '0.82rem' }}
+                    >
+                      <Download size={14} /> Export JSON
+                    </button>
+                    {currentUser.role === 'SUPER_ADMIN' && (
+                      <>
+                        <button
+                          onClick={() => setAuditConfirmModal({
+                            isOpen: true,
+                            type: 'prune',
+                            pruneDays: 30,
+                            title: 'Prune Activity History',
+                            description: 'Select retention criteria to clear older audit records and maintain optimal system performance.'
+                          })}
+                          className="btn btn-secondary"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', fontSize: '0.82rem', borderColor: '#CBD5E1' }}
+                        >
+                          <Clock size={14} /> Prune History
+                        </button>
+                        <button
+                          onClick={() => setAuditConfirmModal({
+                            isOpen: true,
+                            type: 'purge_test_data',
+                            title: 'Purge Demo Records & Reset Test Baseline',
+                            description: 'This will purge residual dummy alumni, sample events, test donations, and placeholder records from local storage and reset all counters to 1. Real admin/staff accounts are preserved.'
+                          })}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            padding: '0.5rem 0.85rem',
+                            fontSize: '0.82rem',
+                            background: '#FFF1F2',
+                            color: '#E11D48',
+                            border: '1px solid #FDA4AF',
+                            borderRadius: '6px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <ShieldAlert size={14} /> Purge Test Data
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filters & Search Toolbar */}
+                <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
+                    {/* Search Input */}
+                    <div style={{ position: 'relative' }}>
+                      <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                      <input
+                        type="text"
+                        placeholder="Search action, actor, record, metadata..."
+                        value={auditSearchQuery}
+                        onChange={e => setAuditSearchQuery(e.target.value)}
+                        className="form-input"
+                        style={{ paddingLeft: '2.2rem', fontSize: '0.82rem', height: '38px', borderRadius: '6px' }}
+                      />
+                    </div>
+
+                    {/* Action Filter */}
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                        <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0B203E', background: '#E2E8F0', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
-                          {log.action}
-                        </span>
-                        <span style={{ fontSize: '0.82rem', color: '#2563EB', fontWeight: 600 }}>
-                          by {log.performedBy}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: '#475569' }}>
-                        Target Record: <strong>{log.affectedRecord}</strong>
-                      </div>
-                      {log.metadata && Object.keys(log.metadata).length > 0 && (
-                        <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.25rem', fontFamily: 'monospace' }}>
-                          {JSON.stringify(log.metadata)}
-                        </div>
+                      <select
+                        value={auditActionFilter}
+                        onChange={e => setAuditActionFilter(e.target.value)}
+                        className="form-input"
+                        style={{ fontSize: '0.82rem', height: '38px', borderRadius: '6px' }}
+                      >
+                        <option value="ALL">All Activity Types ({auditLogs.length})</option>
+                        {uniqueActions.map(act => (
+                          <option key={act} value={act}>{act}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Actor Filter */}
+                    <div>
+                      <select
+                        value={auditActorFilter}
+                        onChange={e => setAuditActorFilter(e.target.value)}
+                        className="form-input"
+                        style={{ fontSize: '0.82rem', height: '38px', borderRadius: '6px' }}
+                      >
+                        <option value="ALL">All Users / Performers</option>
+                        {uniqueActors.map(actor => (
+                          <option key={actor} value={actor}>{actor}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Date Range Inputs */}
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <input
+                        type="date"
+                        title="From Date"
+                        value={auditDateFrom}
+                        onChange={e => setAuditDateFrom(e.target.value)}
+                        style={{ padding: '0.35rem 0.5rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.78rem', width: '50%' }}
+                      />
+                      <span style={{ color: '#94A3B8', fontSize: '0.78rem' }}>to</span>
+                      <input
+                        type="date"
+                        title="To Date"
+                        value={auditDateTo}
+                        onChange={e => setAuditDateTo(e.target.value)}
+                        style={{ padding: '0.35rem 0.5rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.78rem', width: '50%' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Filter Status & Reset */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#64748B', paddingTop: '0.25rem', borderTop: '1px solid #EEF2F6' }}>
+                    <div>
+                      Showing <strong>{filteredLogs.length}</strong> of <strong>{auditLogs.length}</strong> activity records
+                      {(auditSearchQuery || auditActionFilter !== 'ALL' || auditActorFilter !== 'ALL' || auditDateFrom || auditDateTo) && (
+                        <button
+                          onClick={() => {
+                            setAuditSearchQuery('');
+                            setAuditActionFilter('ALL');
+                            setAuditActorFilter('ALL');
+                            setAuditDateFrom('');
+                            setAuditDateTo('');
+                          }}
+                          style={{ marginLeft: '0.75rem', color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                          Clear Filters
+                        </button>
                       )}
                     </div>
 
-                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
-                      {new Date(log.timestamp).toLocaleString()}
+                    {selectedAuditIds.length > 0 && (
+                      <span style={{ color: '#0B203E', fontWeight: 700 }}>
+                        {selectedAuditIds.length} records selected
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Batch Action Toolbar */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #E2E8F0' }}>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', fontWeight: 700, color: '#0B203E', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={isAllFilteredSelected}
+                      onChange={() => {
+                        if (isAllFilteredSelected) {
+                          setSelectedAuditIds([]);
+                        } else {
+                          setSelectedAuditIds(filteredLogs.map(l => l.id));
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span>Select All Filtered ({filteredLogs.length})</span>
+                  </label>
+
+                  {selectedAuditIds.length > 0 && (
+                    <button
+                      onClick={() => setAuditConfirmModal({
+                        isOpen: true,
+                        type: 'selected',
+                        title: `Delete ${selectedAuditIds.length} Selected Records`,
+                        description: `Are you sure you want to permanently delete these ${selectedAuditIds.length} selected activity records? This action cannot be undone.`
+                      })}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        padding: '0.4rem 0.8rem',
+                        fontSize: '0.8rem',
+                        background: '#EF4444',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Trash2 size={13} /> Delete Selected ({selectedAuditIds.length})
+                    </button>
+                  )}
+                </div>
+
+                {/* Audit Logs List */}
+                {filteredLogs.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '3.5rem 1rem', color: '#94A3B8' }}>
+                    <History size={40} color="#CBD5E1" style={{ margin: '0 auto 0.75rem auto' }} />
+                    <h3 style={{ fontSize: '1.1rem', color: '#475569', margin: '0 0 0.35rem 0' }}>No Activity Records Found</h3>
+                    <p style={{ fontSize: '0.85rem', color: '#94A3B8', margin: 0 }}>
+                      {auditLogs.length === 0 
+                        ? 'No activity records have been logged yet. Actions will automatically appear here as administrators and users interact with the system.'
+                        : 'No activity records match your current filter criteria. Try adjusting or clearing your filters.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '1rem' }}>
+                    {filteredLogs.map(log => {
+                      const isSelected = selectedAuditIds.includes(log.id);
+
+                      return (
+                        <div 
+                          key={log.id}
+                          style={{
+                            padding: '0.85rem 1rem',
+                            background: isSelected ? '#F0F9FF' : '#F8FAFC',
+                            border: isSelected ? '1px solid #38BDF8' : '1px solid #E2E8F0',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            justifyContent: 'space-between',
+                            gap: '0.75rem',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', flex: 1 }}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {
+                                setSelectedAuditIds(prev => 
+                                  prev.includes(log.id) ? prev.filter(x => x !== log.id) : [...prev, log.id]
+                                );
+                              }}
+                              style={{ marginTop: '0.3rem', cursor: 'pointer' }}
+                            />
+
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                                <span style={{ fontWeight: 800, fontSize: '0.78rem', color: '#0B203E', background: '#E2E8F0', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                                  {log.action}
+                                </span>
+                                <span style={{ fontSize: '0.8rem', color: '#2563EB', fontWeight: 600 }}>
+                                  by {log.performedBy}
+                                </span>
+                                <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>•</span>
+                                <span style={{ fontSize: '0.74rem', color: '#64748B' }}>
+                                  {new Date(log.timestamp).toLocaleString()}
+                                </span>
+                              </div>
+
+                              <div style={{ fontSize: '0.82rem', color: '#334155' }}>
+                                Target: <strong>{log.affectedRecord}</strong>
+                              </div>
+
+                              {log.metadata && Object.keys(log.metadata).length > 0 && (
+                                <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.3rem', fontFamily: 'monospace', background: '#FFFFFF', padding: '0.35rem 0.5rem', borderRadius: '4px', border: '1px solid #E2E8F0', wordBreak: 'break-all' }}>
+                                  {JSON.stringify(log.metadata)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setAuditConfirmModal({
+                              isOpen: true,
+                              type: 'single',
+                              targetId: log.id,
+                              title: 'Delete Activity Record',
+                              description: `Delete audit entry for "${log.action}" on record "${log.affectedRecord}"?`
+                            })}
+                            title="Delete this record"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#94A3B8',
+                              cursor: 'pointer',
+                              padding: '0.25rem',
+                              borderRadius: '4px'
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = '#EF4444'}
+                            onMouseLeave={e => e.currentTarget.style.color = '#94A3B8'}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Confirmation Modal */}
+              {auditConfirmModal && auditConfirmModal.isOpen && (
+                <div style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(11, 32, 62, 0.65)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 9999,
+                  padding: '1rem'
+                }}>
+                  <div style={{
+                    background: '#FFFFFF',
+                    borderRadius: '14px',
+                    padding: '2rem',
+                    maxWidth: '480px',
+                    width: '100%',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
+                    border: '1px solid #E2E8F0'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#FEE2E2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <AlertTriangle size={22} />
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0B203E', fontWeight: 800 }}>
+                        {auditConfirmModal.title}
+                      </h3>
+                    </div>
+
+                    <p style={{ color: '#475569', fontSize: '0.88rem', lineHeight: '1.5', margin: '0 0 1.25rem 0' }}>
+                      {auditConfirmModal.description}
+                    </p>
+
+                    {auditConfirmModal.type === 'prune' && (
+                      <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#0B203E', marginBottom: '0.4rem' }}>
+                          Select Retention Threshold:
+                        </label>
+                        <select
+                          value={auditConfirmModal.pruneDays ?? 30}
+                          onChange={e => setAuditConfirmModal(prev => prev ? { ...prev, pruneDays: Number(e.target.value) } : null)}
+                          className="form-input"
+                          style={{ fontSize: '0.85rem' }}
+                        >
+                          <option value={7}>Prune entries older than 7 days</option>
+                          <option value={30}>Prune entries older than 30 days (Recommended)</option>
+                          <option value={90}>Prune entries older than 90 days</option>
+                          <option value={0}>Clear all entries (Complete wipe)</option>
+                        </select>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                      <button
+                        onClick={() => setAuditConfirmModal(null)}
+                        disabled={isProcessingAudit}
+                        className="btn btn-secondary"
+                        style={{ padding: '0.55rem 1rem', fontSize: '0.85rem' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (auditConfirmModal.type === 'single' && auditConfirmModal.targetId) {
+                            await executeDeleteSingleAudit(auditConfirmModal.targetId);
+                          } else if (auditConfirmModal.type === 'selected') {
+                            await executeDeleteSelectedAudits();
+                          } else if (auditConfirmModal.type === 'prune') {
+                            await executePruneAudits(auditConfirmModal.pruneDays);
+                          } else if (auditConfirmModal.type === 'purge_test_data') {
+                            await executePurgeTestData();
+                          }
+                        }}
+                        disabled={isProcessingAudit}
+                        style={{
+                          padding: '0.55rem 1.25rem',
+                          fontSize: '0.85rem',
+                          background: '#DC2626',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {isProcessingAudit ? 'Processing...' : 'Confirm Action'}
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* SECTION 2: MEMBERS & APPROVALS (LIVE CMS) */}
         {activeSection === 'approvals' && approvalsSubTab === 'cms' && canAccessCMS && (
