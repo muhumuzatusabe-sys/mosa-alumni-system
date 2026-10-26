@@ -304,7 +304,7 @@ export const App: React.FC = () => {
   // 2.5. SUPER ADMIN FORCED PASSWORD CHANGE (Requirement Section 4)
   // Blocks admin dashboard access until initial temporary password replaced
   // ==============================================================
-  if (currentUser.mustChangePassword && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN')) {
+  if (currentUser && currentUser.mustChangePassword && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN')) {
     return (
       <SuperAdminPasswordChangeModal
         currentUser={currentUser}
@@ -323,7 +323,7 @@ export const App: React.FC = () => {
   // 3. OPTIONAL ALUMNI ONBOARDING (Requirement Section 3 & 4)
   // Presented immediately after account creation
   // ==============================================================
-  if (currentUser.alumniOnboardingDecision === 'PENDING') {
+  if (currentUser && currentUser.alumniOnboardingDecision === 'PENDING') {
     return (
       <>
         <AlumniOnboardingScreen
@@ -349,8 +349,10 @@ export const App: React.FC = () => {
               refreshUserData();
             }}
             onSuccess={async () => {
-              await dataService.completeAlumniOnboarding(currentUser.uid);
-              refreshUserData();
+              if (currentUser) {
+                await dataService.completeAlumniOnboarding(currentUser.uid);
+                refreshUserData();
+              }
             }}
             currentUser={currentUser}
           />
@@ -364,7 +366,7 @@ export const App: React.FC = () => {
   // Ordinary accounts never receive administrative privileges automatically
   // ==============================================================
   if (portalMode === 'admin') {
-    if (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) {
+    if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role))) {
       return (
         <AdminControlPanel
           currentUser={currentUser}
