@@ -33,7 +33,7 @@ Write-Host "`n[3/4] Staging and committing changes to Git..." -ForegroundColor G
 git add .
 $gitChanges = git status --porcelain
 if ($gitChanges) {
-    git commit -m "feat(phase-13): clean test baseline, e2e testing readiness, hardened RBAC security rules, activity history management, and mobile UX"
+    git commit -m "feat(mobile-ux): prestige cream dropdown menu, mobile navigation optimization, and restored admin control panel access"
     Write-Host "[SUCCESS] Changes committed." -ForegroundColor Green
 } else {
     Write-Host "(info) Working tree is clean, no new changes to commit." -ForegroundColor DarkGray

@@ -10,7 +10,7 @@ cd /d "%~dp0"
 
 echo.
 echo [1/4] Building production bundle (TypeScript + Vite)...
-call npm.cmd run build
+cmd /c "npm.cmd run build"
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Build failed! Aborting deployment.
@@ -21,7 +21,7 @@ echo [OK] Production bundle compiled successfully into ./dist
 
 echo.
 echo [2/4] Deploying to Firebase Hosting (mtech-46634)...
-call npx.cmd -y firebase-tools deploy
+cmd /c "npx.cmd -y firebase-tools deploy"
 if %errorlevel% neq 0 (
     echo [WARNING] Firebase deploy reported an issue.
 ) else (
@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(phase-13): clean test baseline, e2e testing readiness, hardened RBAC security rules, activity history management, and mobile UX"
+git commit -m "feat(mobile-ux): prestige cream dropdown menu, mobile navigation optimization, and restored admin control panel access"
 echo [OK] Staged and committed changes.
 
 echo.

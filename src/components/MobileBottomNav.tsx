@@ -5,9 +5,11 @@ import {
   Coins, 
   Bell, 
   Award, 
-  ShieldCheck 
+  ShieldCheck,
+  Sliders 
 } from 'lucide-react';
 import { AuthUser } from '../types';
+import { isStaffRole } from '../services/governanceService';
 
 interface Props {
   currentTab: string;
@@ -17,6 +19,8 @@ interface Props {
   onOpenRegister: () => void;
   onOpenNotifications?: () => void;
   unreadNotificationsCount?: number;
+  onOpenAdmin?: () => void;
+  onSwitchToAdmin?: () => void;
 }
 
 export const MobileBottomNav: React.FC<Props> = ({
@@ -26,7 +30,10 @@ export const MobileBottomNav: React.FC<Props> = ({
   onOpenVerify,
   onOpenNotifications,
   unreadNotificationsCount = 0,
+  onOpenAdmin,
+  onSwitchToAdmin,
 }) => {
+  const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
   const isAlumni = currentUser?.role === 'ALUMNI';
 
   return (
@@ -89,7 +96,20 @@ export const MobileBottomNav: React.FC<Props> = ({
         <span>Alerts</span>
       </button>
 
-      {isAlumni ? (
+      {isStaff ? (
+        <button
+          type="button"
+          className="mobile-bottom-nav-item"
+          onClick={() => {
+            if (onSwitchToAdmin) onSwitchToAdmin();
+            else if (onOpenAdmin) onOpenAdmin();
+          }}
+          style={{ color: '#FBBF24' }}
+        >
+          <Sliders size={19} color="#FBBF24" />
+          <span style={{ color: '#FDE68A', fontWeight: 700 }}>Admin</span>
+        </button>
+      ) : isAlumni ? (
         <button
           type="button"
           className={`mobile-bottom-nav-item ${currentTab === 'my-profile' ? 'active' : ''}`}
@@ -111,3 +131,4 @@ export const MobileBottomNav: React.FC<Props> = ({
     </nav>
   );
 };
+
