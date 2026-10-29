@@ -70,7 +70,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     careers: false,
     community: false,
     information: false,
-    admin: false,
   });
 
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
@@ -129,7 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const memberNumber = memberProfile?.alumniNumber || 
     currentUser?.alumniNumber || 
-    (currentUser ? 'STUDENT NO.: 2400707132' : 'STUDENT NO.: NOT VERIFIED');
+    (currentUser ? 'ALUMNI NO.: 2400707132' : 'ALUMNI NO.: NOT VERIFIED');
 
   const memberPhoto = memberProfile?.photoUrl || 
     currentUser?.photoUrl || 
@@ -435,28 +434,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {memberDisplayName}
                 </div>
                 <div className="mosa-portal-id-number">
-                  {memberNumber.toUpperCase().startsWith('STUDENT') || memberNumber.toUpperCase().startsWith('ALUMNI') 
+                  {memberNumber.toUpperCase().startsWith('ALUMNI') 
                     ? memberNumber 
-                    : `STUDENT NO.: ${memberNumber}`}
+                    : `ALUMNI NO.: ${memberNumber}`}
                 </div>
               </div>
-
-              {/* 01 GENERATE PRN / DIGITAL PASS */}
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  if (currentUser) {
-                    handleTabClick('my-profile');
-                  } else {
-                    onOpenAuth();
-                  }
-                }}
-                className="mosa-portal-numbered-action"
-              >
-                <span className="mosa-portal-num-prefix">01</span>
-                <span className="mosa-portal-num-label">GENERATE PRN / DIGITAL PASS</span>
-              </button>
 
               {/* ACCORDION 1: REGISTRY & MEMBERSHIP (Green Pen Icon & Green Text - Active like Makerere Enrollment) */}
               <div>
@@ -746,52 +728,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </div>
 
-              {/* DIRECT ROW: BIO DATA */}
-              <button
-                type="button"
-                onClick={() => handleTabClick('my-profile')}
-                className={`mosa-portal-direct-row ${currentTab === 'my-profile' ? 'active' : ''}`}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <User size={17} color="#0F172A" />
-                  <span>BIO DATA</span>
-                </div>
-                <ChevronRight size={14} opacity={0.4} />
-              </button>
-
-              {/* DIRECT ROW: MY MAILBOX */}
-              <button
-                type="button"
-                onClick={() => handleTabClick('notifications')}
-                className={`mosa-portal-direct-row ${currentTab === 'notifications' ? 'active' : ''}`}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <Mail size={17} color="#0F172A" />
-                  <span>MY MAILBOX</span>
-                </div>
-                {unreadNotificationsCount > 0 ? (
-                  <span className="mosa-portal-unread-badge">
-                    {unreadNotificationsCount}
-                  </span>
-                ) : (
-                  <ChevronRight size={14} opacity={0.4} />
-                )}
-              </button>
-
-              {/* DIRECT ROW: ACADEMIC CALENDAR */}
-              <button
-                type="button"
-                onClick={() => handleTabClick('events')}
-                className={`mosa-portal-direct-row ${currentTab === 'events' ? 'active' : ''}`}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <Calendar size={17} color="#0F172A" />
-                  <span>ACADEMIC CALENDAR</span>
-                </div>
-                <ChevronRight size={14} opacity={0.4} />
-              </button>
-
-              {/* DIRECT ROW: EVALUATION SURVEYS */}
+              {/* DIRECT ROW: ARCHIVES */}
               <button
                 type="button"
                 onClick={() => handleTabClick('documents')}
@@ -799,69 +736,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   <FileText size={17} color="#0F172A" />
-                  <span>EVALUATION SURVEYS & ARCHIVES</span>
+                  <span>ARCHIVES</span>
                 </div>
                 <ChevronRight size={14} opacity={0.4} />
               </button>
-
-              {/* OPTIONAL ACCORDION: ADMINISTRATION CONSOLE (Staff/Admins only) */}
-              {isStaff && (
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => toggleAccordion('admin')}
-                    className={`mosa-portal-menu-row ${expandedAccordions.admin ? 'active' : ''}`}
-                    style={{ color: '#D97706' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <ShieldCheck size={17} color="#D97706" />
-                      <span>ADMINISTRATION CONSOLE</span>
-                    </div>
-                    {expandedAccordions.admin ? (
-                      <ChevronUp size={16} color="#D97706" />
-                    ) : (
-                      <ChevronDown size={16} color="#D97706" />
-                    )}
-                  </button>
-
-                  {expandedAccordions.admin && (
-                    <div className="mosa-portal-subitems-group">
-                      <button
-                        type="button"
-                        onClick={handleAdminClick}
-                        className="mosa-portal-subitem-btn"
-                      >
-                        <span>Executive Control Panel & Stats</span>
-                        <ChevronRight size={13} opacity={0.6} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleAdminClick}
-                        className="mosa-portal-subitem-btn"
-                      >
-                        <span>Alumni Approvals & Registry Desk</span>
-                        <ChevronRight size={13} opacity={0.6} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleAdminClick}
-                        className="mosa-portal-subitem-btn"
-                      >
-                        <span>Content Management System (CMS)</span>
-                        <ChevronRight size={13} opacity={0.6} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleAdminClick}
-                        className="mosa-portal-subitem-btn"
-                      >
-                        <span>System Security & Audit Trail</span>
-                        <ChevronRight size={13} opacity={0.6} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Footer with Quick Verify & Register Actions */}
@@ -870,16 +748,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <>
                   <button
                     type="button"
-                    onClick={() => { setMenuOpen(false); handleTabClick('my-profile'); }}
-                    className="mosa-portal-footer-action primary"
-                  >
-                    <Award size={14} />
-                    <span>My Digital Pass</span>
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => { setMenuOpen(false); onLogout(); }}
-                    className="mosa-portal-footer-action"
+                    className="mosa-portal-footer-action primary"
+                    style={{ width: '100%', justifyContent: 'center' }}
                   >
                     <LogOut size={14} />
                     <span>Sign Out</span>
