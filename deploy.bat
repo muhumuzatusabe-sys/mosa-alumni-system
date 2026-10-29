@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "fix(mobile): hide top header my-pass, logout, admin buttons on mobile and add scrollable side-by-side bottom navigation bar"
+git commit -m "fix(ts): correct photoUrl property on AlumniProfile in Navbar"
 echo [OK] Staged and committed changes.
 
 echo.

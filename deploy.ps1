@@ -33,7 +33,7 @@ Write-Host "`n[3/4] Staging and committing changes to Git..." -ForegroundColor G
 git add .
 $gitChanges = git status --porcelain
 if ($gitChanges) {
-    git commit -m "fix(mobile): hide top header my-pass, logout, admin buttons on mobile and add scrollable side-by-side bottom navigation bar"
+    git commit -m "fix(ts): correct photoUrl property on AlumniProfile in Navbar"
     Write-Host "[SUCCESS] Changes committed." -ForegroundColor Green
 } else {
     Write-Host "(info) Working tree is clean, no new changes to commit." -ForegroundColor DarkGray

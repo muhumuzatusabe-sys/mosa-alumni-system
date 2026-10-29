@@ -127,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     currentUser?.alumniNumber || 
     (currentUser ? 'STUDENT NO.: 2400707132' : 'STUDENT NO.: NOT VERIFIED');
 
-  const memberPhoto = memberProfile?.profilePhoto || 
+  const memberPhoto = memberProfile?.photoUrl || 
     currentUser?.photoUrl || 
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
 
