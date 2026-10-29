@@ -138,98 +138,121 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="mosa-header" style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
       <div className="mosa-nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', padding: '0.65rem 1.25rem' }}>
-        {/* Left: Menu Drawer Toggle Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+        {/* Left: [MENU] Toggle Button matching screenshot format */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.5rem 0.85rem',
-              borderRadius: '9px',
+              gap: '0.4rem',
+              padding: '0.45rem 0.8rem',
+              borderRadius: '7px',
               fontWeight: 700,
-              fontSize: '0.88rem',
-              color: menuOpen ? '#4ADE80' : '#FFFFFF',
-              background: menuOpen ? 'rgba(34, 197, 94, 0.22)' : 'rgba(255, 255, 255, 0.08)',
-              border: menuOpen ? '1.5px solid #22C55E' : '1px solid rgba(255, 255, 255, 0.18)',
-              boxShadow: menuOpen ? '0 0 14px rgba(34, 197, 94, 0.35)' : 'none',
+              fontSize: '0.82rem',
+              letterSpacing: '0.04em',
+              color: '#15803D',
+              background: '#FFFFFF',
+              border: '1.5px solid #16A34A',
+              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.15)',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
             aria-expanded={menuOpen}
-            aria-label="Open MOSA Member Services Menu"
-            title="Explore All MOSA Services & Sections"
+            aria-label="Toggle Navigation Menu"
           >
-            {menuOpen ? <X size={18} color="#4ADE80" /> : <Menu size={18} color="#4ADE80" />}
-            <span style={{ fontWeight: 700 }}>Menu</span>
-            <ChevronDown size={14} style={{ opacity: 0.9, color: menuOpen ? '#4ADE80' : '#E2E8F0', transform: menuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
+            <Menu size={16} color="#15803D" strokeWidth={2.5} />
+            <span style={{ fontWeight: 800 }}>MENU</span>
           </button>
         </div>
 
-        {/* Centre / Left: MOSA Branding & Application Title */}
+        {/* Center / User Header Section: Profile Photo, "Hi, [NAME] ▾" matching screenshot */}
         <div 
-          className="brand-wrapper" 
-          onClick={() => handleTabClick('home')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', flexShrink: 1, minWidth: 0, textDecoration: 'none' }}
+          onClick={() => {
+            if (currentUser) {
+              handleTabClick('my-profile');
+            } else {
+              onOpenAuth();
+            }
+          }}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '0.5rem', 
+            cursor: 'pointer',
+            padding: '0.25rem 0.6rem',
+            borderRadius: '8px',
+            transition: 'background 0.2s ease'
+          }}
+          title={currentUser ? "View Your Profile Pass" : "Login to Your Account"}
         >
-          <div className="massh-crest" style={{ width: '38px', height: '38px', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)', flexShrink: 0 }}>
-            <span>MASSH</span>
-          </div>
-          <div className="brand-text" style={{ minWidth: 0, overflow: 'hidden' }}>
-            <h1 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <span className="hidden sm:inline">MASSH ALUMNI PORTAL</span>
-              <span className="sm:hidden">MOSA PORTAL</span>
-            </h1>
-            <div className="subtext" style={{ fontSize: '0.68rem', color: '#FCD34D', letterSpacing: '0.03em', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              MOSA • Est. 1997
-            </div>
+          <img
+            src={memberPhoto}
+            alt={memberDisplayName}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '1.5px solid #CBD5E1',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              flexShrink: 0
+            }}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748B' }}>Hi,</span>
+            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.02em' }}>
+              {(memberProfile?.lastName || memberProfile?.firstName || currentUser?.displayName?.split(' ')[0] || 'ALUMNUS').toUpperCase()}
+            </span>
+            <ChevronDown size={14} color="#64748B" />
           </div>
         </div>
 
-        {/* Right Area: Actionable Notifications, Member Identity Pass / Auth, and Far-Right Admin Panel (Exclusively Staff) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0, marginLeft: 'auto' }}>
-          
-          {/* Notifications Button (Dedicated Notifications View Trigger) */}
+        {/* Right Area: Mailbox Envelope + Desktop Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
           <button
             onClick={onOpenNotifications}
             style={{
               position: 'relative',
-              background: currentTab === 'notifications' ? 'rgba(217, 119, 6, 0.35)' : 'rgba(255, 255, 255, 0.08)',
-              border: currentTab === 'notifications' ? '1px solid #D97706' : '1px solid rgba(255, 255, 255, 0.18)',
-              color: '#FFFFFF',
-              width: '38px',
-              height: '38px',
-              borderRadius: '9px',
+              background: 'transparent',
+              border: 'none',
+              color: '#334155',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
-            title={unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Alerts` : 'Notifications Service Centre'}
-            aria-label="Open Notifications Centre"
+            title={unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Messages` : 'My Mailbox'}
+            aria-label="Open Mailbox Notifications"
           >
-            <Bell size={18} color={unreadNotificationsCount > 0 ? '#FBBF24' : '#E2E8F0'} />
+            <Mail size={22} color="#334155" />
             {unreadNotificationsCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: '-4px',
-                  right: '-4px',
+                  top: '-2px',
+                  right: '-2px',
                   background: '#EF4444',
                   color: '#FFFFFF',
-                  fontSize: '0.65rem',
+                  fontSize: '0.62rem',
                   fontWeight: 800,
-                  minWidth: '18px',
-                  height: '18px',
-                  padding: '0 4px',
+                  minWidth: '17px',
+                  height: '17px',
+                  padding: '0 3px',
                   borderRadius: '999px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2px solid #0A271B',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                  border: '1.5px solid #0A271B',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
                 }}
               >
                 {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
@@ -250,24 +273,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                   borderRadius: '8px',
                   fontSize: '0.8rem',
                   fontWeight: 700,
-                  background: currentTab === 'my-profile' ? 'rgba(245, 158, 11, 0.35)' : 'rgba(245, 158, 11, 0.15)',
+                  background: currentTab === 'my-profile' ? '#FEF3C7' : '#FFFBEB',
                   border: '1px solid #F59E0B',
-                  color: '#FDE68A',
+                  color: '#B45309',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
                 title="My Personal MOSA Account & Pass"
               >
-                <Award size={15} color="#FBBF24" />
+                <Award size={15} color="#D97706" />
                 <span>My Pass</span>
               </button>
 
               <button 
                 onClick={onLogout} 
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
-                  color: '#CBD5E1',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  color: '#475569',
                   padding: '0.45rem 0.65rem',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -294,11 +317,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 borderRadius: '8px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, #D97706, #B45309)',
+                background: '#15803D',
                 color: '#FFFFFF',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(217, 119, 6, 0.3)',
+                boxShadow: '0 1px 4px rgba(21, 128, 61, 0.25)',
               }}
             >
               <LogIn size={15} />
@@ -318,18 +341,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 borderRadius: '8px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
-                background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.45), rgba(180, 83, 9, 0.45))',
+                background: '#FEF3C7',
                 border: '1.5px solid #F59E0B',
-                color: '#FDE68A',
+                color: '#B45309',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 marginLeft: '0.25rem',
-                boxShadow: '0 2px 8px rgba(217, 119, 6, 0.3)',
               }}
               title="MOSA Administrative Control Panel"
               aria-label="MOSA Administrative Control Panel"
             >
-              <Sliders size={16} color="#FBBF24" />
+              <Sliders size={16} color="#D97706" />
               <span>Admin</span>
             </button>
           ) : (
@@ -343,9 +365,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 borderRadius: '8px',
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#E2E8F0',
+                background: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                color: '#475569',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 marginLeft: '0.25rem',
@@ -353,7 +375,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Staff & Secretariat Administration Login"
               aria-label="Staff & Secretariat Administration Login"
             >
-              <ShieldCheck size={15} color="#FBBF24" />
+              <ShieldCheck size={15} color="#D97706" />
               <span>Admin</span>
             </button>
           )}

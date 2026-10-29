@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(menu): restore official MOSA menu items naming and constrain dropdown card width on mobile"
+git commit -m "feat(header): align top navigation and floating menu to Makerere portal layout while retaining MOSA items"
 echo [OK] Staged and committed changes.
 
 echo.

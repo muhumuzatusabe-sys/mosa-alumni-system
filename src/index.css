@@ -102,21 +102,21 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--primary-navy-dark);
 }
 
-/* Header & Banner Styles */
+/* Header & Banner Styles (Matching Makerere Clean Light Portal Header) */
 .mosa-header {
-  background: linear-gradient(135deg, var(--primary-navy-dark) 0%, var(--primary-navy) 60%, var(--primary-navy-light) 100%);
-  color: #ffffff;
-  border-bottom: 3px solid var(--gold-accent);
+  background: #FFFFFF;
+  color: #0F172A;
+  border-bottom: 1px solid #E2E8F0;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .mosa-nav-container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0.6rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
