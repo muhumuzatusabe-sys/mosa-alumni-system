@@ -95,7 +95,7 @@ export const ChaptersMap: React.FC<Props> = ({
         </div>
 
         {/* Filter Pills */}
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
+        <div className="horizontal-scroll-touch" style={{ display: 'flex', gap: '0.4rem', maxWidth: '100%' }}>
           {[
             { id: 'ALL', label: 'All Chapters', icon: Globe2 },
             { id: 'UGANDA', label: 'Uganda & Universities', icon: Landmark },
@@ -115,7 +115,9 @@ export const ChaptersMap: React.FC<Props> = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.35rem'
+                gap: '0.35rem',
+                flexShrink: 0,
+                whiteSpace: 'nowrap'
               }}
             >
               <tab.icon size={13} color={filterRegion === tab.id ? '#F59E0B' : '#64748B'} />

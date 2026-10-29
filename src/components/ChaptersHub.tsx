@@ -251,7 +251,7 @@ export const ChaptersHub: React.FC<Props> = ({ currentUser, onOpenAuth, onSelect
       <div className="mosa-card" style={{ padding: '1.25rem' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Status Tabs */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div className="horizontal-scroll-touch" style={{ display: 'flex', gap: '0.5rem', maxWidth: '100%' }}>
             {[
               { id: 'ACTIVE', label: 'Active Chapters' },
               { id: 'ALL', label: 'All Chapters' },
@@ -266,6 +266,8 @@ export const ChaptersHub: React.FC<Props> = ({ currentUser, onOpenAuth, onSelect
                   fontSize: '0.8rem',
                   fontWeight: 600,
                   cursor: 'pointer',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
                   border: statusFilter === tab.id ? '1px solid #0B203E' : '1px solid #CBD5E1',
                   background: statusFilter === tab.id ? '#0B203E' : '#FFFFFF',
                   color: statusFilter === tab.id ? '#FFFFFF' : '#475569',

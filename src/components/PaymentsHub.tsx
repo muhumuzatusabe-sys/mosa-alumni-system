@@ -372,14 +372,18 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '0.5rem', 
-        borderBottom: '1px solid #E2E8F0', 
-        marginBottom: '1.75rem',
-        overflowX: 'auto',
-        paddingBottom: '2px'
-      }}>
+      <div 
+        className="horizontal-scroll-touch"
+        style={{ 
+          display: 'flex', 
+          gap: '0.5rem', 
+          borderBottom: '1px solid #E2E8F0', 
+          marginBottom: '1.75rem',
+          overflowX: 'auto',
+          paddingBottom: '2px',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         <button
           onClick={() => setActiveTab('campaigns')}
           style={{
@@ -393,7 +397,9 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
             fontSize: '0.95rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
           }}
         >
           <HeartHandshake size={18} /> Projects ({campaigns.length})
@@ -412,7 +418,9 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
             fontSize: '0.95rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
           }}
         >
           <Award size={18} /> Annual Contribution
@@ -432,7 +440,9 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
               fontSize: '0.95rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              flexShrink: 0,
+              whiteSpace: 'nowrap'
             }}
           >
             <Receipt size={18} /> Giving History ({myPayments.length})

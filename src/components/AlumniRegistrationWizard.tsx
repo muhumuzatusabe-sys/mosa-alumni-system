@@ -1886,7 +1886,8 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                     style={{ color: '#64748B', borderColor: '#CBD5E1', fontSize: '0.85rem' }}
                     title="Exit registration wizard and return to portal"
                   >
-                    Exit Registration
+                    <span className="hidden sm:inline">Exit Registration</span>
+                    <span className="sm:hidden">Exit</span>
                   </button>
 
                   {step > 1 && (

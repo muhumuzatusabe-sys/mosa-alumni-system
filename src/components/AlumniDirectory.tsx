@@ -279,7 +279,7 @@ export const AlumniDirectory: React.FC<Props> = ({
             </span>
 
             {/* Level Chips */}
-            <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
               {[
                 { id: 'ALL', label: 'All Levels' },
                 { id: 'O_LEVEL', label: 'O-Level' },

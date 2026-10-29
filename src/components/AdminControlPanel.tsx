@@ -714,7 +714,8 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               title="Switch back to public member environment"
             >
               <ArrowLeft size={16} />
-              <span>Return to Member Portal</span>
+              <span className="hidden sm:inline">Return to Member Portal</span>
+              <span className="sm:hidden">Exit Admin</span>
             </button>
 
             <div>
@@ -748,7 +749,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {/* Consolidated Expandable Navigation Bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', borderBottom: '2px solid #E2E8F0', paddingBottom: '0.85rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div className="admin-tabs-nav horizontal-scroll-touch" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             
             {/* 0. OVERVIEW BUTTON */}
             <button
@@ -815,6 +816,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 120 }}
                     />
                     <div
+                      className="admin-dropdown-menu"
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 6px)',
@@ -1032,6 +1034,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 120 }}
                   />
                   <div
+                    className="admin-dropdown-menu"
                     style={{
                       position: 'absolute',
                       top: 'calc(100% + 6px)',

@@ -177,7 +177,7 @@ Issued At: ${new Date().toISOString()}
           />
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div className="horizontal-scroll-touch" style={{ display: 'flex', gap: '0.5rem', maxWidth: '100%' }}>
           {['ALL', 'CONSTITUTION', 'AGM_REPORT', 'CIRCULAR', 'FINANCIAL_REPORT', 'MEMBERSHIP_FORM'].map(cat => (
             <button
               key={cat}
@@ -189,6 +189,8 @@ Issued At: ${new Date().toISOString()}
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
                 background: selectedCategory === cat ? '#0B203E' : '#F1F5F9',
                 color: selectedCategory === cat ? '#FFFFFF' : '#475569',
                 transition: 'all 0.15s ease',

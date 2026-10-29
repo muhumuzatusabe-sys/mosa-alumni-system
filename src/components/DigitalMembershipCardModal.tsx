@@ -174,7 +174,7 @@ export const DigitalMembershipCardModal: React.FC<DigitalMembershipCardModalProp
 
           {/* Footer Actions */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
               <button
                 onClick={handlePrint}
                 style={{

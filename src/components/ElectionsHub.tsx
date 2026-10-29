@@ -329,7 +329,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #E2E8F0', marginBottom: '1.75rem', gap: '0.5rem', overflowX: 'auto' }}>
+      <div className="horizontal-scroll-touch" style={{ display: 'flex', borderBottom: '2px solid #E2E8F0', marginBottom: '1.75rem', gap: '0.5rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <button
           onClick={() => setActiveTab('ballot')}
           style={{
@@ -345,7 +345,8 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             borderBottom: activeTab === 'ballot' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <Vote size={18} color={activeTab === 'ballot' ? '#D97706' : '#64748B'} />
@@ -367,7 +368,8 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             borderBottom: activeTab === 'candidates' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <Users size={18} color={activeTab === 'candidates' ? '#D97706' : '#64748B'} />
@@ -389,7 +391,8 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             borderBottom: activeTab === 'results' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <BarChart2 size={18} color={activeTab === 'results' ? '#D97706' : '#64748B'} />
@@ -411,7 +414,8 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             borderBottom: activeTab === 'nominate' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <UserCheck size={18} color={activeTab === 'nominate' ? '#D97706' : '#64748B'} />

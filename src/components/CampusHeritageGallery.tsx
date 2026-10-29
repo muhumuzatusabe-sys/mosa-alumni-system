@@ -215,7 +215,7 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
       </div>
 
       {/* Category Filter Pills */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.75rem' }}>
+      <div className="horizontal-scroll-touch" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.75rem', maxWidth: '100%' }}>
         {[
           { id: 'ALL', label: `All Photos (${photos.length})` },
           { id: 'FOUNDATION', label: 'Foundation Stone & Milestones' },
@@ -236,6 +236,8 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
               color: selectedCategory === cat.id ? '#FFFFFF' : '#475569',
               border: selectedCategory === cat.id ? '1px solid #0B203E' : '1px solid #CBD5E1',
               cursor: 'pointer',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               transition: 'all 0.15s ease'
             }}
           >

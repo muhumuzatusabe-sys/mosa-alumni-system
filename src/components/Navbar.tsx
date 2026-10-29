@@ -28,7 +28,8 @@ import {
   Briefcase,
   Vote,
   Sparkles,
-  Search
+  Search,
+  GraduationCap
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -161,19 +162,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               borderRadius: '9px',
               fontWeight: 700,
               fontSize: '0.88rem',
-              color: menuOpen ? '#FDE68A' : '#FFFFFF',
-              background: menuOpen ? 'rgba(217, 119, 6, 0.35)' : 'rgba(255, 255, 255, 0.08)',
-              border: menuOpen ? '1px solid #D97706' : '1px solid rgba(255, 255, 255, 0.18)',
+              color: menuOpen ? '#22D3EE' : '#FFFFFF',
+              background: menuOpen ? 'rgba(6, 182, 212, 0.22)' : 'rgba(255, 255, 255, 0.08)',
+              border: menuOpen ? '1.5px solid #06B6D4' : '1px solid rgba(255, 255, 255, 0.18)',
+              boxShadow: menuOpen ? '0 0 14px rgba(6, 182, 212, 0.35)' : 'none',
               cursor: 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
             }}
             aria-expanded={menuOpen}
             aria-label="Open MOSA Member Services Menu"
             title="Explore All MOSA Services & Sections"
           >
-            {menuOpen ? <X size={18} color="#FBBF24" /> : <Menu size={18} color="#FBBF24" />}
+            {menuOpen ? <X size={18} color="#22D3EE" /> : <Menu size={18} color="#22D3EE" />}
             <span style={{ fontWeight: 700 }}>Menu</span>
-            <ChevronDown size={14} style={{ opacity: 0.8, transform: menuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+            <ChevronDown size={14} style={{ opacity: 0.9, color: menuOpen ? '#22D3EE' : '#E2E8F0', transform: menuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
           </button>
         </div>
 
@@ -339,7 +341,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               aria-label="MOSA Administrative Control Panel"
             >
               <Sliders size={16} color="#FBBF24" />
-              <span>Admin Panel</span>
+              <span className="hidden sm:inline">Admin</span>
             </button>
           ) : (
             <button
@@ -369,50 +371,34 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* REFINED PRESTIGE CREAM DROPDOWN MENU */}
+      {/* PRESTIGE SMOOTH CYAN DROPDOWN MENU */}
       {menuOpen && (
         <>
-          {/* Subtle backdrop for click-outside dismissal (does not obscure the entire page) */}
+          {/* Backdrop for click-outside dismissal (does not obscure the entire page) */}
           <div 
-            className="mosa-cream-backdrop"
+            className="mosa-cyan-backdrop"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Compact Cream Dropdown Panel */}
+          {/* Sleek Scrollable Cyan Menu Panel */}
           <div 
-            className="mosa-cream-dropdown"
+            className="mosa-cyan-dropdown"
             role="dialog"
-            aria-label="MOSA Portal Directory"
+            aria-label="MOSA Navigation Menu"
           >
             {/* Header */}
-            <div className="mosa-cream-header">
+            <div className="mosa-cyan-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                <div 
-                  style={{ 
-                    width: '30px', 
-                    height: '30px', 
-                    borderRadius: '8px', 
-                    background: '#113D2B', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    border: '1px solid #C68A24',
-                    color: '#FDE68A',
-                    fontWeight: 900,
-                    fontSize: '0.68rem',
-                    letterSpacing: '0.05em',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  MASSH
+                <div className="mosa-cyan-logo-badge">
+                  <GraduationCap size={18} color="#22D3EE" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '0.82rem', color: '#113D2B', fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-                    MOSA Portal Directory
+                  <div className="mosa-cyan-title">
+                    MOSA Navigation Menu
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: '#78716C', fontWeight: 500 }}>
-                    Mandela Old Students Association • All Services
+                  <div className="mosa-cyan-subtitle">
+                    Mandela Old Students Association • All 15 Sections
                   </div>
                 </div>
               </div>
@@ -420,270 +406,90 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  background: '#ECE4D4',
-                  border: '1px solid #DFD6C3',
-                  color: '#44403C',
-                  borderRadius: '7px',
-                  width: '28px',
-                  height: '28px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#DFD6C3';
-                  e.currentTarget.style.color = '#1C1917';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#ECE4D4';
-                  e.currentTarget.style.color = '#44403C';
-                }}
+                className="mosa-cyan-close-btn"
                 aria-label="Close Menu"
               >
-                <X size={16} />
+                <X size={17} />
               </button>
             </div>
 
-            {/* Quick Live Filter & Shortcut Actions */}
-            <div style={{ padding: '0.65rem 0.75rem 0.4rem', borderBottom: '1px solid #EAE2D2', background: '#FAF7EE' }}>
-              <div style={{ position: 'relative', marginBottom: '0.45rem' }}>
-                <Search size={15} style={{ position: 'absolute', left: '0.65rem', top: '50%', transform: 'translateY(-50%)', color: '#78716C', pointerEvents: 'none' }} />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter MOSA sections & services..."
-                  style={{
-                    width: '100%',
-                    padding: '0.45rem 0.65rem 0.45rem 2rem',
-                    fontSize: '0.8rem',
-                    borderRadius: '8px',
-                    border: '1px solid #D8CEBB',
-                    background: '#FFFFFF',
-                    color: '#1C1917',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', color: '#78716C', cursor: 'pointer', padding: 0 }}
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
+            {/* Continuous Scrollable List — All Items Clearly Visible & Grouped */}
+            <div className="mosa-cyan-scroll">
+              {menuCategories.map((cat) => {
+                const CatIcon = cat.icon;
+                const activeItems = cat.items.filter(item => item.enabled);
+                if (activeItems.length === 0) return null;
 
-              {/* Quick Action Badges */}
-              <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
-                <button
-                  type="button"
-                  onClick={() => { setMenuOpen(false); if (onOpenVerify) onOpenVerify(); }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    padding: '0.25rem 0.55rem',
-                    borderRadius: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    background: '#FFFFFF',
-                    border: '1px solid #D8CEBB',
-                    color: '#113D2B',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <ShieldCheck size={13} color="#C68A24" />
-                  <span>Verify Alumnus</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setMenuOpen(false); onOpenRegister(); }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    padding: '0.25rem 0.55rem',
-                    borderRadius: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    background: '#FFFFFF',
-                    border: '1px solid #D8CEBB',
-                    color: '#113D2B',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <UserPlus size={13} color="#16A34A" />
-                  <span>Join / Register</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleAdminClick}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    padding: '0.25rem 0.55rem',
-                    borderRadius: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    background: '#113D2B',
-                    border: '1px solid #C68A24',
-                    color: '#FDE68A',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <Sliders size={13} color="#FBBF24" />
-                  <span>Admin Panel</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Categories List */}
-            <div className="mosa-cream-scroll">
-              {displayedCategories.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#78716C' }}>
-                  <Search size={28} style={{ opacity: 0.4, marginBottom: '0.5rem' }} />
-                  <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>No matching sections found</div>
-                  <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Try searching for "directory", "voting", "dues", or "events"</div>
-                </div>
-              ) : (
-                displayedCategories.map((cat) => {
-                  const CatIcon = cat.icon;
-                  return (
-                    <div key={cat.title} className="mosa-cream-section">
-                      <div className="mosa-cream-section-header">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                          <div style={{ width: '22px', height: '22px', borderRadius: '6px', background: '#F1E8D7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#113D2B' }}>
-                            <CatIcon size={13} />
-                          </div>
-                          <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#113D2B', letterSpacing: '0.02em' }}>
-                            {cat.title}
-                          </span>
-                        </div>
-                        <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#92400E', background: '#FEF3C7', border: '1px solid #FDE68A', padding: '0.08rem 0.4rem', borderRadius: '999px' }}>
-                          {cat.items.length}
-                        </span>
+                return (
+                  <div key={cat.title} className="mosa-cyan-category-section">
+                    <div className="mosa-cyan-group-title">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <CatIcon size={13} color="#22D3EE" />
+                        <span>{cat.title}</span>
                       </div>
+                      <span className="mosa-cyan-count-pill">{activeItems.length}</span>
+                    </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {cat.items.map((item) => {
-                          const ItemIcon = item.icon;
-                          const isCurrent = currentTab === item.key;
-                          return (
-                            <button
-                              key={item.key}
-                              type="button"
-                              onClick={() => handleTabClick(item.key)}
-                              className={`mosa-cream-item ${isCurrent ? 'active' : ''}`}
-                            >
-                              <div
-                                style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  borderRadius: '7px',
-                                  background: isCurrent ? '#FEF3C7' : '#F7F3EA',
-                                  border: isCurrent ? '1px solid #F59E0B' : '1px solid #E7DFC9',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0,
-                                  color: isCurrent ? '#B45309' : '#113D2B'
-                                }}
-                              >
-                                <ItemIcon size={15} />
-                              </div>
+                    <div className="mosa-cyan-items-group">
+                      {activeItems.map((item) => {
+                        const ItemIcon = item.icon;
+                        const isCurrent = currentTab === item.key;
+                        return (
+                          <button
+                            key={item.key}
+                            type="button"
+                            onClick={() => handleTabClick(item.key)}
+                            className={`mosa-cyan-nav-row ${isCurrent ? 'active' : ''}`}
+                          >
+                            <div className={`mosa-cyan-nav-icon ${isCurrent ? 'active' : ''}`}>
+                              <ItemIcon size={16} />
+                            </div>
 
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', justifyContent: 'space-between' }}>
-                                  <span style={{ fontSize: '0.82rem', fontWeight: isCurrent ? 800 : 700, color: isCurrent ? '#92400E' : '#1C1917' }}>
-                                    {item.label}
+                            <div className="mosa-cyan-nav-text">
+                              <div className="mosa-cyan-nav-label-row">
+                                <span className={`mosa-cyan-nav-label ${isCurrent ? 'active' : ''}`}>
+                                  {item.label}
+                                </span>
+                                {isCurrent && (
+                                  <span className="mosa-cyan-nav-active-pill">
+                                    Current
                                   </span>
-                                  {isCurrent && (
-                                    <span style={{ fontSize: '0.6rem', fontWeight: 800, color: '#92400E', background: '#FEF3C7', padding: '0.08rem 0.35rem', borderRadius: '4px', border: '1px solid #FDE68A', textTransform: 'uppercase' }}>
-                                      Active
-                                    </span>
-                                  )}
-                                </div>
-                                <div style={{ fontSize: '0.68rem', color: '#64748B', lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '0.1rem' }}>
-                                  {item.desc}
-                                </div>
+                                )}
                               </div>
+                              <div className="mosa-cyan-nav-desc">
+                                {item.desc}
+                              </div>
+                            </div>
 
-                              {!isCurrent && <ChevronRight size={14} color="#A8A29E" style={{ flexShrink: 0 }} />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-
-              {/* Dedicated Administrative Access Card */}
-              <div className="mosa-cream-admin-card">
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                    <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: 'rgba(245, 158, 11, 0.25)', border: '1px solid #F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Sliders size={16} color="#FBBF24" />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#FDE68A', letterSpacing: '0.02em' }}>
-                        Admin Control Panel
-                      </div>
-                      <div style={{ fontSize: '0.68rem', color: '#CBD5E1' }}>
-                        {isStaff ? 'Authenticated as Staff Member' : 'Secretariat & Executive Suite'}
-                      </div>
+                            <ChevronRight size={14} className="mosa-cyan-nav-arrow" />
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
+                );
+              })}
+            </div>
 
-                  <span style={{ fontSize: '0.62rem', fontWeight: 800, color: '#FDE68A', background: 'rgba(245, 158, 11, 0.2)', padding: '0.15rem 0.45rem', borderRadius: '999px', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
-                    {isStaff ? 'Authorized' : 'Restricted'}
-                  </span>
-                </div>
+            {/* Footer with Quick Verify & Register Actions */}
+            <div className="mosa-cyan-footer">
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); if (onOpenVerify) onOpenVerify(); }}
+                className="mosa-cyan-footer-btn"
+              >
+                <ShieldCheck size={14} color="#22D3EE" />
+                <span>Verify Alumnus</span>
+              </button>
 
-                <div style={{ fontSize: '0.72rem', color: '#E2E8F0', marginBottom: '0.65rem', lineHeight: 1.35 }}>
-                  {isStaff 
-                    ? 'Manage registry approvals, digital membership cards, finances, roll calls, and governance.'
-                    : 'Restricted to MASSH executive officers, secretariat administrators, and verified staff.'}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleAdminClick}
-                  style={{
-                    width: '100%',
-                    padding: '0.45rem 0.75rem',
-                    borderRadius: '8px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-                    color: '#FFFFFF',
-                    border: '1px solid #FBBF24',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  <ShieldCheck size={14} color="#FFFFFF" />
-                  <span>{isStaff ? 'Enter Administrative Control Panel' : 'Staff & Secretariat Login'}</span>
-                  <ChevronRight size={14} />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); onOpenRegister(); }}
+                className="mosa-cyan-footer-btn primary"
+              >
+                <UserPlus size={14} color="#67E8F9" />
+                <span>Join / Register</span>
+              </button>
             </div>
           </div>
         </>

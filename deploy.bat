@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(mobile-ux): prestige cream dropdown menu, mobile navigation optimization, and restored admin control panel access"
+git commit -m "feat(mobile): optimize mobile responsiveness, touch targets, horizontal touch scrolling, bottom sheet modals, and safe areas"
 echo [OK] Staged and committed changes.
 
 echo.

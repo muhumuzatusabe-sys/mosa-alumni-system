@@ -249,16 +249,20 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
       </div>
 
       {/* 2. MODERN HORIZONTAL SECTION NAVIGATOR */}
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '12px',
-        padding: '0.4rem',
-        display: 'flex',
-        gap: '0.4rem',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        overflowX: 'auto'
-      }}>
+      <div 
+        className="horizontal-scroll-touch"
+        style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '0.4rem',
+          display: 'flex',
+          gap: '0.4rem',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
         {[
           { id: 'pass', label: 'My Membership ID', icon: QrCode },
           { id: 'personal', label: 'Personal Info', icon: User },
@@ -278,7 +282,7 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
               type="button"
               onClick={() => setActiveTab(tab.id as DashboardTab)}
               style={{
-                flex: 1,
+                flex: '0 0 auto',
                 padding: '0.7rem 0.85rem',
                 borderRadius: '8px',
                 border: 'none',

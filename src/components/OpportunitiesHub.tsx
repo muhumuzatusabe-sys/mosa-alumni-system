@@ -422,7 +422,7 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
       </div>
 
       {/* Main Tab Navigation */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #E2E8F0', marginBottom: '1.75rem', gap: '0.5rem', overflowX: 'auto' }}>
+      <div className="horizontal-scroll-touch" style={{ display: 'flex', borderBottom: '2px solid #E2E8F0', marginBottom: '1.75rem', gap: '0.5rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <button
           onClick={() => setActiveTab('opportunities')}
           style={{
@@ -438,7 +438,8 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
             borderBottom: activeTab === 'opportunities' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <Briefcase size={18} color={activeTab === 'opportunities' ? '#D97706' : '#64748B'} />
@@ -460,7 +461,8 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
             borderBottom: activeTab === 'mentors' ? '3px solid #D97706' : '3px solid transparent',
             marginBottom: '-2px',
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}
         >
           <Compass size={18} color={activeTab === 'mentors' ? '#D97706' : '#64748B'} />
@@ -483,7 +485,8 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
               borderBottom: activeTab === 'my-items' ? '3px solid #D97706' : '3px solid transparent',
               marginBottom: '-2px',
               cursor: 'pointer',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
           >
             <Clock size={18} color={activeTab === 'my-items' ? '#D97706' : '#64748B'} />
