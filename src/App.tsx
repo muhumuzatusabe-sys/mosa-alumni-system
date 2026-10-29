@@ -635,50 +635,8 @@ export const App: React.FC = () => {
               Mandela Old Students Association (MOSA) • Founded 1997
             </div>
             <div style={{ color: '#8BA193', fontSize: '0.78rem', marginTop: '0.35rem', fontStyle: 'italic' }}>
-              "Education is the Most Powerful Weapon"
+              "Caring to Achieve"
             </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setIsVerifyOpen(true)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#FCD34D',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                textDecoration: 'underline',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-              }}
-            >
-              <ShieldCheck size={15} />
-              <span>Verify Alumni Number</span>
-            </button>
-
-            <button
-              onClick={handleAdminGateClick}
-              style={{
-                background: 'rgba(198, 138, 36, 0.18)',
-                border: '1px solid #C68A24',
-                color: '#FDE68A',
-                borderRadius: '6px',
-                padding: '0.4rem 0.8rem',
-                cursor: 'pointer',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                transition: 'all 0.2s',
-              }}
-            >
-              <Sliders size={14} color="#FBBF24" />
-              <span>Staff & Secretariat Admin Portal</span>
-            </button>
           </div>
         </div>
       </footer>

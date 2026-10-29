@@ -161,6 +161,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [prefixInput, setPrefixInput] = useState('MA. ');
   const [padDigitsInput, setPadDigitsInput] = useState(4);
   const [autoApproveInput, setAutoApproveInput] = useState(true);
+  const [allowSelfAssignedInput, setAllowSelfAssignedInput] = useState(false);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState('');
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -262,6 +263,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       setPrefixInput(settings.prefix || 'MA. ');
       setPadDigitsInput(settings.padDigits || 4);
       setAutoApproveInput(settings.autoApproveRegistrations !== false);
+      setAllowSelfAssignedInput(settings.allowSelfAssignedAlumniNumber === true);
 
       const modules = await dataService.getModuleSettings();
       setModuleSettings(modules);
@@ -479,6 +481,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         prefix: prefixInput,
         padDigits: Number(padDigitsInput),
         autoApproveRegistrations: autoApproveInput,
+        allowSelfAssignedAlumniNumber: allowSelfAssignedInput,
       });
 
       setSaveSuccessMessage('Settings and feature toggles updated successfully.');
@@ -2290,6 +2293,38 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     </div>
                     {autoApproveInput ? (
                       <ToggleRight size={28} color="#2563EB" />
+                    ) : (
+                      <ToggleLeft size={28} color="#94A3B8" />
+                    )}
+                  </div>
+
+                  {/* Allow Members Self-Assigning / Claiming Alumni Numbers */}
+                  <div
+                    onClick={() => setAllowSelfAssignedInput(!allowSelfAssignedInput)}
+                    style={{
+                      padding: '1rem',
+                      borderRadius: '10px',
+                      background: allowSelfAssignedInput ? '#FFFBEB' : '#F8FAFC',
+                      border: allowSelfAssignedInput ? '1.5px solid #FDE68A' : '1px solid #E2E8F0',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '1rem',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 600, color: allowSelfAssignedInput ? '#B45309' : '#334155', fontSize: '0.92rem' }}>
+                        Allow Members to Self-Assign / Claim Alumni Numbers
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                        {allowSelfAssignedInput
+                          ? 'Active: Members can input an existing physical register number during registration.'
+                          : 'Paused: Members cannot self-assign numbers. The system strictly generates sequential numbers automatically.'}
+                      </div>
+                    </div>
+                    {allowSelfAssignedInput ? (
+                      <ToggleRight size={28} color="#D97706" />
                     ) : (
                       <ToggleLeft size={28} color="#94A3B8" />
                     )}

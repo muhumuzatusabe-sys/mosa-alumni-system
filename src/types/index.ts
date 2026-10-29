@@ -186,6 +186,7 @@ export interface SystemSettings {
   };
   allowManualMANumberAssignment?: boolean;
   autoApproveRegistrations?: boolean;
+  allowSelfAssignedAlumniNumber?: boolean; // When false, members cannot claim or self-assign numbers during registration
   usedMANumbersRegistry?: string[];
   fieldPermissions?: Record<string, { viewRoles: UserRole[]; editRoles: UserRole[] }>;
   moduleSettings?: ModuleSettings;

@@ -150,7 +150,7 @@ export const AlumniDirectory: React.FC<Props> = ({
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', zIndex: 2 }}>
           <button className="btn btn-gold" onClick={onOpenRegister}>
-            Register as an Alumnus
+            Register
           </button>
         </div>
       </div>
@@ -354,7 +354,7 @@ export const AlumniDirectory: React.FC<Props> = ({
           </p>
           {!searchQuery && levelFilter === 'ALL' && !yearFilter ? (
             <button className="btn btn-gold" onClick={onOpenRegister}>
-              Register as an Alumnus
+              Register
             </button>
           ) : (
             <button className="btn btn-secondary" onClick={() => { setSearchQuery(''); setLevelFilter('ALL'); setYearFilter(''); }}>

@@ -31,7 +31,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(menu): fine-tune menu - use ALUMNI NO, remove 01 PRN, biodata, mailbox, academic calendar, administration console, and my digital pass, rename evaluation surveys to ARCHIVES"
+git commit -m "fix(footer): remove verify link and admin button, update motto to Caring to Achieve"
 echo [OK] Staged and committed changes.
 
 echo.

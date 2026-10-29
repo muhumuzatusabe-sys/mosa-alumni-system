@@ -159,7 +159,8 @@ const defaultSettings: SystemSettings = {
     instructions: 'Enter your Alumni Number (e.g. MA. 0001) or Application Reference (e.g. MOSA-2026-00001) as the transaction reason.',
   },
   allowManualMANumberAssignment: true,
-  autoApproveRegistrations: false,
+  autoApproveRegistrations: true, // System always autoverifies unless admin explicitly stops/toggles it OFF
+  allowSelfAssignedAlumniNumber: false, // Paused by default: members cannot self-assign numbers unless admin toggles it ON
   moduleSettings: {
     home: true,
     about: true,
@@ -202,7 +203,7 @@ const defaultWebsiteContent: WebsiteContent = {
     profileTitle: 'Mandela Secondary School Hoima (MASSH)',
     profileParagraph1: 'Mandela Secondary School Hoima was founded in 1997 in Hoima City, Uganda. Named in honour of the legendary statesman Nelson Mandela, the school has consistently championed academic diligence, moral integrity, leadership, and community service.',
     profileParagraph2: 'Offering both O-Level (UCE) and A-Level (UACE) curricula, MASSH has graduated thousands of professionals serving with distinction across Africa and internationally.',
-    motto: '"Education is the Most Powerful Weapon"',
+    motto: '"Caring to Achieve"',
     colors: 'Navy Blue & Gold',
     milestones: [
       {
@@ -812,8 +813,9 @@ export const dataService = {
         const existingAlumni = await this.getAlumniList();
         existingAlumni.forEach(a => usedRegistry.add(this.normalizeAlumniNumber(a.alumniNumber)));
 
-        // Phase 3: Check if applicant has an existing legacy number from physical register
-        if (appData.existingAlumniNumber && appData.existingAlumniNumber.trim()) {
+        // Phase 3: Check if applicant has an existing legacy number from physical register (if self-assignment is enabled by admin)
+        const canSelfAssign = settings.allowSelfAssignedAlumniNumber === true;
+        if (canSelfAssign && appData.existingAlumniNumber && appData.existingAlumniNumber.trim()) {
           const normExisting = this.normalizeAlumniNumber(appData.existingAlumniNumber, prefix, pad);
           // Check if already claimed by another active registered alumnus
           const alreadyLinked = existingAlumni.find(a => this.normalizeAlumniNumber(a.alumniNumber) === normExisting);

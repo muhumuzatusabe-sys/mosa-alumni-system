@@ -101,6 +101,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
   const [padDigitsInput, setPadDigitsInput] = useState(4);
   const [nextNumberInput, setNextNumberInput] = useState(1);
   const [autoApproveInput, setAutoApproveInput] = useState(true);
+  const [allowSelfAssignedInput, setAllowSelfAssignedInput] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsNotice, setSettingsNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -199,6 +200,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
         setPadDigitsInput(settings.padDigits || 4);
         setNextNumberInput(settings.nextAlumniNumber || 1);
         setAutoApproveInput(settings.autoApproveRegistrations !== false);
+        setAllowSelfAssignedInput(settings.allowSelfAssignedAlumniNumber === true);
       }
     } catch (err) {
       console.error(err);
@@ -218,6 +220,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
         padDigits: Number(padDigitsInput) || systemSettings.padDigits,
         nextAlumniNumber: Number(nextNumberInput) || systemSettings.nextAlumniNumber,
         autoApproveRegistrations: autoApproveInput,
+        allowSelfAssignedAlumniNumber: allowSelfAssignedInput,
       };
       await dataService.updateSystemSettings(updated);
       await loadData();
@@ -1160,10 +1163,28 @@ export const AdminApplicationReview: React.FC<Props> = ({
                     checked={autoApproveInput}
                     onChange={e => setAutoApproveInput(e.target.checked)}
                   />
-                  <span>Auto-Assign MA Number on Signup</span>
+                  <span>Auto-Verify / Approve Registrations</span>
                 </label>
                 <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.2rem' }}>
-                  Newly registered alumni receive permanent number instantly
+                  {autoApproveInput
+                    ? 'Active: Registrations are automatically verified & approved immediately upon signup'
+                    : 'Paused: Applications require manual review before verification'}
+                </span>
+              </div>
+
+              <div style={{ paddingBottom: '0.5rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 600, color: '#0B203E' }}>
+                  <input
+                    type="checkbox"
+                    checked={allowSelfAssignedInput}
+                    onChange={e => setAllowSelfAssignedInput(e.target.checked)}
+                  />
+                  <span>Allow Members to Self-Assign Numbers</span>
+                </label>
+                <span style={{ fontSize: '0.75rem', color: '#64748B', display: 'block', marginTop: '0.2rem' }}>
+                  {allowSelfAssignedInput
+                    ? 'Active: Members can input an existing physical register number'
+                    : 'Paused: Members cannot self-assign numbers; system generates sequential numbers'}
                 </span>
               </div>
 

@@ -211,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Right Area: Mailbox Envelope + Desktop Actions */}
+        {/* Right Area: Alerts Bell + Desktop Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
           <button
             onClick={onOpenNotifications}
@@ -229,10 +229,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
-            title={unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Messages` : 'My Mailbox'}
-            aria-label="Open Mailbox Notifications"
+            title={unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Alerts` : 'Alerts & Notifications'}
+            aria-label="Open Alerts & Notifications"
           >
-            <Mail size={22} color="#334155" />
+            <Bell size={22} color="#334155" />
             {unreadNotificationsCount > 0 && (
               <span
                 style={{
@@ -497,7 +497,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => { setMenuOpen(false); onOpenRegister(); }}
                       className="mosa-portal-subitem-btn"
                     >
-                      <span>Register as Alumnus (New Member)</span>
+                      <span>Register</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button

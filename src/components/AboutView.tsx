@@ -187,7 +187,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onBack }) => {
               <div>
                 <div style={{ fontSize: '0.78rem', color: '#D1FAE5', textTransform: 'uppercase', fontWeight: 600 }}>School Motto</div>
                 <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', fontStyle: 'italic' }}>
-                  "{content?.motto || 'Education is the Most Powerful Weapon'}"
+                  "{content?.motto || 'Caring to Achieve'}"
                 </div>
               </div>
               <div>

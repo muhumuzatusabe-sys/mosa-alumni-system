@@ -53,6 +53,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedNum, setCopiedNum] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ id: string; referenceId: string; name: string; alumniNumber?: string } | null>(null);
+  const [allowSelfAssignedNumber, setAllowSelfAssignedNumber] = useState<boolean>(false);
   const wizardBodyRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,6 +137,9 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
   useEffect(() => {
     if (isOpen) {
       dataService.getChapters('ACTIVE').then(list => setChapters(list)).catch(console.error);
+      dataService.getSystemSettings().then(settings => {
+        setAllowSelfAssignedNumber(settings.allowSelfAssignedAlumniNumber === true);
+      }).catch(console.error);
     }
   }, [isOpen]);
 
@@ -331,7 +335,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
         middleName: formData.middleName.trim() || undefined,
         lastName: formData.lastName.trim(),
         nickname: formData.nickname.trim() || undefined,
-        existingAlumniNumber: formData.existingAlumniNumber.trim() || undefined,
+        existingAlumniNumber: (allowSelfAssignedNumber && formData.existingAlumniNumber.trim()) ? formData.existingAlumniNumber.trim() : undefined,
         cohortYear: String(formData.aYearCompleted || formData.oYearCompleted),
         gender: formData.gender,
         dateOfBirth: formData.dateOfBirth,
@@ -1025,32 +1029,34 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                     </div>
                   </div>
 
-                  {/* Optional Existing Alumni Number from Physical Registers */}
-                  <div style={{
-                    background: '#FFFBEB',
-                    border: '1.5px solid #FDE68A',
-                    borderRadius: '10px',
-                    padding: '0.9rem 1.15rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.35rem',
-                  }}>
-                    <label className="form-label" style={{ fontWeight: 700, color: '#92400E', margin: 0, fontSize: '0.88rem' }}>
-                      Existing Alumni Membership Number (if already allocated)
-                    </label>
-                    <input
-                      type="text"
-                      name="existingAlumniNumber"
-                      value={formData.existingAlumniNumber}
-                      onChange={handleChange}
-                      className="form-control"
-                      placeholder="e.g. MA. 0001 (Found on physical register or certificate)"
-                      style={{ background: '#FFFFFF', borderColor: '#F59E0B', fontSize: '0.9rem', padding: '0.55rem 0.8rem' }}
-                    />
-                    <div style={{ fontSize: '0.78rem', color: '#78350F', lineHeight: 1.4 }}>
-                      Example format: <strong>MA. 0001</strong>. If you were already allocated a permanent number in previous physical register books, enter it here. Leave this blank if you do not have one; a unique permanent number will be generated for you automatically.
+                  {/* Optional Existing Alumni Number from Physical Registers - only shown when admin permits self-assigned/claimed numbers */}
+                  {allowSelfAssignedNumber && (
+                    <div style={{
+                      background: '#FFFBEB',
+                      border: '1.5px solid #FDE68A',
+                      borderRadius: '10px',
+                      padding: '0.9rem 1.15rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.35rem',
+                    }}>
+                      <label className="form-label" style={{ fontWeight: 700, color: '#92400E', margin: 0, fontSize: '0.88rem' }}>
+                        Existing Alumni Membership Number (if already allocated)
+                      </label>
+                      <input
+                        type="text"
+                        name="existingAlumniNumber"
+                        value={formData.existingAlumniNumber}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="e.g. MA. 0001 (Found on physical register or certificate)"
+                        style={{ background: '#FFFFFF', borderColor: '#F59E0B', fontSize: '0.9rem', padding: '0.55rem 0.8rem' }}
+                      />
+                      <div style={{ fontSize: '0.78rem', color: '#78350F', lineHeight: 1.4 }}>
+                        Example format: <strong>MA. 0001</strong>. If you were already allocated a permanent number in previous physical register books, enter it here. Leave this blank if you do not have one; a unique permanent number will be generated for you automatically.
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '1rem' }}>
                     <div className="form-group">

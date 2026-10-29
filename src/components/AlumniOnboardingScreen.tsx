@@ -113,7 +113,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
               lineHeight: 1.25,
             }}
           >
-            Register as a MASSH Alumnus
+            Register
           </h1>
 
           <p
@@ -254,7 +254,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
             >
               <CheckCircle2 size={19} color="#FCD34D" />
-              <span>Register as Alumnus</span>
+              <span>Register</span>
               <ArrowRight size={17} style={{ marginLeft: 'auto' }} />
             </button>
 

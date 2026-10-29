@@ -3,9 +3,7 @@ import {
   Home,
   Users, 
   Coins, 
-  Bell, 
-  Award, 
-  ShieldCheck,
+  ClipboardCheck, 
   Sliders,
   LogOut,
   LogIn
@@ -17,8 +15,8 @@ interface Props {
   currentTab: string;
   setCurrentTab: (tab: any) => void;
   currentUser: AuthUser | null;
-  onOpenVerify: () => void;
-  onOpenRegister: () => void;
+  onOpenVerify?: () => void;
+  onOpenRegister?: () => void;
   onOpenNotifications?: () => void;
   unreadNotificationsCount?: number;
   onOpenAdmin?: () => void;
@@ -65,21 +63,15 @@ export const MobileBottomNav: React.FC<Props> = ({
         <span>Registry</span>
       </button>
 
-      {/* 3. My Pass (Dedicated Digital Identity) */}
+      {/* 3. Attendance (Replacing My Pass) */}
       <button
         type="button"
-        className={`mobile-bottom-nav-item ${currentTab === 'my-profile' ? 'active' : ''}`}
-        onClick={() => {
-          if (currentUser) {
-            setCurrentTab('my-profile');
-          } else if (onOpenAuth) {
-            onOpenAuth();
-          }
-        }}
-        title="My Digital Pass"
+        className={`mobile-bottom-nav-item ${currentTab === 'attendance' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('attendance')}
+        title="Meeting Attendance & Roll Call"
       >
-        <Award size={19} color={currentTab === 'my-profile' ? '#FBBF24' : '#FDE68A'} />
-        <span style={{ color: currentTab === 'my-profile' ? '#FBBF24' : '#FDE68A', fontWeight: 700 }}>My Pass</span>
+        <ClipboardCheck size={19} />
+        <span>Attendance</span>
       </button>
 
       {/* 4. Giving / Payments */}
@@ -93,41 +85,7 @@ export const MobileBottomNav: React.FC<Props> = ({
         <span>Giving</span>
       </button>
 
-      {/* 5. Alerts / Mailbox */}
-      <button
-        type="button"
-        className={`mobile-bottom-nav-item ${currentTab === 'notifications' ? 'active' : ''}`}
-        onClick={onOpenNotifications}
-        style={{ position: 'relative' }}
-        title="Alerts & Notifications"
-      >
-        <Bell size={19} />
-        {unreadNotificationsCount > 0 && (
-          <span 
-            style={{ 
-              position: 'absolute', 
-              top: '3px', 
-              right: 'calc(50% - 13px)', 
-              background: '#EF4444', 
-              color: '#FFFFFF', 
-              fontSize: '0.6rem', 
-              fontWeight: 800, 
-              width: '14px', 
-              height: '14px', 
-              borderRadius: '50%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.4)'
-            }}
-          >
-            {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-          </span>
-        )}
-        <span>Alerts</span>
-      </button>
-
-      {/* 6. Admin Panel (Direct Staff switch or Admin Gate) */}
+      {/* 5. Admin Panel (Direct Staff switch or Admin Gate) */}
       <button
         type="button"
         className="mobile-bottom-nav-item"
@@ -145,17 +103,6 @@ export const MobileBottomNav: React.FC<Props> = ({
       >
         <Sliders size={19} color="#FBBF24" />
         <span style={{ color: '#FDE68A', fontWeight: 700 }}>Admin</span>
-      </button>
-
-      {/* 7. Verify Alumnus Desk */}
-      <button
-        type="button"
-        className="mobile-bottom-nav-item"
-        onClick={onOpenVerify}
-        title="Verify Permanent Alumni Number"
-      >
-        <ShieldCheck size={19} />
-        <span>Verify</span>
       </button>
 
       {/* 8. Logout / Login */}

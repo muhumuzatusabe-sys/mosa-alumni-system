@@ -470,7 +470,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                   >
                     <UserPlus size={13} />
-                    <span>Register as Alumnus</span>
+                    <span>Register</span>
                   </button>
                 </div>
               </div>
