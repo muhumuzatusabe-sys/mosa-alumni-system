@@ -630,57 +630,75 @@ img, video, canvas, svg, iframe {
     min-width: 520px;
   }
 
-  /* Mobile Bottom Navigation Bar */
+  /* Mobile Bottom Navigation Bar - Static Fixed Bar with Scrollable Side-by-Side Icons */
   .mobile-bottom-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: calc(64px + env(safe-area-inset-bottom, 0px));
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), 6px);
-    background: #0A271B;
-    border-top: 1.5px solid rgba(198, 138, 36, 0.45);
-    box-shadow: 0 -4px 20px rgba(10, 39, 27, 0.45);
-    z-index: 999;
-    justify-content: space-around;
-    align-items: center;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    backdrop-filter: blur(14px);
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 4px) !important;
+    background: #0A271B !important;
+    border-top: 1.5px solid rgba(198, 138, 36, 0.45) !important;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45) !important;
+    z-index: 1000 !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    gap: 0.35rem !important;
+    backdrop-filter: blur(14px) !important;
+  }
+
+  .mobile-bottom-nav::-webkit-scrollbar {
+    display: none !important;
   }
 
   .mobile-bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: #94A3B8;
-    font-size: 0.65rem;
-    font-weight: 600;
-    gap: 2px;
-    cursor: pointer;
-    flex: 1;
-    padding: 6px 2px;
-    transition: all 0.2s ease;
-    border-radius: 8px;
-    min-height: 48px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    color: #94A3B8 !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    gap: 2px !important;
+    cursor: pointer !important;
+    flex: 0 0 auto !important;
+    min-width: 60px !important;
+    padding: 6px 6px !important;
+    transition: all 0.18s ease !important;
+    border-radius: 8px !important;
+    min-height: 48px !important;
+    white-space: nowrap !important;
   }
 
   .mobile-bottom-nav-item:active {
-    transform: scale(0.96);
-    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.08) !important;
   }
 
   .mobile-bottom-nav-item.active {
-    color: #FBBF24;
+    color: #FBBF24 !important;
+    background: rgba(251, 191, 36, 0.12) !important;
   }
 
   .mobile-bottom-nav-item.active svg {
-    color: #FBBF24;
-    transform: translateY(-2px);
+    color: #FBBF24 !important;
+    transform: translateY(-1px);
+  }
+
+  .main-wrapper {
+    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   /* Admin Navigation Scroll Strip */
@@ -992,39 +1010,39 @@ table tbody tr:hover {
 }
 
 /* ============================================================== */
+/* MOSA OFFICIAL INSTITUTIONAL MEMBERSHIP MENU (MAKERERE PORTAL STYLE) */
 /* ============================================================== */
-/* MOSA PROFESSIONAL SMOOTH CYAN DROPDOWN MENU                     */
-/* ============================================================== */
-.mosa-cyan-backdrop {
+.mosa-portal-menu-backdrop {
   position: fixed;
   inset: 0;
   top: 56px;
-  background: rgba(4, 18, 24, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 1050;
-  transition: opacity 0.25s ease;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1200;
+  animation: mosaFadeIn 0.2s ease;
 }
 
-.mosa-cyan-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0.85rem;
-  width: min(390px, calc(100vw - 1.25rem));
-  max-width: 390px;
-  max-height: min(580px, calc(86vh - 55px));
-  background: linear-gradient(175deg, #091D24 0%, #051318 100%);
-  border: 1.5px solid rgba(34, 211, 238, 0.35);
+.mosa-portal-menu-card {
+  position: fixed;
+  top: 58px;
+  left: 12px;
+  width: min(340px, calc(100vw - 24px));
+  max-width: 340px;
+  max-height: calc(100vh - 72px);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 14px;
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8), 0 0 24px rgba(6, 182, 212, 0.2), inset 0 1px 0 rgba(34, 211, 238, 0.2);
-  z-index: 1060;
+  box-shadow: 0 16px 48px -8px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 1210;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: mosaCyanDropIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: mosaCardSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
-@keyframes mosaCyanDropIn {
+@keyframes mosaCardSlideIn {
   from {
     opacity: 0;
     transform: translateY(-8px) scale(0.98);
@@ -1035,295 +1053,316 @@ table tbody tr:hover {
   }
 }
 
-.mosa-cyan-header {
+.mosa-portal-menu-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.65rem 0.9rem;
-  background: linear-gradient(180deg, rgba(14, 45, 56, 0.95) 0%, rgba(10, 32, 40, 0.95) 100%);
-  border-bottom: 1.5px solid rgba(34, 211, 238, 0.22);
+  gap: 0.65rem;
+  padding: 0.85rem 1rem 0.65rem 1rem;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F1F5F9;
   flex-shrink: 0;
 }
 
-.mosa-cyan-logo-badge {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(6, 182, 212, 0.16);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid #22D3EE;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
-  flex-shrink: 0;
-}
-
-.mosa-cyan-title {
-  font-size: 0.88rem;
-  color: #FFFFFF;
+.mosa-portal-inst-title {
+  color: #15803D;
   font-weight: 800;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  text-transform: uppercase;
 }
 
-.mosa-cyan-subtitle {
-  font-size: 0.67rem;
-  color: #67E8F9;
-  font-weight: 500;
-  opacity: 0.85;
-  line-height: 1.2;
-}
-
-.mosa-cyan-close-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  color: #94A3B8;
-  border-radius: 7px;
-  width: 28px;
-  height: 28px;
+.mosa-portal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #64748B;
+  padding: 4px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
 }
 
-.mosa-cyan-close-btn:hover {
-  background: rgba(6, 182, 212, 0.25);
-  color: #22D3EE;
-  border-color: #22D3EE;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+.mosa-portal-close-btn:hover {
+  background: #F1F5F9;
+  color: #0F172A;
 }
 
-.mosa-cyan-scroll {
+.mosa-portal-scroll-body {
+  flex: 1;
   overflow-y: auto;
-  padding: 0.45rem 0.65rem 0.65rem;
+  overflow-x: hidden;
+  padding: 0.85rem 0.95rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
-  min-height: 0;
+  gap: 0.4rem;
   -webkit-overflow-scrolling: touch;
 }
 
-.mosa-cyan-scroll::-webkit-scrollbar {
+.mosa-portal-scroll-body::-webkit-scrollbar {
   width: 5px;
 }
-.mosa-cyan-scroll::-webkit-scrollbar-track {
-  background: rgba(6, 182, 212, 0.06);
-  border-radius: 4px;
+.mosa-portal-scroll-body::-webkit-scrollbar-track {
+  background: #F8FAFC;
 }
-.mosa-cyan-scroll::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.4);
-  border-radius: 4px;
-}
-.mosa-cyan-scroll::-webkit-scrollbar-thumb:hover {
-  background: #22D3EE;
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
-}
-
-.mosa-cyan-category-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.mosa-cyan-group-title {
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #22D3EE;
-  padding: 0.35rem 0.35rem 0.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.mosa-cyan-count-pill {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: #67E8F9;
-  background: rgba(6, 182, 212, 0.15);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  padding: 0.05rem 0.4rem;
+.mosa-portal-scroll-body::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
   border-radius: 999px;
 }
 
-.mosa-cyan-items-group {
-  display: flex;
-  flex-direction: column;
-  background: rgba(12, 34, 43, 0.65);
-  border: 1px solid rgba(34, 211, 238, 0.16);
+/* Dark Slate Member Profile Card */
+.mosa-portal-id-box {
+  background: #1C2D37;
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  padding: 1.1rem 0.85rem 1rem 0.85rem;
+  text-align: center;
+  color: #FFFFFF;
+  margin-bottom: 0.65rem;
+  box-shadow: 0 4px 14px rgba(28, 45, 55, 0.25);
 }
 
-.mosa-cyan-nav-row {
-  width: 100%;
+.mosa-portal-id-photo {
+  width: 74px;
+  height: 74px;
+  border-radius: 10px;
+  border: 2.5px solid #FFFFFF;
+  object-fit: cover;
+  margin: 0 auto 0.65rem auto;
+  display: block;
+  background: #334155;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mosa-portal-id-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+  word-break: break-word;
+}
+
+.mosa-portal-id-number {
+  font-weight: 700;
+  font-size: 0.74rem;
+  color: #CBD5E1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Numbered Action 01 */
+.mosa-portal-numbered-action {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.48rem 0.65rem;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(34, 211, 238, 0.08);
   cursor: pointer;
+  width: 100%;
   text-align: left;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
+  color: #0F172A;
 }
 
-.mosa-cyan-nav-row:last-child {
-  border-bottom: none;
+.mosa-portal-numbered-action:hover {
+  background: #F8FAFC;
 }
 
-.mosa-cyan-nav-row:hover {
-  background: rgba(6, 182, 212, 0.14);
-  transform: translateX(3px);
+.mosa-portal-num-prefix {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #0F172A;
+  min-width: 20px;
 }
 
-.mosa-cyan-nav-row.active {
-  background: linear-gradient(90deg, rgba(6, 182, 212, 0.28) 0%, rgba(6, 182, 212, 0.06) 100%);
-  box-shadow: inset 3px 0 0 #22D3EE;
+.mosa-portal-num-label {
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #0F172A;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-.mosa-cyan-nav-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #38BDF8;
-  transition: all 0.18s ease;
-}
-
-.mosa-cyan-nav-icon.active {
-  background: #06B6D4;
-  border-color: #22D3EE;
-  color: #022C22;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.5);
-}
-
-.mosa-cyan-nav-row:hover .mosa-cyan-nav-icon {
-  color: #22D3EE;
-  border-color: #22D3EE;
-}
-
-.mosa-cyan-nav-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.mosa-cyan-nav-label-row {
+/* Accordion Item Header */
+.mosa-portal-menu-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.35rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  color: #0F172A;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-.mosa-cyan-nav-label {
-  font-size: 0.82rem;
+.mosa-portal-menu-row:hover {
+  background: #F8FAFC;
+}
+
+/* Specific styling for Enrollment row (green in screenshot) */
+.mosa-portal-menu-row.enrollment {
+  color: #16A34A;
+}
+.mosa-portal-menu-row.enrollment:hover {
+  background: #F0FDF4;
+}
+
+/* Specific styling for Payments row (soft grey pill in screenshot) */
+.mosa-portal-menu-row.pill-highlight {
+  background: #F1F3F5;
+}
+.mosa-portal-menu-row.pill-highlight:hover {
+  background: #E5E7EB;
+}
+
+/* Active current row */
+.mosa-portal-menu-row.active {
+  background: #F0FDF4;
+  color: #15803D;
+}
+
+/* Subitems Container */
+.mosa-portal-subitems-group {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1.85rem;
+  margin: 0.15rem 0 0.4rem 0;
+  border-left: 2px solid #E2E8F0;
+  margin-left: 1.25rem;
+  gap: 0.2rem;
+}
+
+.mosa-portal-subitem-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #F1F5F9;
+  color: #334155;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.mosa-portal-subitem-btn:hover {
+  background: #F1F5F9;
+  color: #15803D;
+}
+
+.mosa-portal-subitem-btn.active {
+  background: #DCFCE7;
+  color: #15803D;
+  font-weight: 700;
+}
+
+/* Standalone direct rows */
+.mosa-portal-direct-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  color: #0F172A;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mosa-portal-direct-row:hover {
+  background: #F8FAFC;
+}
+
+.mosa-portal-direct-row.active {
+  background: #F0FDF4;
+  color: #15803D;
+}
+
+.mosa-portal-unread-badge {
+  background: #EF4444;
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
   line-height: 1.2;
 }
 
-.mosa-cyan-nav-label.active {
-  color: #22D3EE;
-  font-weight: 800;
-  text-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
-}
-
-.mosa-cyan-nav-active-pill {
-  font-size: 0.55rem;
-  font-weight: 800;
-  color: #22D3EE;
-  background: rgba(6, 182, 212, 0.2);
-  padding: 0.05rem 0.35rem;
-  border-radius: 4px;
-  border: 1px solid #22D3EE;
-  text-transform: uppercase;
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.25);
-}
-
-.mosa-cyan-nav-desc {
-  font-size: 0.67rem;
-  color: #94A3B8;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.05rem;
-}
-
-.mosa-cyan-nav-arrow {
-  color: #475569;
-  flex-shrink: 0;
-  transition: transform 0.18s ease, color 0.18s ease;
-}
-
-.mosa-cyan-nav-row:hover .mosa-cyan-nav-arrow {
-  color: #22D3EE;
-  transform: translateX(2px);
-}
-
-.mosa-cyan-footer {
+/* Footer in menu */
+.mosa-portal-menu-footer {
   display: flex;
-  gap: 0.4rem;
-  padding: 0.5rem 0.65rem;
-  background: #0A242E;
-  border-top: 1px solid rgba(34, 211, 238, 0.2);
+  gap: 0.5rem;
+  padding: 0.75rem 0.95rem;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
   flex-shrink: 0;
 }
 
-.mosa-cyan-footer-btn {
+.mosa-portal-footer-action {
   flex: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0.42rem 0.5rem;
-  border-radius: 6px;
-  font-size: 0.74rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 7px;
+  font-size: 0.78rem;
   font-weight: 700;
-  background: rgba(6, 182, 212, 0.12);
-  border: 1px solid rgba(34, 211, 238, 0.3);
-  color: #E0F2FE;
   cursor: pointer;
-  transition: all 0.18s ease;
-  white-space: nowrap;
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #1E293B;
+  transition: all 0.15s ease;
 }
 
-.mosa-cyan-footer-btn:hover {
-  background: rgba(6, 182, 212, 0.25);
-  border-color: #22D3EE;
+.mosa-portal-footer-action:hover {
+  background: #F1F5F9;
+}
+
+.mosa-portal-footer-action.primary {
+  background: #15803D;
+  border-color: #15803D;
   color: #FFFFFF;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
 }
 
-.mosa-cyan-footer-btn.primary {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(14, 116, 144, 0.45));
-  border: 1px solid #06B6D4;
-  color: #FFFFFF;
-}
-
-.mosa-cyan-footer-btn.primary:hover {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.45), rgba(14, 116, 144, 0.6));
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.4);
+.mosa-portal-footer-action.primary:hover {
+  background: #166534;
 }
 
 /* Mobile Responsive Adjustments */
 @media (max-width: 767px) {
-  .mosa-cyan-dropdown {
-    left: 0.5rem;
-    right: 0.5rem;
+  .mosa-portal-menu-card {
+    left: 8px;
+    right: 8px;
     width: auto;
-    max-width: calc(100vw - 1rem);
-    max-height: calc(85vh - 55px);
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 65px);
     border-radius: 12px;
   }
 
@@ -1339,10 +1378,6 @@ table tbody tr:hover {
 
   .brand-text h1 {
     font-size: 0.98rem !important;
-  }
-
-  .mosa-cyan-scroll {
-    padding: 0.4rem 0.5rem 0.65rem;
   }
 }
 

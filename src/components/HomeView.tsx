@@ -165,7 +165,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     fontWeight: 800,
                   }}
                 >
-                  MASH Alumni Photo
+                  MASSH Alumni Photo
                 </span>
 
                 {memberProfile.photoUrl ? (

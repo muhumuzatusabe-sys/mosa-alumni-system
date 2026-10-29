@@ -683,7 +683,7 @@ export const App: React.FC = () => {
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation - Static Fixed Bar with Scrollable Side-by-Side Icons */}
       <MobileBottomNav
         currentTab={currentTab}
         setCurrentTab={handleNavigate}
@@ -694,6 +694,8 @@ export const App: React.FC = () => {
         unreadNotificationsCount={unreadNotifsCount}
         onOpenAdmin={handleAdminGateClick}
         onSwitchToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : handleAdminGateClick}
+        onLogout={handleLogout}
+        onOpenAuth={() => openAuth('alumni')}
       />
 
       {/* Member Registration Wizard */}
