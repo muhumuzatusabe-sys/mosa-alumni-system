@@ -26,7 +26,11 @@ import {
   Edit3,
   Building2,
   User,
-  CheckCircle2
+  CheckCircle2,
+  BookOpen,
+  Newspaper,
+  HeartHandshake,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -61,11 +65,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [memberProfile, setMemberProfile] = useState<AlumniProfile | null>(null);
   const [expandedAccordions, setExpandedAccordions] = useState<Record<string, boolean>>({
-    enrollment: false,
-    payments: false,
-    programme: false,
-    services: false,
-    voting: false,
+    registry: true, // open by default like Enrollment in Makerere portal
+    giving: false,
+    careers: false,
+    community: false,
+    information: false,
     admin: false,
   });
 
@@ -432,26 +436,58 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="mosa-portal-num-label">GENERATE PRN / DIGITAL PASS</span>
               </button>
 
-              {/* ACCORDION 1: ENROLLMENT & REGISTRATION (Green Pen Icon & Green Text) */}
+              {/* ACCORDION 1: REGISTRY & MEMBERSHIP (Green Pen Icon & Green Text - Active like Makerere Enrollment) */}
               <div>
                 <button
                   type="button"
-                  onClick={() => toggleAccordion('enrollment')}
-                  className={`mosa-portal-menu-row enrollment ${expandedAccordions.enrollment ? 'active' : ''}`}
+                  onClick={() => toggleAccordion('registry')}
+                  className={`mosa-portal-menu-row enrollment ${expandedAccordions.registry ? 'active' : ''}`}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <Edit3 size={17} color="#16A34A" />
-                    <span>ENROLLMENT & REGISTRATION</span>
+                    <span>REGISTRY & MEMBERSHIP</span>
                   </div>
-                  {expandedAccordions.enrollment ? (
+                  {expandedAccordions.registry ? (
                     <ChevronUp size={16} color="#16A34A" />
                   ) : (
                     <ChevronDown size={16} color="#16A34A" />
                   )}
                 </button>
 
-                {expandedAccordions.enrollment && (
+                {expandedAccordions.registry && (
                   <div className="mosa-portal-subitems-group">
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('home')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'home' ? 'active' : ''}`}
+                    >
+                      <span>MOSA Dashboard & Overview</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('welcome')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'welcome' ? 'active' : ''}`}
+                    >
+                      <span>Welcome & Association Orientation</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('directory')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'directory' ? 'active' : ''}`}
+                    >
+                      <span>Alumni Directory & Member Search</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('membership')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'membership' ? 'active' : ''}`}
+                    >
+                      <span>Membership Categories & Rights</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
                     <button
                       type="button"
                       onClick={() => { setMenuOpen(false); onOpenRegister(); }}
@@ -468,60 +504,36 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>Verify Permanent Alumni Number</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('membership')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'membership' ? 'active' : ''}`}
-                    >
-                      <span>Official Membership Rights & Guide</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('welcome')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'welcome' ? 'active' : ''}`}
-                    >
-                      <span>MOSA Welcome & Orientation Page</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('attendance')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'attendance' ? 'active' : ''}`}
-                    >
-                      <span>Member Roll Call & Assembly Sign-In</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
                   </div>
                 )}
               </div>
 
-              {/* ACCORDION 2: PAYMENTS (Highlighted soft-gray pill matching image) */}
+              {/* ACCORDION 2: PHILANTHROPY & GIVING (Coins Icon & Highlighted Gray Pill matching Payments) */}
               <div>
                 <button
                   type="button"
-                  onClick={() => toggleAccordion('payments')}
-                  className={`mosa-portal-menu-row pill-highlight ${expandedAccordions.payments ? 'active' : ''}`}
+                  onClick={() => toggleAccordion('giving')}
+                  className={`mosa-portal-menu-row pill-highlight ${expandedAccordions.giving ? 'active' : ''}`}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <Coins size={17} color="#0F172A" />
-                    <span>PAYMENTS</span>
+                    <span>PHILANTHROPY & GIVING</span>
                   </div>
-                  {expandedAccordions.payments ? (
+                  {expandedAccordions.giving ? (
                     <ChevronUp size={16} color="#0F172A" />
                   ) : (
                     <ChevronDown size={16} color="#0F172A" />
                   )}
                 </button>
 
-                {expandedAccordions.payments && (
+                {expandedAccordions.giving && (
                   <div className="mosa-portal-subitems-group">
                     <button
                       type="button"
                       onClick={() => handleTabClick('payments')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'payments' ? 'active' : ''}`}
                     >
-                      <span>Annual Membership Subscription (UGX 50k)</span>
+                      <span>Annual Membership Dues (UGX 50,000)</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -529,7 +541,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('payments')}
                       className="mosa-portal-subitem-btn"
                     >
-                      <span>School Development Project Campaigns</span>
+                      <span>School Development & Building Campaigns</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -537,103 +549,47 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('payments')}
                       className="mosa-portal-subitem-btn"
                     >
-                      <span>Alumni Welfare & Emergency Aid Fund</span>
+                      <span>Alumni Welfare & Solidarity Trust Fund</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleTabClick('payments')}
-                      className="mosa-portal-subitem-btn"
+                      onClick={() => handleTabClick('documents')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'documents' ? 'active' : ''}`}
                     >
-                      <span>Treasury Statements & Numbered Invoices</span>
+                      <span>Treasury Statements & Official Receipts</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* ACCORDION 3: MY PROGRAMME (ALUMNI REGISTRY & CHAPTERS) */}
+              {/* ACCORDION 3: CAREERS & GOVERNANCE */}
               <div>
                 <button
                   type="button"
-                  onClick={() => toggleAccordion('programme')}
-                  className={`mosa-portal-menu-row ${expandedAccordions.programme ? 'active' : ''}`}
+                  onClick={() => toggleAccordion('careers')}
+                  className={`mosa-portal-menu-row ${expandedAccordions.careers ? 'active' : ''}`}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <GraduationCap size={17} color="#0F172A" />
-                    <span>MY PROGRAMME & CHAPTERS</span>
+                    <Briefcase size={17} color="#0F172A" />
+                    <span>CAREERS & GOVERNANCE</span>
                   </div>
-                  {expandedAccordions.programme ? (
+                  {expandedAccordions.careers ? (
                     <ChevronUp size={16} color="#0F172A" />
                   ) : (
                     <ChevronDown size={16} color="#0F172A" />
                   )}
                 </button>
 
-                {expandedAccordions.programme && (
-                  <div className="mosa-portal-subitems-group">
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('directory')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'directory' ? 'active' : ''}`}
-                    >
-                      <span>Complete Alumni Directory & Member Search</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('chapters')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'chapters' ? 'active' : ''}`}
-                    >
-                      <span>University Chapters (MUMASA, KYUMASA)</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('chapters')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Regional & Diaspora Chapters</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('directory')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Academic Cohorts & Alumni Sets</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ACCORDION 4: SERVICES & OPPORTUNITIES */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleAccordion('services')}
-                  className={`mosa-portal-menu-row ${expandedAccordions.services ? 'active' : ''}`}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <Building2 size={17} color="#0F172A" />
-                    <span>SERVICES & OPPORTUNITIES</span>
-                  </div>
-                  {expandedAccordions.services ? (
-                    <ChevronUp size={16} color="#0F172A" />
-                  ) : (
-                    <ChevronDown size={16} color="#0F172A" />
-                  )}
-                </button>
-
-                {expandedAccordions.services && (
+                {expandedAccordions.careers && (
                   <div className="mosa-portal-subitems-group">
                     <button
                       type="button"
                       onClick={() => handleTabClick('opportunities')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'opportunities' ? 'active' : ''}`}
                     >
-                      <span>Jobs, Internships & Tenders Hub</span>
+                      <span>Job Opportunities & Career Hub</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -641,7 +597,55 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('opportunities')}
                       className="mosa-portal-subitem-btn"
                     >
-                      <span>Alumni Career Mentorship Network</span>
+                      <span>Internships & Professional Mentorship</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('elections')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'elections' ? 'active' : ''}`}
+                    >
+                      <span>NEC General Elections & Manifestos</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('elections')}
+                      className="mosa-portal-subitem-btn"
+                    >
+                      <span>Cast Ballot & Certified Results</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ACCORDION 4: COMMUNITY & PROGRAMS */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('community')}
+                  className={`mosa-portal-menu-row ${expandedAccordions.community ? 'active' : ''}`}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <Users size={17} color="#0F172A" />
+                    <span>COMMUNITY & PROGRAMS</span>
+                  </div>
+                  {expandedAccordions.community ? (
+                    <ChevronUp size={16} color="#0F172A" />
+                  ) : (
+                    <ChevronDown size={16} color="#0F172A" />
+                  )}
+                </button>
+
+                {expandedAccordions.community && (
+                  <div className="mosa-portal-subitems-group">
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('attendance')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'attendance' ? 'active' : ''}`}
+                    >
+                      <span>Roll Call & Assembly Sign-In</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -649,7 +653,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('events')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'events' ? 'active' : ''}`}
                     >
-                      <span>Events, Reunions & Sports Gala</span>
+                      <span>Alumni Events, Reunions & Dinners</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -657,7 +661,55 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('gallery')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'gallery' ? 'active' : ''}`}
                     >
-                      <span>Campus Heritage & Milestones Gallery</span>
+                      <span>Heritage & Milestones Photo Gallery</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('chapters')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'chapters' ? 'active' : ''}`}
+                    >
+                      <span>University & Regional Chapters (MUMASA, etc.)</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ACCORDION 5: INFORMATION & HERITAGE */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('information')}
+                  className={`mosa-portal-menu-row ${expandedAccordions.information ? 'active' : ''}`}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <BookOpen size={17} color="#0F172A" />
+                    <span>INFORMATION & HERITAGE</span>
+                  </div>
+                  {expandedAccordions.information ? (
+                    <ChevronUp size={16} color="#0F172A" />
+                  ) : (
+                    <ChevronDown size={16} color="#0F172A" />
+                  )}
+                </button>
+
+                {expandedAccordions.information && (
+                  <div className="mosa-portal-subitems-group">
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('news')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'news' ? 'active' : ''}`}
+                    >
+                      <span>News, Circulars & Announcements</span>
+                      <ChevronRight size={13} opacity={0.6} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick('about')}
+                      className={`mosa-portal-subitem-btn ${currentTab === 'about' ? 'active' : ''}`}
+                    >
+                      <span>About Mandela SS & MOSA History</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -665,63 +717,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('contact')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'contact' ? 'active' : ''}`}
                     >
-                      <span>Secretariat Helpdesk & WhatsApp Inquiries</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ACCORDION 5: E-VOTING & ELECTIONS */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleAccordion('voting')}
-                  className={`mosa-portal-menu-row ${expandedAccordions.voting ? 'active' : ''}`}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <Vote size={17} color="#0F172A" />
-                    <span>E-VOTING</span>
-                  </div>
-                  {expandedAccordions.voting ? (
-                    <ChevronUp size={16} color="#0F172A" />
-                  ) : (
-                    <ChevronDown size={16} color="#0F172A" />
-                  )}
-                </button>
-
-                {expandedAccordions.voting && (
-                  <div className="mosa-portal-subitems-group">
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'elections' ? 'active' : ''}`}
-                    >
-                      <span>NEC Executive General Elections</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Candidate Manifestos & Profiles</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Cast Secure Digital Ballot</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Certified Election Results & Archive</span>
+                      <span>Secretariat Contact & Helpdesk</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                   </div>

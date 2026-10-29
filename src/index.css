@@ -47,6 +47,14 @@
   padding: 0;
 }
 
+html {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  touch-action: pan-y !important;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--cream-bg);
@@ -54,6 +62,38 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  touch-action: pan-y !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+}
+
+p, span, h1, h2, h3, h4, h5, h6, div, section, article, main, header, footer {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Any section that exceeds width scrolls sideways locally, without moving the whole display */
+.overflow-x-auto,
+.table-responsive,
+.admin-table-container,
+.horizontal-scroll,
+.horizontal-scroll-touch,
+.mobile-bottom-nav,
+.admin-tabs-nav,
+div:has(> table) {
+  touch-action: pan-x pan-y !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1016,9 +1056,9 @@ table tbody tr:hover {
   position: fixed;
   inset: 0;
   top: 56px;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.25);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 1200;
   animation: mosaFadeIn 0.2s ease;
 }
@@ -1026,14 +1066,14 @@ table tbody tr:hover {
 .mosa-portal-menu-card {
   position: fixed;
   top: 58px;
-  left: 12px;
-  width: min(340px, calc(100vw - 24px));
-  max-width: 340px;
+  left: 10px;
+  width: 295px;
+  max-width: min(295px, 78vw);
   max-height: calc(100vh - 72px);
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 14px;
-  box-shadow: 0 16px 48px -8px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
   z-index: 1210;
   display: flex;
   flex-direction: column;
@@ -1359,9 +1399,9 @@ table tbody tr:hover {
 @media (max-width: 767px) {
   .mosa-portal-menu-card {
     left: 8px;
-    right: 8px;
-    width: auto;
-    max-width: calc(100vw - 16px);
+    right: auto;
+    width: 290px;
+    max-width: min(290px, 80vw);
     max-height: calc(100vh - 65px);
     border-radius: 12px;
   }
