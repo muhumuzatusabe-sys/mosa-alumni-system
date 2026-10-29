@@ -143,6 +143,17 @@ const DEFAULT_MATRIX: RolePermissionMatrix = {
 export const isStaffRole = (role?: UserRole | null): boolean =>
   !!role && role !== 'ALUMNI' && role !== 'USER';
 
+export const isRegisteredAlumni = (user?: AuthUser | null): boolean => {
+  if (!user) return false;
+  if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || isStaffRole(user.role)) {
+    return true;
+  }
+  if (user.role === 'ALUMNI') return true;
+  if (user.alumniNumber && user.alumniNumber.trim() !== '') return true;
+  if (user.alumniId && user.alumniId.trim() !== '') return true;
+  return false;
+};
+
 // ==========================================
 // ATTENDANCE LABELS
 // ==========================================

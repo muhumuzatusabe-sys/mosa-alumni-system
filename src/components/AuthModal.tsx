@@ -43,6 +43,12 @@ export const AuthModal: React.FC<Props> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // OTP Verification for Password Creation
+  const [pwdStep, setPwdStep] = useState<'details' | 'otp_verify'>('details');
+  const [otpCode, setOtpCode] = useState('');
+  const [simulatedOtpNotice, setSimulatedOtpNotice] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   // Status and verification states
   const [loading, setLoading] = useState(false);
   const [verifyingEmail, setVerifyingEmail] = useState(false);
@@ -137,8 +143,8 @@ export const AuthModal: React.FC<Props> = ({
     }
   };
 
-  // Handle Alumni Password Creation
-  const handleCreatePassword = async (e: React.FormEvent) => {
+  // Step 1: Request OTP for password creation
+  const handleRequestPasswordOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
@@ -160,9 +166,56 @@ export const AuthModal: React.FC<Props> = ({
 
     setLoading(true);
     try {
+      const res = await dataService.sendRegistrationOtp(email);
+      if (res.success) {
+        setPwdStep('otp_verify');
+        setSuccessMsg(`A 6-digit verification code has been dispatched to ${email}. Please enter it below.`);
+        if (res.code) {
+          setSimulatedOtpNotice(res.code);
+        }
+        setResendCooldown(60);
+        const timer = setInterval(() => {
+          setResendCooldown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        setErrorMsg(res.error || 'Failed to send verification code. Please check your email.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'An error occurred while sending the code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP and finalize Password Creation
+  const handleVerifyOtpAndCreatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (!otpCode || otpCode.trim().length < 4) {
+      setErrorMsg('Please enter the 6-digit verification code sent to your email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const otpCheck = await dataService.verifyRegistrationOtp(email, otpCode);
+      if (!otpCheck.success) {
+        setErrorMsg(otpCheck.error || 'Invalid or expired verification code.');
+        setLoading(false);
+        return;
+      }
+
       const res = await dataService.createAlumniPassword(email, password);
       if (res.success && res.user) {
-        setSuccessMsg('Password created and linked successfully! Signing you in...');
+        setSuccessMsg('Email verified and password created successfully! Signing you in...');
         setTimeout(() => {
           onLoginSuccess(res.user!);
           onClose();
@@ -593,7 +646,9 @@ export const AuthModal: React.FC<Props> = ({
               {/* SUBMODE B: ALUMNI CREATE / RESET PASSWORD          */}
               {/* -------------------------------------------------- */}
               {alumniMode === 'create_password' && (
-                <form onSubmit={handleCreatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <>
+                  {pwdStep === 'details' ? (
+                    <form onSubmit={handleRequestPasswordOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
                       Your Registered Email Address
@@ -802,11 +857,154 @@ export const AuthModal: React.FC<Props> = ({
                       boxShadow: '0 4px 10px rgba(17, 61, 43, 0.2)'
                     }}
                   >
-                    <KeyRound size={18} />
-                    <span>{loading ? 'Saving & Signing In...' : 'Save Password & Sign In'}</span>
+                    <ShieldCheck size={18} />
+                    <span>{loading ? 'Sending Code...' : 'Send Verification Code & Continue'}</span>
                   </button>
                 </form>
+              ) : (
+                /* OTP VERIFICATION VIEW FOR PASSWORD CREATION */
+                <form onSubmit={handleVerifyOtpAndCreatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ 
+                    background: '#F8FAFC', 
+                    border: '1.5px solid #E2E8F0', 
+                    borderRadius: '12px', 
+                    padding: '1rem', 
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      borderRadius: '50%', 
+                      background: '#ECFDF5', 
+                      color: '#059669', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      margin: '0 auto 0.5rem auto'
+                    }}>
+                      <ShieldCheck size={22} />
+                    </div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0F172A' }}>
+                      Verify Your Email Address
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
+                      We sent a 6-digit confirmation code to:
+                    </div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#113D2B', marginTop: '0.1rem' }}>
+                      {email}
+                    </div>
+
+                    {simulatedOtpNotice && (
+                      <div style={{
+                        marginTop: '0.65rem',
+                        padding: '0.45rem 0.65rem',
+                        background: '#FEF3C7',
+                        border: '1px dashed #D97706',
+                        borderRadius: '8px',
+                        fontSize: '0.76rem',
+                        color: '#92400E'
+                      }}>
+                        Verification Code: <strong style={{ fontSize: '0.95rem', letterSpacing: '2px', color: '#78350F' }}>{simulatedOtpNotice}</strong>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B', textAlign: 'center', display: 'block' }}>
+                      Enter 6-Digit Code
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={e => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="• • • • • •"
+                      autoFocus
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '2px solid #113D2B',
+                        borderRadius: '8px',
+                        fontSize: '1.3rem',
+                        fontWeight: 800,
+                        letterSpacing: '6px',
+                        textAlign: 'center',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        color: '#0F172A',
+                        background: '#FFFFFF'
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading || otpCode.trim().length < 4}
+                    className="btn btn-primary"
+                    style={{
+                      marginTop: '0.25rem',
+                      padding: '0.85rem',
+                      borderRadius: '8px',
+                      background: '#113D2B',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      fontSize: '0.92rem',
+                      border: 'none',
+                      cursor: (loading || otpCode.trim().length < 4) ? 'not-allowed' : 'pointer',
+                      opacity: (loading || otpCode.trim().length < 4) ? 0.7 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 10px rgba(17, 61, 43, 0.2)'
+                    }}
+                  >
+                    <CheckCircle2 size={18} />
+                    <span>{loading ? 'Verifying & Setting Password...' : 'Verify Email & Finish'}</span>
+                  </button>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPwdStep('details');
+                        setOtpCode('');
+                        setErrorMsg('');
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#64748B',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      Change Email
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={resendCooldown > 0 || loading}
+                      onClick={handleRequestPasswordOtp}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: resendCooldown > 0 ? '#9CA3AF' : '#C68A24',
+                        fontWeight: 700,
+                        cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
+                    </button>
+                  </div>
+                </form>
               )}
+            </>
+          )}
             </div>
           )}
 

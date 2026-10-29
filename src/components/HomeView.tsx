@@ -17,7 +17,8 @@ import {
   Menu,
   Clock,
   UserPlus,
-  GraduationCap
+  GraduationCap,
+  Lock
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -27,6 +28,7 @@ import {
   PaymentTransaction 
 } from '../types';
 import { dataService } from '../services/dataService';
+import { isRegisteredAlumni } from '../services/governanceService';
 
 interface HomeViewProps {
   currentUser: AuthUser | null;
@@ -54,6 +56,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [compactAlumni, setCompactAlumni] = useState<AlumniProfile[]>([]);
   const [totalAlumniCount, setTotalAlumniCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const isRegistered = isRegisteredAlumni(currentUser);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -69,8 +72,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
           dataService.getPayments(),
         ]);
 
+        const isRegistered = isRegisteredAlumni(currentUser);
         setActiveCampaigns(campaignsList.slice(0, 2));
-        setCompactAlumni(alumniList.slice(0, 3));
+        setCompactAlumni(isRegistered ? alumniList.slice(0, 3) : []);
         setTotalAlumniCount(alumniList.length);
 
         // Resolve current member profile
@@ -122,6 +126,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const campaignPercent = featuredCampaign && featuredCampaign.targetAmount > 0
     ? Math.min(Math.round((featuredCampaign.raisedAmount / featuredCampaign.targetAmount) * 100), 100)
     : 0;
+
+  // Resolve user/member profile photo to ensure it always reflects on the card
+  const userPhoto = memberProfile?.photoUrl || 
+    currentUser?.photoUrl || 
+    (userApplication as any)?.photoUrl || 
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
 
   return (
     <div className="home-container" style={{ width: '100%', maxWidth: '1160px', margin: '0 auto', boxSizing: 'border-box' }}>
@@ -287,22 +297,37 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Alumni Membership
                 </span>
 
-                <div
-                  style={{
-                    width: '58px',
-                    height: '58px',
-                    borderRadius: '50%',
-                    background: 'rgba(245, 158, 11, 0.2)',
-                    color: '#FCD34D',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '2px dashed #FBBF24',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
-                  }}
-                >
-                  <Clock size={24} />
-                </div>
+                {userPhoto ? (
+                  <img
+                    src={userPhoto}
+                    alt={userApplication?.firstName || currentUser?.displayName || 'MASSH Member'}
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px dashed #FBBF24',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      background: 'rgba(245, 158, 11, 0.2)',
+                      color: '#FCD34D',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px dashed #FBBF24',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
+                    }}
+                  >
+                    <Clock size={24} />
+                  </div>
+                )}
               </div>
 
               <div style={{ minWidth: 0, flex: 1 }}>
@@ -382,22 +407,37 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Alumni Membership
                 </span>
 
-                <div
-                  style={{
-                    width: '58px',
-                    height: '58px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    color: '#CBD5E1',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1.5px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-                  }}
-                >
-                  <GraduationCap size={24} color="#94A3B8" />
-                </div>
+                {userPhoto ? (
+                  <img
+                    src={userPhoto}
+                    alt={currentUser?.displayName || 'MASSH Member'}
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid #FBBF24',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '58px',
+                      height: '58px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: '#CBD5E1',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                    }}
+                  >
+                    <GraduationCap size={24} color="#94A3B8" />
+                  </div>
+                )}
               </div>
 
               <div style={{ minWidth: 0, flex: 1 }}>
@@ -803,102 +843,135 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </button>
               </div>
 
-              {/* Compact 3-Member Preview */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.85rem' }}>
-                {compactAlumni.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '1.5rem 0.5rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8' }}>
-                    <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.25rem' }}>
-                      No alumni registered yet
-                    </div>
-                    <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                      Be the first Mandelian scholar to complete registration.
-                    </div>
+              {/* Compact 3-Member Preview / Registration Requirement Barrier */}
+              {!isRegistered ? (
+                <div style={{ textAlign: 'center', padding: '1.25rem 0.75rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8', marginBottom: '0.85rem' }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.45rem auto' }}>
+                    <Lock size={18} />
                   </div>
-                ) : (
-                  compactAlumni.map((alumnus, idx) => {
-                  const fullName = `${alumnus.firstName} ${alumnus.lastName}`;
-                  const occupation = alumnus.occupation || 'Mandela Secondary School Alumnus';
-                  const alumniNo = alumnus.alumniNumber || `MA. 000${idx + 1}`;
+                  <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0B271C', marginBottom: '0.2rem' }}>
+                    Member Registry Protected
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#4B6354', lineHeight: 1.45, marginBottom: '0.75rem', maxWidth: '300px', margin: '0 auto 0.75rem auto' }}>
+                    Access to the alumni directory and member records is exclusively available to registered MASSH alumni.
+                  </div>
+                  <button
+                    onClick={onOpenRegister}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      background: '#113D2B',
+                      color: '#FFFFFF',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      padding: '0.45rem 0.9rem',
+                      borderRadius: '6px',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <UserPlus size={14} />
+                    <span>Register as Alumnus</span>
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.85rem' }}>
+                  {compactAlumni.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '1.5rem 0.5rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8' }}>
+                      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.25rem' }}>
+                        No alumni registered yet
+                      </div>
+                      <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
+                        Be the first Mandelian scholar to complete registration.
+                      </div>
+                    </div>
+                  ) : (
+                    compactAlumni.map((alumnus, idx) => {
+                      const fullName = `${alumnus.firstName} ${alumnus.lastName}`;
+                      const occupation = alumnus.occupation || 'Mandela Secondary School Alumnus';
+                      const alumniNo = alumnus.alumniNumber || `MA. 000${idx + 1}`;
 
-                  return (
-                    <div
-                      key={alumnus.internalId}
-                      onClick={() => onSelectAlumni ? onSelectAlumni(alumnus) : onNavigate('directory')}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.65rem',
-                        padding: '0.55rem 0.6rem',
-                        borderRadius: '8px',
-                        background: '#FAF7EE',
-                        border: '1px solid #E5DFD1',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                      title={`Tap to view full profile of ${fullName}`}
-                    >
-                      {alumnus.photoUrl ? (
-                        <img
-                          src={alumnus.photoUrl}
-                          alt={fullName}
-                          style={{
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                            border: '1.5px solid #D3CAB8',
-                            flexShrink: 0,
-                          }}
-                        />
-                      ) : (
+                      return (
                         <div
+                          key={alumnus.internalId}
+                          onClick={() => onSelectAlumni ? onSelectAlumni(alumnus) : onNavigate('directory')}
                           style={{
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '50%',
-                            background: '#113D2B',
-                            color: '#FDE68A',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 700,
-                            fontSize: '0.75rem',
-                            flexShrink: 0,
+                            gap: '0.65rem',
+                            padding: '0.55rem 0.6rem',
+                            borderRadius: '8px',
+                            background: '#FAF7EE',
+                            border: '1px solid #E5DFD1',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
                           }}
+                          title={`Tap to view full profile of ${fullName}`}
                         >
-                          {alumnus.firstName[0]}{alumnus.lastName[0]}
-                        </div>
-                      )}
+                          {alumnus.photoUrl ? (
+                            <img
+                              src={alumnus.photoUrl}
+                              alt={fullName}
+                              style={{
+                                width: '34px',
+                                height: '34px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                border: '1.5px solid #D3CAB8',
+                                flexShrink: 0,
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: '34px',
+                                height: '34px',
+                                borderRadius: '50%',
+                                background: '#113D2B',
+                                color: '#FDE68A',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {alumnus.firstName[0]}{alumnus.lastName[0]}
+                            </div>
+                          )}
 
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: '#0B271C', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {fullName}
-                        </div>
-                        <div style={{ color: '#4B6354', fontSize: '0.72rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {occupation}
-                        </div>
-                      </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, color: '#0B271C', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {fullName}
+                            </div>
+                            <div style={{ color: '#4B6354', fontSize: '0.72rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {occupation}
+                            </div>
+                          </div>
 
-                      <span
-                        style={{
-                          fontFamily: 'monospace',
-                          fontWeight: 800,
-                          fontSize: '0.75rem',
-                          color: '#B45309',
-                          background: '#FFFBEB',
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '5px',
-                          border: '1px solid #FDE68A',
-                          flexShrink: 0,
-                        }}
-                      >
-                        {alumniNo}
-                      </span>
-                    </div>
-                  );
-                })
+                          <span
+                            style={{
+                              fontFamily: 'monospace',
+                              fontWeight: 800,
+                              fontSize: '0.75rem',
+                              color: '#B45309',
+                              background: '#FFFBEB',
+                              padding: '0.15rem 0.45rem',
+                              borderRadius: '5px',
+                              border: '1px solid #FDE68A',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {alumniNo}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               )}
-              </div>
             </div>
 
             {/* Bottom Registry Action */}
@@ -921,8 +994,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 boxShadow: '0 2px 6px rgba(10, 39, 27, 0.25)',
               }}
             >
-              <span>Explore Complete Registry</span>
-              <ArrowRight size={14} color="#FDE68A" />
+              {isRegistered ? (
+                <>
+                  <span>Explore Complete Registry</span>
+                  <ArrowRight size={14} color="#FDE68A" />
+                </>
+              ) : (
+                <>
+                  <Lock size={14} color="#FDE68A" />
+                  <span>Alumni Registry (Registration Required)</span>
+                </>
+              )}
             </button>
           </div>
 

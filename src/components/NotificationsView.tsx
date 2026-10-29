@@ -11,16 +11,19 @@ import {
   Megaphone, 
   ArrowRight,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  HeartHandshake
 } from 'lucide-react';
 import { AlumniNotification, AuthUser } from '../types';
 import { dataService } from '../services/dataService';
+import { isRegisteredAlumni } from '../services/governanceService';
 
 interface Props {
   currentUser: AuthUser | null;
   onNavigate: (tab: any, targetId?: string) => void;
   onBack?: () => void;
   onOpenAdmin?: () => void;
+  onOpenRegister?: () => void;
   onRefreshNotifs?: () => void;
 }
 
@@ -29,16 +32,24 @@ export const NotificationsView: React.FC<Props> = ({
   onNavigate,
   onBack,
   onOpenAdmin,
+  onOpenRegister,
   onRefreshNotifs,
 }) => {
   const [notifications, setNotifications] = useState<AlumniNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('ALL');
 
+  const isRegistered = isRegisteredAlumni(currentUser);
+
   const loadNotifications = async () => {
+    if (!isRegistered) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const alumniId = currentUser?.alumniId || 'alumni-0001';
+      const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
       const list = await dataService.getAlumniNotifications(alumniId);
       setNotifications(list);
     } catch (e) {
@@ -50,10 +61,11 @@ export const NotificationsView: React.FC<Props> = ({
 
   useEffect(() => {
     loadNotifications();
-  }, [currentUser]);
+  }, [currentUser, isRegistered]);
 
   const handleMarkAllRead = async () => {
-    const alumniId = currentUser?.alumniId || 'alumni-0001';
+    if (!isRegistered) return;
+    const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
     await dataService.markAllNotificationsAsRead(alumniId);
     await loadNotifications();
     if (onRefreshNotifs) onRefreshNotifs();
@@ -96,6 +108,9 @@ export const NotificationsView: React.FC<Props> = ({
 
   const getNotificationIcon = (notif: AlumniNotification) => {
     const typeUpper = (notif.type || '').toUpperCase();
+    if (typeUpper.includes('DONATION')) {
+      return <HeartHandshake size={18} color="#D97706" />;
+    }
     if (typeUpper.includes('PAYMENT') || typeUpper.includes('DUES') || notif.linkTab === 'payments') {
       return <Coins size={18} color="#059669" />;
     }
@@ -130,6 +145,154 @@ export const NotificationsView: React.FC<Props> = ({
     if (activeFilter === 'ATTENDANCE') return n.linkTab === 'attendance' || (n.type && n.type.includes('ATTENDANCE'));
     return true;
   });
+
+  if (!isRegistered) {
+    return (
+      <div style={{ maxWidth: '880px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem' }}>
+        {/* Top Header Card */}
+        <div 
+          style={{ 
+            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)', 
+            borderRadius: '16px', 
+            padding: '1.75rem 1.5rem', 
+            color: '#FFFFFF',
+            marginBottom: '1.5rem',
+            boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.25)',
+            border: '1.5px solid rgba(198, 138, 36, 0.3)',
+          }}
+        >
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                background: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                color: '#F8FAFC',
+                borderRadius: '8px',
+                padding: '0.45rem 0.9rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                marginBottom: '1.25rem',
+              }}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Dashboard</span>
+            </button>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div 
+              style={{ 
+                width: '46px', 
+                height: '46px', 
+                borderRadius: '12px', 
+                background: 'rgba(217, 119, 6, 0.25)', 
+                border: '1.5px solid #D97706',
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                color: '#FDE68A'
+              }}
+            >
+              <Bell size={24} />
+            </div>
+            <div>
+              <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.01em' }}>
+                Notification Center
+              </h1>
+              <p style={{ margin: '0.2rem 0 0 0', color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.86rem' }}>
+                Official Mandela Old Students Association Announcements & Community Alerts
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Protection / Gated Card */}
+        <div
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
+            padding: '3rem 1.75rem',
+            textAlign: 'center'
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: '#FEF3C7',
+              border: '2px solid #F59E0B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem auto',
+              color: '#B45309'
+            }}
+          >
+            <Bell size={30} />
+          </div>
+
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.65rem' }}>
+            Alumni Registration Required to Receive Notifications
+          </h2>
+
+          <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: '520px', margin: '0 auto 1.5rem auto' }}>
+            Association circulars, official notices, meeting attendance roll calls, donation updates, and convention announcements are delivered strictly to verified registered alumni members.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
+            <button
+              onClick={() => onOpenRegister ? onOpenRegister() : onNavigate('home')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                background: 'linear-gradient(135deg, #113D2B 0%, #15803D 100%)',
+                color: '#FFFFFF',
+                padding: '0.85rem 1.75rem',
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '0.92rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(21, 128, 61, 0.25)',
+                width: '100%',
+                maxWidth: '320px'
+              }}
+            >
+              <CheckCircle2 size={18} />
+              <span>Register as Alumnus</span>
+            </button>
+
+            {onBack && (
+              <button
+                onClick={onBack}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#64748B',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  padding: '0.4rem 0.8rem',
+                }}
+              >
+                Return to Dashboard
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '880px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem' }}>

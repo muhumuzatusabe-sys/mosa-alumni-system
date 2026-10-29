@@ -42,6 +42,12 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // OTP Verification States for Account Creation
+  const [registrationStep, setRegistrationStep] = useState<'details' | 'otp_verification'>('details');
+  const [otpCode, setOtpCode] = useState('');
+  const [simulatedOtpNotice, setSimulatedOtpNotice] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
   // States
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -50,12 +56,15 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
   // Clear errors when switching modes
   const handleSwitchMode = (mode: 'create-account' | 'login' | 'reset-password' | 'admin-login') => {
     setAuthMode(mode);
+    setRegistrationStep('details');
+    setOtpCode('');
+    setSimulatedOtpNotice(null);
     setErrorMessage('');
     setSuccessMessage('');
   };
 
-  // 1. CREATE ACCOUNT SUBMISSION
-  const handleCreateAccount = async (e: React.FormEvent) => {
+  // Step 1: Send OTP to verify email
+  const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
@@ -78,14 +87,57 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
 
     setLoading(true);
     try {
-      const res = await dataService.createAccount(cleanEmail, password);
+      const res = await dataService.sendRegistrationOtp(cleanEmail);
+      if (res.success) {
+        setRegistrationStep('otp_verification');
+        setSuccessMessage(`A 6-digit verification code has been dispatched to ${cleanEmail}. Please enter it below to confirm your email.`);
+        if (res.code) {
+          setSimulatedOtpNotice(res.code);
+        }
+        setResendCooldown(60);
+        const timer = setInterval(() => {
+          setResendCooldown((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        setErrorMessage(res.error || 'Failed to send verification code. Please check your email.');
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'A network error occurred while sending the code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP and finalize Account Creation
+  const handleVerifyOtpAndCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = otpCode.trim();
+
+    if (!cleanOtp || cleanOtp.length < 4) {
+      setErrorMessage('Please enter the verification code sent to your email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await dataService.createAccount(cleanEmail, password, cleanOtp);
       if (res.success && res.user) {
-        setSuccessMessage('Account created successfully! Preparing your alumni experience...');
+        setSuccessMessage('Email verified and account created successfully! Preparing your alumni experience...');
         setTimeout(() => {
           onLoginSuccess(res.user!);
         }, 600);
       } else {
-        setErrorMessage(res.error || 'Failed to create account. Please try again.');
+        setErrorMessage(res.error || 'Invalid verification code. Please try again.');
       }
     } catch (err: any) {
       setErrorMessage(err?.message || 'A network error occurred. Please try again.');
@@ -427,225 +479,399 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
 
           {/* VIEW 1: CREATE ACCOUNT */}
           {authMode === 'create-account' && (
-            <form onSubmit={handleCreateAccount}>
-              <div style={{ marginBottom: '1.1rem' }}>
-                <label
-                  htmlFor="register-email"
-                  style={{
-                    display: 'block',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#1E293B',
-                    marginBottom: '0.4rem',
-                  }}
-                >
-                  Email Address
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Mail
-                    size={18}
-                    color="#94A3B8"
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                  />
-                  <input
-                    id="register-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g. yourname@gmail.com"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem 0.75rem 2.6rem',
-                      border: '1.5px solid #CBD5E1',
-                      borderRadius: '10px',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.2s',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
-                  />
-                </div>
-              </div>
+            <>
+              {registrationStep === 'details' ? (
+                <form onSubmit={handleRequestOtp}>
+                  <div style={{ marginBottom: '1.1rem' }}>
+                    <label
+                      htmlFor="register-email"
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: '#1E293B',
+                        marginBottom: '0.4rem',
+                      }}
+                    >
+                      Email Address
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <Mail
+                        size={18}
+                        color="#94A3B8"
+                        style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                      />
+                      <input
+                        id="register-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="e.g. yourname@gmail.com"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem 0.75rem 2.6rem',
+                          border: '1.5px solid #CBD5E1',
+                          borderRadius: '10px',
+                          fontSize: '0.92rem',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s',
+                        }}
+                        onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
+                        onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                      />
+                    </div>
+                    <span style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.3rem', display: 'block' }}>
+                      A 6-digit verification code will be sent to this email to ensure authenticity.
+                    </span>
+                  </div>
 
-              <div style={{ marginBottom: '1.1rem' }}>
-                <label
-                  htmlFor="register-password"
-                  style={{
-                    display: 'block',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#1E293B',
-                    marginBottom: '0.4rem',
-                  }}
-                >
-                  Password <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>(minimum 6 characters)</span>
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Lock
-                    size={18}
-                    color="#94A3B8"
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                  />
-                  <input
-                    id="register-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create a secure password"
-                    required
-                    minLength={6}
+                  <div style={{ marginBottom: '1.1rem' }}>
+                    <label
+                      htmlFor="register-password"
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: '#1E293B',
+                        marginBottom: '0.4rem',
+                      }}
+                    >
+                      Password <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 400 }}>(minimum 6 characters)</span>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <Lock
+                        size={18}
+                        color="#94A3B8"
+                        style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                      />
+                      <input
+                        id="register-password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Create a secure password"
+                        required
+                        minLength={6}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 2.7rem 0.75rem 2.6rem',
+                          border: '1.5px solid #CBD5E1',
+                          borderRadius: '10px',
+                          fontSize: '0.92rem',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s',
+                        }}
+                        onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
+                        onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#94A3B8',
+                          padding: '4px',
+                        }}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '1.4rem' }}>
+                    <label
+                      htmlFor="register-confirm-password"
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: '#1E293B',
+                        marginBottom: '0.4rem',
+                      }}
+                    >
+                      Confirm Password
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <KeyRound
+                        size={18}
+                        color="#94A3B8"
+                        style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                      />
+                      <input
+                        id="register-confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Re-enter your password"
+                        required
+                        minLength={6}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 2.7rem 0.75rem 2.6rem',
+                          border: '1.5px solid #CBD5E1',
+                          borderRadius: '10px',
+                          fontSize: '0.92rem',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s',
+                        }}
+                        onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
+                        onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={showConfirmPassword ? 'Hide confirmed password' : 'Show confirmed password'}
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: '#94A3B8',
+                          padding: '4px',
+                        }}
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    id="btn-submit-create-account"
+                    disabled={loading}
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.7rem 0.75rem 2.6rem',
-                      border: '1.5px solid #CBD5E1',
-                      borderRadius: '10px',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.2s',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
+                      padding: '0.85rem',
+                      background: 'linear-gradient(135deg, #113D2B 0%, #0A271B 100%)',
+                      color: '#FFFFFF',
                       border: 'none',
-                      cursor: 'pointer',
-                      color: '#94A3B8',
-                      padding: '4px',
+                      borderRadius: '10px',
+                      fontSize: '0.98rem',
+                      fontWeight: 700,
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      opacity: loading ? 0.75 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(17, 61, 43, 0.28)',
+                      transition: 'opacity 0.2s',
                     }}
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {loading ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        <span>Sending Verification Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={18} />
+                        <span>Send Verification Code &amp; Continue</span>
+                      </>
+                    )}
                   </button>
-                </div>
-              </div>
 
-              <div style={{ marginBottom: '1.4rem' }}>
-                <label
-                  htmlFor="register-confirm-password"
-                  style={{
-                    display: 'block',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#1E293B',
-                    marginBottom: '0.4rem',
-                  }}
-                >
-                  Confirm Password
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <KeyRound
-                    size={18}
-                    color="#94A3B8"
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                  />
-                  <input
-                    id="register-confirm-password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter your password"
-                    required
-                    minLength={6}
+                  <div style={{ marginTop: '1.15rem', textAlign: 'center', fontSize: '0.82rem', color: '#64748B' }}>
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => handleSwitchMode('login')}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#C68A24',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
+                    >
+                      Log In here
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                /* STEP 2: OTP VERIFICATION FORM */
+                <form onSubmit={handleVerifyOtpAndCreateAccount}>
+                  <div style={{ 
+                    background: '#F8FAFC', 
+                    border: '1.5px solid #E2E8F0', 
+                    borderRadius: '12px', 
+                    padding: '1.1rem', 
+                    marginBottom: '1.25rem',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ 
+                      width: '42px', 
+                      height: '42px', 
+                      borderRadius: '50%', 
+                      background: '#ECFDF5', 
+                      color: '#059669', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      margin: '0 auto 0.6rem auto'
+                    }}>
+                      <ShieldCheck size={24} />
+                    </div>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0F172A' }}>
+                      Verify Your Email Address
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
+                      We sent a 6-digit confirmation code to:
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#113D2B', marginTop: '0.15rem' }}>
+                      {email}
+                    </div>
+
+                    {simulatedOtpNotice && (
+                      <div style={{
+                        marginTop: '0.75rem',
+                        padding: '0.5rem 0.75rem',
+                        background: '#FEF3C7',
+                        border: '1px dashed #D97706',
+                        borderRadius: '8px',
+                        fontSize: '0.78rem',
+                        color: '#92400E'
+                      }}>
+                        Verification Code: <strong style={{ fontSize: '1rem', letterSpacing: '2px', color: '#78350F' }}>{simulatedOtpNotice}</strong>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <label
+                      htmlFor="register-otp"
+                      style={{
+                        display: 'block',
+                        fontSize: '0.82rem',
+                        fontWeight: 700,
+                        color: '#1E293B',
+                        marginBottom: '0.4rem',
+                        textAlign: 'center'
+                      }}
+                    >
+                      Enter 6-Digit Code
+                    </label>
+                    <input
+                      id="register-otp"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="• • • • • •"
+                      autoFocus
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem',
+                        border: '2px solid #113D2B',
+                        borderRadius: '10px',
+                        fontSize: '1.4rem',
+                        fontWeight: 800,
+                        letterSpacing: '8px',
+                        textAlign: 'center',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        color: '#0F172A',
+                        background: '#FFFFFF'
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    id="btn-verify-otp-create"
+                    disabled={loading || otpCode.trim().length < 4}
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.7rem 0.75rem 2.6rem',
-                      border: '1.5px solid #CBD5E1',
-                      borderRadius: '10px',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                      transition: 'border-color 0.2s',
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = '#113D2B')}
-                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? 'Hide confirmed password' : 'Show confirmed password'}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
+                      padding: '0.85rem',
+                      background: 'linear-gradient(135deg, #113D2B 0%, #0A271B 100%)',
+                      color: '#FFFFFF',
                       border: 'none',
-                      cursor: 'pointer',
-                      color: '#94A3B8',
-                      padding: '4px',
+                      borderRadius: '10px',
+                      fontSize: '0.98rem',
+                      fontWeight: 700,
+                      cursor: (loading || otpCode.trim().length < 4) ? 'not-allowed' : 'pointer',
+                      opacity: (loading || otpCode.trim().length < 4) ? 0.7 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 12px rgba(17, 61, 43, 0.28)',
+                      transition: 'opacity 0.2s',
                     }}
                   >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {loading ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        <span>Verifying Code &amp; Registering...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={18} />
+                        <span>Verify Email &amp; Create Account</span>
+                      </>
+                    )}
                   </button>
-                </div>
-              </div>
 
-              <button
-                type="submit"
-                id="btn-submit-create-account"
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #113D2B 0%, #0A271B 100%)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '0.98rem',
-                  fontWeight: 700,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.75 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  boxShadow: '0 4px 12px rgba(17, 61, 43, 0.28)',
-                  transition: 'opacity 0.2s',
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>Creating Account...</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus size={18} />
-                    <span>Create Account</span>
-                  </>
-                )}
-              </button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', fontSize: '0.82rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRegistrationStep('details');
+                        setOtpCode('');
+                        setErrorMessage('');
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#64748B',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      <ArrowLeft size={14} />
+                      <span>Change Email</span>
+                    </button>
 
-              <div style={{ marginTop: '1.15rem', textAlign: 'center', fontSize: '0.82rem', color: '#64748B' }}>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => handleSwitchMode('login')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#C68A24',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                >
-                  Log In here
-                </button>
-              </div>
-            </form>
+                    <button
+                      type="button"
+                      disabled={resendCooldown > 0 || loading}
+                      onClick={handleRequestOtp}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: resendCooldown > 0 ? '#94A3B8' : '#C68A24',
+                        fontWeight: 700,
+                        cursor: resendCooldown > 0 ? 'not-allowed' : 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </>
           )}
 
           {/* VIEW 2: LOG IN */}

@@ -17,7 +17,8 @@ const testFiles = [
   'src/tests/test_notifications_padding_staff.ts',
   'src/tests/test_opportunities_elections_cards.ts',
   'src/tests/test_official_mosa_id_card.ts',
-  'src/tests/test_security_rbac_hardening.ts'
+  'src/tests/test_security_rbac_hardening.ts',
+  'src/tests/test_alumni_registration_access_gate.ts'
 ];
 
 console.log('Running all 17 test suites (including Security & RBAC Hardening)...');

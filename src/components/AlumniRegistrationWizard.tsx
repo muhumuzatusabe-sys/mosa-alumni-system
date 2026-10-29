@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dataService } from '../services/dataService';
+import { dataService, defaultSeedChapters } from '../services/dataService';
 import { Chapter, AuthUser } from '../types';
 import { 
   X, 
@@ -24,7 +24,8 @@ import {
   Sparkles,
   Upload,
   Trash2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Search
 } from 'lucide-react';
 
 interface Props {
@@ -49,11 +50,13 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [chapters, setChapters] = useState<Chapter[]>(defaultSeedChapters);
   const [copiedRef, setCopiedRef] = useState(false);
   const [copiedNum, setCopiedNum] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ id: string; referenceId: string; name: string; alumniNumber?: string } | null>(null);
   const [allowSelfAssignedNumber, setAllowSelfAssignedNumber] = useState<boolean>(false);
+  const [chapterCategoryFilter, setChapterCategoryFilter] = useState<'ALL' | 'UNIVERSITY' | 'REGIONAL' | 'DIASPORA'>('ALL');
+  const [chapterSearchQuery, setChapterSearchQuery] = useState('');
   const wizardBodyRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,7 +139,13 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
 
   useEffect(() => {
     if (isOpen) {
-      dataService.getChapters('ACTIVE').then(list => setChapters(list)).catch(console.error);
+      dataService.getChapters('ACTIVE').then(list => {
+        if (list && list.length > 0) {
+          setChapters(list);
+        } else {
+          setChapters(defaultSeedChapters);
+        }
+      }).catch(() => setChapters(defaultSeedChapters));
       dataService.getSystemSettings().then(settings => {
         setAllowSelfAssignedNumber(settings.allowSelfAssignedAlumniNumber === true);
       }).catch(console.error);
@@ -1606,90 +1615,188 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                       <Building2 size={18} color="#D97706" /> Step 6: Affiliate with a MOSA Chapter
                     </h4>
                     <p style={{ fontSize: '0.85rem', color: '#64748B' }}>
-                      Connect with fellow Mandela Old Students at your university, regional home base, or diaspora chapter.
+                      Select your university chapter (e.g., MUMASA, KYUMASA, MBUMASA, GUMASA, MUBSMASA, NKUMASA), regional mother chapter, or diaspora chapter to network with peers.
                     </p>
                   </div>
 
+                  {/* Filter Tabs and Search Bar */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {/* Option: General Alumni (No Chapter) */}
-                    <div 
-                      onClick={() => setFormData(prev => ({ ...prev, selectedChapterId: '' }))}
-                      style={{
-                        padding: '1rem',
-                        borderRadius: '10px',
-                        border: !formData.selectedChapterId ? '2px solid #0B203E' : '1px solid #E2E8F0',
-                        background: !formData.selectedChapterId ? '#F8FAFC' : '#ffffff',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#0B203E', fontSize: '0.95rem' }}>
-                          General Alumni (No Specific Chapter)
-                        </div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748B' }}>
-                          Registered directly under the central MOSA National Secretariat in Hoima.
-                        </div>
-                      </div>
-                      <div style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        border: !formData.selectedChapterId ? '6px solid #0B203E' : '2px solid #CBD5E1'
-                      }} />
-                    </div>
-
-                    {/* Populated chapters */}
-                    {chapters.map(chap => {
-                      const isSelected = formData.selectedChapterId === chap.id;
-                      return (
-                        <div
-                          key={chap.id}
-                          onClick={() => setFormData(prev => ({ ...prev, selectedChapterId: chap.id }))}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {[
+                        { id: 'ALL', label: 'All Chapters' },
+                        { id: 'UNIVERSITY', label: 'University / Institutional' },
+                        { id: 'REGIONAL', label: 'Regional & Mother Chapter' },
+                        { id: 'DIASPORA', label: 'International Diaspora' },
+                      ].map(tab => (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setChapterCategoryFilter(tab.id as any)}
                           style={{
-                            padding: '1rem',
-                            borderRadius: '10px',
-                            border: isSelected ? '2px solid #0B203E' : '1px solid #E2E8F0',
-                            background: isSelected ? '#F0F9FF' : '#ffffff',
+                            padding: '0.4rem 0.85rem',
+                            borderRadius: '8px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
                             cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            transition: 'all 0.2s ease'
+                            border: chapterCategoryFilter === tab.id ? '1px solid #0B203E' : '1px solid #CBD5E1',
+                            background: chapterCategoryFilter === tab.id ? '#0B203E' : '#FFFFFF',
+                            color: chapterCategoryFilter === tab.id ? '#FFFFFF' : '#475569',
+                            transition: 'all 0.15s ease'
                           }}
                         >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                              <span style={{ fontWeight: 700, color: '#0B203E', fontSize: '0.95rem' }}>
-                                {chap.name}
-                              </span>
-                              <span style={{
-                                fontSize: '0.7rem',
-                                padding: '2px 8px',
-                                borderRadius: '12px',
-                                background: '#FEF3C7',
-                                color: '#92400E',
-                                fontWeight: 700
-                              }}>
-                                {chap.chapterType}
-                              </span>
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: '#64748B' }}>
-                              {chap.description || `Based in ${chap.location}`} • {chap.memberCount} members
-                            </div>
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div style={{ position: 'relative' }}>
+                      <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                      <input
+                        type="text"
+                        placeholder="Search chapter by name, code, university or city (e.g. Makerere, MUMASA, Kyambogo)..."
+                        value={chapterSearchQuery}
+                        onChange={e => setChapterSearchQuery(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.55rem 0.85rem 0.55rem 2.3rem',
+                          borderRadius: '8px',
+                          border: '1.5px solid #CBD5E1',
+                          fontSize: '0.85rem',
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '4px' }}>
+                    {/* Option: General Alumni (Central Secretariat) */}
+                    {(chapterCategoryFilter === 'ALL' || !chapterSearchQuery.trim()) && (
+                      <div 
+                        onClick={() => setFormData(prev => ({ ...prev, selectedChapterId: '' }))}
+                        style={{
+                          padding: '1rem',
+                          borderRadius: '10px',
+                          border: !formData.selectedChapterId ? '2px solid #0B203E' : '1px solid #E2E8F0',
+                          background: !formData.selectedChapterId ? '#F0F9FF' : '#ffffff',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          boxShadow: !formData.selectedChapterId ? '0 2px 8px rgba(11,32,62,0.08)' : 'none',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <span style={{
+                              background: '#0B203E',
+                              color: '#FCD34D',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontWeight: 800,
+                              fontSize: '0.75rem',
+                              letterSpacing: '0.05em'
+                            }}>
+                              GENERAL MOSA
+                            </span>
+                            <span style={{ fontWeight: 700, color: '#0B203E', fontSize: '0.95rem' }}>
+                              National Secretariat Central Registry
+                            </span>
                           </div>
-                          <div style={{
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            border: isSelected ? '6px solid #0B203E' : '2px solid #CBD5E1'
-                          }} />
+                          <div style={{ fontSize: '0.8rem', color: '#64748B' }}>
+                            Direct affiliation with the central MOSA National Secretariat at MASSH Main Campus, Hoima. Choose this if your university or district does not yet have a specialized chapter.
+                          </div>
                         </div>
-                      );
-                    })}
+                        <div style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          flexShrink: 0,
+                          marginLeft: '1rem',
+                          border: !formData.selectedChapterId ? '6px solid #0B203E' : '2px solid #CBD5E1'
+                        }} />
+                      </div>
+                    )}
+
+                    {/* Filtered Official Chapters */}
+                    {chapters
+                      .filter(chap => {
+                        const matchesCategory = chapterCategoryFilter === 'ALL' || chap.chapterType === chapterCategoryFilter;
+                        const query = chapterSearchQuery.trim().toLowerCase();
+                        const matchesSearch = !query ||
+                          chap.name.toLowerCase().includes(query) ||
+                          chap.code.toLowerCase().includes(query) ||
+                          chap.institution.toLowerCase().includes(query) ||
+                          chap.location.toLowerCase().includes(query);
+                        return matchesCategory && matchesSearch;
+                      })
+                      .map(chap => {
+                        const isSelected = formData.selectedChapterId === chap.id;
+                        return (
+                          <div
+                            key={chap.id}
+                            onClick={() => setFormData(prev => ({ ...prev, selectedChapterId: chap.id }))}
+                            style={{
+                              padding: '1rem',
+                              borderRadius: '10px',
+                              border: isSelected ? '2px solid #0B203E' : '1px solid #E2E8F0',
+                              background: isSelected ? '#F0F9FF' : '#ffffff',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              boxShadow: isSelected ? '0 2px 8px rgba(11,32,62,0.08)' : 'none',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                                <span style={{
+                                  background: '#0B203E',
+                                  color: '#FCD34D',
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                  fontWeight: 800,
+                                  fontSize: '0.8rem',
+                                  letterSpacing: '0.05em'
+                                }}>
+                                  {chap.code}
+                                </span>
+                                <span style={{ fontWeight: 700, color: '#0B203E', fontSize: '0.95rem' }}>
+                                  {chap.name}
+                                </span>
+                                <span style={{
+                                  fontSize: '0.7rem',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  background: chap.chapterType === 'UNIVERSITY' ? '#EFF6FF' : chap.chapterType === 'REGIONAL' ? '#ECFDF5' : '#FEF3C7',
+                                  color: chap.chapterType === 'UNIVERSITY' ? '#1D4ED8' : chap.chapterType === 'REGIONAL' ? '#047857' : '#92400E',
+                                  fontWeight: 700
+                                }}>
+                                  {chap.chapterType}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '0.8rem', color: '#475569', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                <span>🏛️ {chap.institution}</span>
+                                <span>📍 {chap.location}</span>
+                                <span style={{ fontWeight: 600, color: '#D97706' }}>👥 {chap.memberCount} members</span>
+                              </div>
+                              <div style={{ fontSize: '0.78rem', color: '#64748B', lineHeight: '1.4' }}>
+                                {chap.description}
+                              </div>
+                            </div>
+                            <div style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              flexShrink: 0,
+                              marginLeft: '1rem',
+                              border: isSelected ? '6px solid #0B203E' : '2px solid #CBD5E1'
+                            }} />
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               )}

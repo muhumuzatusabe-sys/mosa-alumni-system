@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AuthUser, ModuleSettings, AlumniProfile } from '../types';
-import { isStaffRole } from '../services/governanceService';
+import { isStaffRole, isRegisteredAlumni } from '../services/governanceService';
 import { dataService } from '../services/dataService';
 import { 
   Users, 
@@ -73,6 +73,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   });
 
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
+  const isRegistered = isRegisteredAlumni(currentUser);
 
   // Load Member Profile for Identity Box
   useEffect(() => {
@@ -229,11 +230,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
-            title={unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Alerts` : 'Alerts & Notifications'}
+            title={!isRegistered ? 'Alerts (Registered Alumni Only)' : (unreadNotificationsCount > 0 ? `${unreadNotificationsCount} Unread Alerts` : 'Alerts & Notifications')}
             aria-label="Open Alerts & Notifications"
           >
             <Bell size={22} color="#334155" />
-            {unreadNotificationsCount > 0 && (
+            {isRegistered && unreadNotificationsCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
@@ -481,7 +482,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('directory')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'directory' ? 'active' : ''}`}
                     >
-                      <span>Alumni Directory & Member Search</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <span>Alumni Directory & Member Search</span>
+                        {!isRegistered && (
+                          <span style={{ fontSize: '0.64rem', fontWeight: 700, padding: '0.1rem 0.4rem', borderRadius: '4px', background: '#FEF3C7', color: '#B45309', border: '1px solid #FDE68A' }}>
+                            Registered Only
+                          </span>
+                        )}
+                      </div>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -537,7 +545,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onClick={() => handleTabClick('payments')}
                       className={`mosa-portal-subitem-btn ${currentTab === 'payments' ? 'active' : ''}`}
                     >
-                      <span>Annual Membership Dues (UGX 50,000)</span>
+                      <span>Annual Alumni Contribution</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -594,14 +602,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className={`mosa-portal-subitem-btn ${currentTab === 'opportunities' ? 'active' : ''}`}
                     >
                       <span>Job Opportunities & Career Hub</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('opportunities')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Internships & Professional Mentorship</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                     <button
@@ -742,41 +742,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Footer with Quick Verify & Register Actions */}
-            <div className="mosa-portal-menu-footer">
-              {currentUser ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => { setMenuOpen(false); onLogout(); }}
-                    className="mosa-portal-footer-action primary"
-                    style={{ width: '100%', justifyContent: 'center' }}
-                  >
-                    <LogOut size={14} />
-                    <span>Sign Out</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => { setMenuOpen(false); if (onOpenVerify) onOpenVerify(); }}
-                    className="mosa-portal-footer-action"
-                  >
-                    <ShieldCheck size={14} color="#15803D" />
-                    <span>Verify Alumnus</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMenuOpen(false); onOpenRegister(); }}
-                    className="mosa-portal-footer-action primary"
-                  >
-                    <UserPlus size={14} />
-                    <span>Join / Register</span>
-                  </button>
-                </>
-              )}
-            </div>
+            {/* Footer with Quick Register Action (Guest Only) */}
+            {!currentUser && (
+              <div className="mosa-portal-menu-footer">
+                <button
+                  type="button"
+                  onClick={() => { setMenuOpen(false); onOpenRegister(); }}
+                  className="mosa-portal-footer-action primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <UserPlus size={14} />
+                  <span>Join / Register</span>
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

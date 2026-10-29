@@ -48,8 +48,8 @@ export const PaymentModal: React.FC<Props> = ({
 
   const [category, setCategory] = useState<PaymentCategory>(defaultCategory);
   const [campaignId, setCampaignId] = useState<string>(defaultCampaignId || (campaigns[0]?.id || ''));
-  const [amount, setAmount] = useState<number>(defaultAmount || (defaultCategory === 'ANNUAL_MEMBERSHIP' ? 50000 : 100000));
-  const [customAmount, setCustomAmount] = useState<string>('');
+  const [amount, setAmount] = useState<number>(defaultAmount || (defaultCategory === 'ANNUAL_MEMBERSHIP' ? 0 : 100000));
+  const [customAmount, setCustomAmount] = useState<string>(defaultAmount ? String(defaultAmount) : '');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('MTN_MOMO');
   const [transactionReference, setTransactionReference] = useState('');
   const [payerPhoneOrAccount, setPayerPhoneOrAccount] = useState(currentAlumnus?.phone || '');
@@ -224,7 +224,7 @@ export const PaymentModal: React.FC<Props> = ({
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
                 <button
                   type="button"
-                  onClick={() => { setCategory('ANNUAL_MEMBERSHIP'); setAmount(50000); }}
+                  onClick={() => { setCategory('ANNUAL_MEMBERSHIP'); }}
                   style={{
                     padding: '0.75rem',
                     borderRadius: '8px',
@@ -238,13 +238,13 @@ export const PaymentModal: React.FC<Props> = ({
                     Annual Alumni Contribution
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                    UGX 50,000 / Year (Voluntary)
+                    Voluntary / Any Amount
                   </div>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => { setCategory('PROJECT_DONATION'); setAmount(100000); }}
+                  onClick={() => { setCategory('PROJECT_DONATION'); if (!amount) setAmount(100000); }}
                   style={{
                     padding: '0.75rem',
                     borderRadius: '8px',
@@ -264,7 +264,7 @@ export const PaymentModal: React.FC<Props> = ({
 
                 <button
                   type="button"
-                  onClick={() => { setCategory('WELFARE_CONTRIBUTION'); setAmount(50000); }}
+                  onClick={() => { setCategory('WELFARE_CONTRIBUTION'); }}
                   style={{
                     padding: '0.75rem',
                     borderRadius: '8px',

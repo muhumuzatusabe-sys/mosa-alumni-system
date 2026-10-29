@@ -11,7 +11,8 @@ import {
   Landmark,
   ChevronDown,
   ChevronUp,
-  ArrowLeft
+  ArrowLeft,
+  Globe
 } from 'lucide-react';
 import { AuthUser, ContactContent, FaqItem, SecretariatContact } from '../types';
 import { dataService } from '../services/dataService';
@@ -270,6 +271,21 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
                   <div style={{ color: '#CBD5E1', fontSize: '0.88rem' }}>
                     {content?.workingHours || 'Monday – Friday: 8:00 AM – 5:00 PM EAT'}
                   </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
+                <Globe size={20} color="#FBBF24" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div style={{ fontWeight: 600, color: '#FFFFFF', fontSize: '0.95rem' }}>Official Alumni Portal</div>
+                  <a 
+                    href="https://mtech-46634.web.app" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    style={{ color: '#FDE68A', fontSize: '0.88rem', textDecoration: 'underline', fontWeight: 600 }}
+                  >
+                    https://mtech-46634.web.app
+                  </a>
                 </div>
               </div>
             </div>

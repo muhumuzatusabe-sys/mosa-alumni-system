@@ -113,7 +113,7 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
   const handleOpenPayDues = () => {
     setPayDefaultCategory('ANNUAL_MEMBERSHIP');
     setPayDefaultCampaignId(undefined);
-    setPayDefaultAmount(50000);
+    setPayDefaultAmount(undefined);
     setIsPayModalOpen(true);
   };
 
@@ -614,10 +614,10 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <div style={{ fontSize: '0.8rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 600 }}>
-                    Suggested Annual Contribution
+                    Annual Contribution
                   </div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0B203E', marginTop: '2px' }}>
-                    UGX 50,000 <span style={{ fontSize: '0.9rem', color: '#64748B', fontWeight: 500 }}>/ calendar year (Voluntary)</span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0B203E', marginTop: '2px' }}>
+                    Voluntary Amount <span style={{ fontSize: '0.9rem', color: '#64748B', fontWeight: 500 }}>/ calendar year (Give as you wish)</span>
                   </div>
                 </div>
 
@@ -671,7 +671,7 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
                 className="btn btn-primary"
                 style={{ padding: '0.85rem 2.5rem', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#059669', borderColor: '#059669' }}
               >
-                <HeartHandshake size={18} /> Make Voluntary Contribution (UGX 50,000)
+                <HeartHandshake size={18} /> Make Voluntary Contribution
               </button>
             </div>
           </div>

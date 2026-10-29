@@ -25,7 +25,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { MOSAWelcomeView } from './components/MOSAWelcomeView';
 import { SuperAdminPasswordChangeModal } from './components/SuperAdminPasswordChangeModal';
 import { dataService } from './services/dataService';
-import { isStaffRole } from './services/governanceService';
+import { isStaffRole, isRegisteredAlumni } from './services/governanceService';
 import { MemberAttendanceView } from './components/MemberAttendanceView';
 import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { ElectionsHub } from './components/ElectionsHub';
@@ -44,7 +44,7 @@ export const App: React.FC = () => {
   const [authResolving, setAuthResolving] = useState<boolean>(true);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState<number>(0);
   const [showAuthGate, setShowAuthGate] = useState<boolean>(false);
-  const [isGuestBrowsing, setIsGuestBrowsing] = useState<boolean>(false);
+  const [authInitialMode, setAuthInitialMode] = useState<'create-account' | 'login' | 'reset-password' | 'admin-login'>('create-account');
 
   const handleNavigate = (tab: string) => {
     if (tab === currentTab) return;
@@ -67,27 +67,6 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const getTabLabel = (tab: string) => {
-    switch (tab) {
-      case 'notifications': return 'MOSA Notification Centre';
-      case 'directory': return 'Alumni Registry';
-      case 'membership': return 'Membership & Number Guide';
-      case 'payments': return 'Donations & Giving';
-      case 'events': return 'Events & Reunions';
-      case 'attendance': return 'Meeting Attendance';
-      case 'gallery': return 'Campus Heritage Gallery';
-      case 'news': return 'News & Official Circulars';
-      case 'chapters': return 'Campus & Institutional Chapters';
-      case 'documents': return 'Official Documents & Archives';
-      case 'about': return 'About MASSH & MOSA';
-      case 'contact': return 'Contact Secretariat';
-      case 'my-profile': return 'My Alumni Dashboard';
-      case 'opportunities': return 'Opportunities & Mentorship Hub';
-      case 'elections': return 'Elections & Digital Voting';
-      case 'welcome': return 'MOSA Welcome Experience';
-      default: return 'Alumni Services';
-    }
-  };
 
   // Dynamic Module Toggles (Configured by Administrator)
   const [moduleSettings, setModuleSettings] = useState<ModuleSettings>({
@@ -118,8 +97,9 @@ export const App: React.FC = () => {
   const [selectedAlumnus, setSelectedAlumnus] = useState<AlumniProfile | null>(null);
   const [verifyInitialQuery, setVerifyInitialQuery] = useState<string>('');
 
-  const openAuth = (portal: 'alumni' | 'admin' = 'alumni') => {
+  const openAuth = (portal: 'alumni' | 'admin' = 'alumni', mode: 'create-account' | 'login' | 'reset-password' | 'admin-login' = 'login') => {
     setAuthPortal(portal);
+    setAuthInitialMode(mode);
     setIsAuthOpen(true);
   };
 
@@ -130,10 +110,16 @@ export const App: React.FC = () => {
       const modules = await dataService.getModuleSettings();
       setModuleSettings(modules);
 
-      const notifs = await dataService.getAlumniNotifications(user?.alumniId || 'alumni-0001');
-      setUnreadNotifsCount(notifs.filter(n => !n.isRead).length);
+      if (user && isRegisteredAlumni(user)) {
+        const alumniId = user.alumniId || user.alumniNumber || user.uid;
+        const notifs = await dataService.getAlumniNotifications(alumniId);
+        setUnreadNotifsCount(notifs.filter(n => !n.isRead).length);
+      } else {
+        setUnreadNotifsCount(0);
+      }
     } catch (e) {
       console.error(e);
+      setUnreadNotifsCount(0);
     }
   };
 
@@ -147,13 +133,13 @@ export const App: React.FC = () => {
     };
     initApp();
 
-    // Check for ?verify-card= query parameter from scannable QR code
-    if (typeof window !== 'undefined' && window.location.search) {
-      const params = new URLSearchParams(window.location.search);
-      const verifyToken = params.get('verify-card');
-      if (verifyToken) {
-        setVerifyInitialQuery(verifyToken);
-        setIsVerifyOpen(true);
+    // Request notification permissions for installed PWA / system app alerts strictly for registered alumni
+    const user = dataService.getCurrentUser();
+    if (user && isRegisteredAlumni(user)) {
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        try {
+          Notification.requestPermission().catch(() => {});
+        } catch (e) {}
       }
     }
   }, []);
@@ -161,7 +147,6 @@ export const App: React.FC = () => {
   const handleLogout = () => {
     dataService.logout();
     setCurrentUser(null);
-    setIsGuestBrowsing(false);
     setPortalMode('member');
     setCurrentTab('home');
     setTabHistory(['home']);
@@ -263,13 +248,14 @@ export const App: React.FC = () => {
   // ==============================================================
   // 2. MOSA WELCOME VIEW & AUTHENTICATION GATE
   // Public visitors see the official MOSA Welcome Experience by default
+  // Account creation or authentication is strictly required before entering
   // ==============================================================
-  if (!currentUser && !isGuestBrowsing) {
+  if (!currentUser) {
     if (showAuthGate) {
       return (
         <AuthenticationGate
           portal={authPortal}
-          initialMode={authPortal === 'admin' ? 'admin-login' : 'login'}
+          initialMode={authInitialMode}
           onLoginSuccess={(user) => {
             setShowAuthGate(false);
             handleLoginSuccess(user);
@@ -280,23 +266,29 @@ export const App: React.FC = () => {
     }
 
     return (
-      <>
-        <MOSAWelcomeView
-          currentUser={null}
-          onOpenLogin={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
-          onOpenRegisterAccount={() => { setAuthPortal('alumni'); setShowAuthGate(true); }}
-          onOpenVerify={() => setIsVerifyOpen(true)}
-          onGoToPortal={() => { setIsGuestBrowsing(true); setCurrentTab('home'); }}
-          onGoToAdmin={() => { setAuthPortal('admin'); setShowAuthGate(true); }}
-        />
-        {isVerifyOpen && (
-          <PublicVerifyAlumniModal
-            isOpen={isVerifyOpen}
-            onClose={() => setIsVerifyOpen(false)}
-            initialQuery={verifyInitialQuery}
-          />
-        )}
-      </>
+      <MOSAWelcomeView
+        currentUser={null}
+        onOpenLogin={() => {
+          setAuthPortal('alumni');
+          setAuthInitialMode('login');
+          setShowAuthGate(true);
+        }}
+        onOpenRegisterAccount={() => {
+          setAuthPortal('alumni');
+          setAuthInitialMode('create-account');
+          setShowAuthGate(true);
+        }}
+        onGoToPortal={() => {
+          setAuthPortal('alumni');
+          setAuthInitialMode('create-account');
+          setShowAuthGate(true);
+        }}
+        onGoToAdmin={() => {
+          setAuthPortal('admin');
+          setAuthInitialMode('admin-login');
+          setShowAuthGate(true);
+        }}
+      />
     );
   }
 
@@ -417,7 +409,7 @@ export const App: React.FC = () => {
               boxShadow: '0 2px 4px rgba(10, 39, 27, 0.04)'
             }}
           >
-            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
               <button
                 id="btn-global-inapp-back"
                 onClick={handleBack}
@@ -440,17 +432,6 @@ export const App: React.FC = () => {
                 <ArrowLeft size={16} />
                 <span>Back</span>
               </button>
-
-              <div className="universal-back-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: '#4B6354' }}>
-                <button 
-                  onClick={() => { setCurrentTab('home'); setTabHistory(['home']); }}
-                  style={{ background: 'none', border: 'none', color: '#C68A24', cursor: 'pointer', fontWeight: 600, padding: 0 }}
-                >
-                  Dashboard
-                </button>
-                <span>/</span>
-                <span style={{ color: '#0B271C', fontWeight: 600 }}>{getTabLabel(currentTab)}</span>
-              </div>
             </div>
           </aside>
         )}
@@ -462,6 +443,7 @@ export const App: React.FC = () => {
             onNavigate={handleNavigate}
             onBack={handleBack}
             onOpenAdmin={handleAdminGateClick}
+            onOpenRegister={() => setIsRegisterOpen(true)}
             onRefreshNotifs={refreshUserData}
           />
         )}
@@ -638,6 +620,120 @@ export const App: React.FC = () => {
               "Caring to Achieve"
             </div>
           </div>
+
+          {/* Association Handles & Official Secretariat Contacts */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+              {/* X / Twitter */}
+              <a
+                href="https://x.com/Masshalumni"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow MOSA on X (@Masshalumni)"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 900,
+                }}
+              >
+                𝕏
+              </a>
+
+              {/* LinkedIn */}
+              <a
+                href="https://linkedin.com/company/mosa-massh"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Connect with MOSA on LinkedIn"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#60A5FA',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                }}
+              >
+                in
+              </a>
+
+              {/* TikTok */}
+              <a
+                href="https://tiktok.com/@mosa_massh"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow MOSA on TikTok"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#F43F5E',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                }}
+              >
+                ♪
+              </a>
+
+              {/* Gmail / Email */}
+              <a
+                href="mailto:masshalumni@gmail.com"
+                title="Email MOSA Secretariat"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#F87171',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                }}
+              >
+                @
+              </a>
+            </div>
+
+            <div style={{ color: '#94A3B8', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <span>Tel: +256 782 123456</span>
+              <span>•</span>
+              <span>WhatsApp: +256 782 123456</span>
+              <span>•</span>
+              <a 
+                href="https://mtech-46634.web.app" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
+              >
+                mtech-46634.web.app
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
 
@@ -710,6 +806,7 @@ export const App: React.FC = () => {
           refreshUserData();
         }}
         currentUser={currentUser}
+        onOpenRegister={() => setIsRegisterOpen(true)}
         onNavigateTab={(tab) => {
           if (tab === 'admin') {
             handleAdminGateClick();

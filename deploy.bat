@@ -7,6 +7,7 @@ echo    Automated Deployment: Firebase Hosting + GitHub
 echo ==========================================================
 
 cd /d "%~dp0"
+set NODE_OPTIONS=--max-old-space-size=4096
 
 echo.
 echo [1/4] Building production bundle (TypeScript + Vite)...
@@ -31,7 +32,7 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "fix(footer): remove verify link and admin button, update motto to Caring to Achieve"
+git commit -m "feat(chapters): populate university chapters in registration wizard, remove map section from chapters hub, and deduplicate career hub menu item"
 echo [OK] Staged and committed changes.
 
 echo.

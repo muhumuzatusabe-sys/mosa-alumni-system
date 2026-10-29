@@ -50,6 +50,16 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
   const [carouselImages, setCarouselImages] = useState<CarouselImageItem[]>([]);
   const [carouselIntervalSeconds, setCarouselIntervalSeconds] = useState<number>(6);
 
+  // Association Social Handles & Official Contacts
+  const [socialX, setSocialX] = useState('');
+  const [socialLinkedIn, setSocialLinkedIn] = useState('');
+  const [socialGmail, setSocialGmail] = useState('');
+  const [socialTikTok, setSocialTikTok] = useState('');
+  const [officialPhone, setOfficialPhone] = useState('');
+  const [officialWhatsApp, setOfficialWhatsApp] = useState('');
+  const [officialAddress, setOfficialAddress] = useState('');
+  const [officialWebsite, setOfficialWebsite] = useState('');
+
   const loadConfig = async () => {
     setLoading(true);
     try {
@@ -58,6 +68,16 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setHeroTitle(cfg.draftHeroTitle || cfg.heroTitle);
       setSlogan(cfg.draftSlogan || cfg.slogan);
       setSubtitle(cfg.draftSubtitle || cfg.subtitle);
+      setIntroMessage(cfg.draftIntroMessage || cfg.introMessage);
+      setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
+      setSocialX(cfg.draftSocialX ?? cfg.socialX ?? 'https://x.com/Masshalumni');
+      setSocialLinkedIn(cfg.draftSocialLinkedIn ?? cfg.socialLinkedIn ?? 'https://linkedin.com/company/mosa-massh');
+      setSocialGmail(cfg.draftSocialGmail ?? cfg.socialGmail ?? 'secretariat@massh.ac.ug');
+      setSocialTikTok(cfg.draftSocialTikTok ?? cfg.socialTikTok ?? 'https://tiktok.com/@mosa_massh');
+      setOfficialPhone(cfg.draftOfficialPhone ?? cfg.officialPhone ?? '+256 782 123456');
+      setOfficialWhatsApp(cfg.draftOfficialWhatsApp ?? cfg.officialWhatsApp ?? '256782123456');
+      setOfficialAddress(cfg.draftOfficialAddress ?? cfg.officialAddress ?? 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda');
+      setOfficialWebsite(cfg.draftOfficialWebsite ?? cfg.officialWebsite ?? 'https://mtech-46634.web.app');
       setIntroMessage(cfg.draftIntroMessage || cfg.introMessage);
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
       setCarouselImages(
@@ -195,6 +215,14 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
           draftHeroImageUrl: heroImageUrl,
           draftCarouselImages: carouselImages,
           draftCarouselIntervalSeconds: carouselIntervalSeconds,
+          draftSocialX: socialX,
+          draftSocialLinkedIn: socialLinkedIn,
+          draftSocialGmail: socialGmail,
+          draftSocialTikTok: socialTikTok,
+          draftOfficialPhone: officialPhone,
+          draftOfficialWhatsApp: officialWhatsApp,
+          draftOfficialAddress: officialAddress,
+          draftOfficialWebsite: officialWebsite,
         },
         currentUser
       );
@@ -226,6 +254,14 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
           draftHeroImageUrl: heroImageUrl,
           draftCarouselImages: carouselImages,
           draftCarouselIntervalSeconds: carouselIntervalSeconds,
+          draftSocialX: socialX,
+          draftSocialLinkedIn: socialLinkedIn,
+          draftSocialGmail: socialGmail,
+          draftSocialTikTok: socialTikTok,
+          draftOfficialPhone: officialPhone,
+          draftOfficialWhatsApp: officialWhatsApp,
+          draftOfficialAddress: officialAddress,
+          draftOfficialWebsite: officialWebsite,
         },
         currentUser
       );
@@ -853,6 +889,184 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Row 6: Association Social Handles & Official Contacts (Input by Admin) */}
+        <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '1.5rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#FCD34D' }}>
+              Association Presence
+            </span>
+            <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#FFFFFF', margin: '0.2rem 0 0.35rem 0' }}>
+              Official Social Media Handles & Secretariat Contacts
+            </h4>
+            <p style={{ fontSize: '0.82rem', color: '#94A3B8', margin: 0 }}>
+              These handles and official communication lines will be displayed directly across the Welcome page and portal headers.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            {/* X / Twitter */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                X (Twitter) Handle / URL
+              </label>
+              <input
+                type="text"
+                value={socialX}
+                onChange={(e) => setSocialX(e.target.value)}
+                placeholder="https://x.com/Masshalumni"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* LinkedIn */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                LinkedIn Page URL
+              </label>
+              <input
+                type="text"
+                value={socialLinkedIn}
+                onChange={(e) => setSocialLinkedIn(e.target.value)}
+                placeholder="https://linkedin.com/company/mosa-massh"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Official Gmail / Email */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                Official Secretariat Email / Gmail
+              </label>
+              <input
+                type="email"
+                value={socialGmail}
+                onChange={(e) => setSocialGmail(e.target.value)}
+                placeholder="secretariat@massh.ac.ug"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* TikTok */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                TikTok Handle / URL
+              </label>
+              <input
+                type="text"
+                value={socialTikTok}
+                onChange={(e) => setSocialTikTok(e.target.value)}
+                placeholder="https://tiktok.com/@mosa_massh"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Official Phone */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                Official Phone Number
+              </label>
+              <input
+                type="text"
+                value={officialPhone}
+                onChange={(e) => setOfficialPhone(e.target.value)}
+                placeholder="+256 782 123456"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Official WhatsApp */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                Official WhatsApp Contact
+              </label>
+              <input
+                type="text"
+                value={officialWhatsApp}
+                onChange={(e) => setOfficialWhatsApp(e.target.value)}
+                placeholder="256782123456"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Official Website */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 700, color: '#E2E8F0', marginBottom: '0.35rem' }}>
+                Official Website URL
+              </label>
+              <input
+                type="url"
+                value={officialWebsite}
+                onChange={(e) => setOfficialWebsite(e.target.value)}
+                placeholder="https://mtech-46634.web.app"
+                style={{
+                  width: '100%',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: '#FFFFFF',
+                  fontSize: '0.88rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
           </div>
         </div>
 

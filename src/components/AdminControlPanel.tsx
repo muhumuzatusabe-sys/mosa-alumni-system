@@ -884,123 +884,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               </div>
             )}
 
-            {/* 2. LEADERSHIP & OFFICES */}
-            {canAccessLeadership && (
-              <button
-                onClick={() => {
-                  setActiveSection('leadership');
-                  setRegistryDropdownOpen(false);
-                  setApprovalsDropdownOpen(false);
-                }}
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  borderRadius: '10px',
-                  border: activeSection === 'leadership' ? '2px solid #0B203E' : '1px solid #CBD5E1',
-                  background: activeSection === 'leadership' ? '#0B203E' : '#FFFFFF',
-                  color: activeSection === 'leadership' ? '#FFFFFF' : '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: activeSection === 'leadership' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Award size={17} color={activeSection === 'leadership' ? '#FBBF24' : '#D97706'} />
-                <span>Leadership & Offices</span>
-              </button>
-            )}
-
-            {/* SECRETARIAT & WHATSAPP COMMUNICATIONS */}
-            {canAccessSecretariat && (
-              <button
-                onClick={() => {
-                  setActiveSection('secretariat');
-                  setRegistryDropdownOpen(false);
-                  setApprovalsDropdownOpen(false);
-                }}
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  borderRadius: '10px',
-                  border: activeSection === 'secretariat' ? '2px solid #0B203E' : '1px solid #CBD5E1',
-                  background: activeSection === 'secretariat' ? '#0B203E' : '#FFFFFF',
-                  color: activeSection === 'secretariat' ? '#FFFFFF' : '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: activeSection === 'secretariat' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Phone size={17} color={activeSection === 'secretariat' ? '#FBBF24' : '#D97706'} />
-                <span>Secretariat & WhatsApp</span>
-              </button>
-            )}
-
-            {/* 3. WELCOME PAGE MANAGEMENT */}
-            {canAccessWelcomePage && (
-              <button
-                onClick={() => {
-                  setActiveSection('welcome_page');
-                  setRegistryDropdownOpen(false);
-                  setApprovalsDropdownOpen(false);
-                }}
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  borderRadius: '10px',
-                  border: activeSection === 'welcome_page' ? '2px solid #0B203E' : '1px solid #CBD5E1',
-                  background: activeSection === 'welcome_page' ? '#0B203E' : '#FFFFFF',
-                  color: activeSection === 'welcome_page' ? '#FFFFFF' : '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: activeSection === 'welcome_page' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Sparkles size={17} color={activeSection === 'welcome_page' ? '#FBBF24' : '#D97706'} />
-                <span>Welcome Page</span>
-              </button>
-            )}
-
-            {/* 4. MEMBER DATA EXPORTS */}
-            {canAccessExports && (
-              <button
-                onClick={() => {
-                  setActiveSection('exports');
-                  setRegistryDropdownOpen(false);
-                  setApprovalsDropdownOpen(false);
-                }}
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  borderRadius: '10px',
-                  border: activeSection === 'exports' ? '2px solid #0B203E' : '1px solid #CBD5E1',
-                  background: activeSection === 'exports' ? '#0B203E' : '#FFFFFF',
-                  color: activeSection === 'exports' ? '#FFFFFF' : '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: activeSection === 'exports' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Download size={17} color={activeSection === 'exports' ? '#FBBF24' : '#D97706'} />
-                <span>Data Exports</span>
-              </button>
-            )}
-
-            {/* 5. EXPANDABLE "Members & Approvals" BUTTON */}
+            {/* 2. EXPANDABLE "Members & Approvals" BUTTON */}
             <div style={{ position: 'relative' }}>
               <button
                 onClick={() => {
@@ -1103,6 +987,122 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 </>
               )}
             </div>
+
+            {/* 3. LEADERSHIP & OFFICES */}
+            {canAccessLeadership && (
+              <button
+                onClick={() => {
+                  setActiveSection('leadership');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'leadership' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'leadership' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'leadership' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'leadership' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Award size={17} color={activeSection === 'leadership' ? '#FBBF24' : '#D97706'} />
+                <span>Leadership & Offices</span>
+              </button>
+            )}
+
+            {/* SECRETARIAT & WHATSAPP COMMUNICATIONS */}
+            {canAccessSecretariat && (
+              <button
+                onClick={() => {
+                  setActiveSection('secretariat');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'secretariat' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'secretariat' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'secretariat' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'secretariat' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Phone size={17} color={activeSection === 'secretariat' ? '#FBBF24' : '#D97706'} />
+                <span>Secretariat & WhatsApp</span>
+              </button>
+            )}
+
+            {/* 4. WELCOME PAGE MANAGEMENT */}
+            {canAccessWelcomePage && (
+              <button
+                onClick={() => {
+                  setActiveSection('welcome_page');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'welcome_page' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'welcome_page' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'welcome_page' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'welcome_page' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Sparkles size={17} color={activeSection === 'welcome_page' ? '#FBBF24' : '#D97706'} />
+                <span>Welcome Page</span>
+              </button>
+            )}
+
+            {/* 5. MEMBER DATA EXPORTS */}
+            {canAccessExports && (
+              <button
+                onClick={() => {
+                  setActiveSection('exports');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'exports' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'exports' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'exports' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'exports' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Download size={17} color={activeSection === 'exports' ? '#FBBF24' : '#D97706'} />
+                <span>Data Exports</span>
+              </button>
+            )}
 
             {/* 6. SUPER ADMIN SECURITY */}
             {canAccessSecurity && (

@@ -20,12 +20,9 @@ import {
   Building2,
   UserPlus,
   ArrowRight,
-  ArrowLeft,
-  Compass,
-  Grid
+  ArrowLeft
 } from 'lucide-react';
 import { ChapterFormModal } from './ChapterFormModal';
-import { ChaptersMap } from './ChaptersMap';
 
 interface Props {
   currentUser: AuthUser | null;
@@ -39,7 +36,6 @@ export const ChaptersHub: React.FC<Props> = ({ currentUser, onOpenAuth, onSelect
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ACTIVE');
-  const [viewMode, setViewMode] = useState<'MAP' | 'GRID'>('MAP');
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
   const [chapterMembers, setChapterMembers] = useState<ChapterMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
@@ -278,50 +274,8 @@ export const ChaptersHub: React.FC<Props> = ({ currentUser, onOpenAuth, onSelect
             ))}
           </div>
 
-          {/* Controls: Search, View Mode, Create */}
+          {/* Controls: Search, Create */}
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* View Mode Toggle */}
-            <div style={{ display: 'flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', border: '1px solid #CBD5E1' }}>
-              <button
-                type="button"
-                onClick={() => setViewMode('MAP')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  padding: '0.35rem 0.65rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: viewMode === 'MAP' ? '#0B203E' : 'transparent',
-                  color: viewMode === 'MAP' ? '#FFFFFF' : '#475569',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                <Compass size={14} color={viewMode === 'MAP' ? '#F59E0B' : '#64748B'} /> Map Locator
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('GRID')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  padding: '0.35rem 0.65rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: viewMode === 'GRID' ? '#0B203E' : 'transparent',
-                  color: viewMode === 'GRID' ? '#FFFFFF' : '#475569',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                <Grid size={14} color={viewMode === 'GRID' ? '#F59E0B' : '#64748B'} /> Grid List
-              </button>
-            </div>
-
             <div style={{ position: 'relative' }}>
               <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
               <input
@@ -354,18 +308,11 @@ export const ChaptersHub: React.FC<Props> = ({ currentUser, onOpenAuth, onSelect
         </div>
       </div>
 
-      {/* Chapters Content (Map or Grid) */}
+      {/* Chapters Content (Grid) */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: '#64748B' }}>
           Loading MOSA chapters...
         </div>
-      ) : viewMode === 'MAP' ? (
-        <ChaptersMap
-          chapters={filteredChapters}
-          selectedChapter={selectedChapter}
-          onSelectChapter={loadMembers}
-          onJoinChapter={handleJoinChapter}
-        />
       ) : filteredChapters.length === 0 ? (
         <div className="mosa-card" style={{ padding: '3.5rem', textAlign: 'center' }}>
           <Landmark size={48} color="#94A3B8" style={{ margin: '0 auto 1rem auto' }} />

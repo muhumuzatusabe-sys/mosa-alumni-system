@@ -10,8 +10,10 @@ import {
   ArrowLeft,
   Users,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
+import { isRegisteredAlumni } from '../services/governanceService';
 
 interface Props {
   currentUser: AuthUser | null;
@@ -69,8 +71,14 @@ export const AlumniDirectory: React.FC<Props> = ({
     loadDatabaseStats();
   }, []);
 
+  const isRegistered = isRegisteredAlumni(currentUser);
+
   // Load and filter searchable alumni list
   const loadAlumni = async () => {
+    if (!isRegistered) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const results = await dataService.searchAlumni(searchQuery, {
@@ -87,8 +95,219 @@ export const AlumniDirectory: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    loadAlumni();
-  }, [searchQuery, levelFilter, yearFilter, campusFilter]);
+    if (isRegistered) {
+      loadAlumni();
+    } else {
+      setLoading(false);
+    }
+  }, [isRegistered, searchQuery, levelFilter, yearFilter, campusFilter]);
+
+  if (!isRegistered) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Registry Heading with Back button */}
+        <div 
+          style={{
+            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)',
+            borderRadius: '16px',
+            padding: '1.75rem 2rem',
+            color: '#ffffff',
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 8px 20px rgba(10, 39, 27, 0.16)',
+            border: '1.5px solid rgba(198, 138, 36, 0.35)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1.25rem'
+          }}
+        >
+          <div style={{ maxWidth: '680px', position: 'relative', zIndex: 2 }}>
+            {onBack && (
+              <button
+                onClick={onBack}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '8px',
+                  background: 'rgba(255, 255, 255, 0.12)',
+                  color: '#FFFFFF',
+                  border: '1px solid rgba(255, 255, 255, 0.22)',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  marginBottom: '0.75rem',
+                }}
+              >
+                <ArrowLeft size={15} />
+                <span>Back to Dashboard</span>
+              </button>
+            )}
+
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', background: 'rgba(217, 119, 6, 0.2)', border: '1px solid #D97706', padding: '0.2rem 0.65rem', borderRadius: '999px', fontSize: '0.76rem', color: '#FCD34D', fontWeight: 700, marginBottom: '0.5rem' }}>
+              <Lock size={13} /> MASSH ALUMNI PORTAL • Protected Member Directory
+            </div>
+
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '0.25rem 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
+              Mandela Alumni Registry & Member Search
+            </h1>
+            <p style={{ margin: 0, color: 'rgba(255, 255, 255, 0.82)', fontSize: '0.92rem', lineHeight: 1.5 }}>
+              Institutional member database preserving cohorts from 1997 to date.
+            </p>
+          </div>
+        </div>
+
+        {/* Protection / Registration Gate Card */}
+        <div 
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
+            padding: '2.5rem 1.75rem',
+            textAlign: 'center',
+            maxWidth: '680px',
+            margin: '1rem auto',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: '#FEF3C7',
+              border: '2px solid #F59E0B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem auto',
+              color: '#B45309'
+            }}
+          >
+            <Lock size={32} />
+          </div>
+
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.75rem' }}>
+            Alumni Registration Required
+          </h2>
+
+          <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '540px', margin: '0 auto 1.5rem auto' }}>
+            To safeguard member privacy, contact information, and cohort records, the Mandela Secondary School Hoima Alumni Registry is strictly restricted to verified registered alumni.
+          </p>
+
+          {currentUser ? (
+            <div 
+              style={{
+                background: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '10px',
+                padding: '0.85rem 1.15rem',
+                marginBottom: '1.5rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.75rem',
+                textAlign: 'left'
+              }}
+            >
+              <Users size={20} color="#64748B" />
+              <div>
+                <div style={{ fontSize: '0.82rem', color: '#64748B' }}>Active Account:</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0F172A' }}>
+                  {currentUser.email} <span style={{ color: '#D97706', fontSize: '0.78rem', fontWeight: 600 }}>• Alumni Registration Pending</span>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
+            <button
+              onClick={onOpenRegister}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                background: 'linear-gradient(135deg, #113D2B 0%, #15803D 100%)',
+                color: '#FFFFFF',
+                padding: '0.85rem 1.75rem',
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(21, 128, 61, 0.3)',
+                transition: 'all 0.2s ease',
+                width: '100%',
+                maxWidth: '360px'
+              }}
+            >
+              <GraduationCap size={20} />
+              <span>Register as an Alumnus Now</span>
+            </button>
+
+            {onBack && (
+              <button
+                onClick={onBack}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#64748B',
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  padding: '0.4rem 0.8rem',
+                }}
+              >
+                Return to Dashboard
+              </button>
+            )}
+          </div>
+
+          <div 
+            style={{
+              marginTop: '2rem',
+              paddingTop: '1.5rem',
+              borderTop: '1px solid #F1F5F9',
+              textAlign: 'left',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '0.85rem'
+            }}
+          >
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div style={{ fontSize: '0.82rem', color: '#475569' }}>
+                <strong>Classmate Search:</strong> Reconnect with former classmates from O-Level & A-Level cohorts.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div style={{ fontSize: '0.82rem', color: '#475569' }}>
+                <strong>Verified MA Number:</strong> Receive your permanent sequential alumni number.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div style={{ fontSize: '0.82rem', color: '#475569' }}>
+                <strong>Official Pass:</strong> Unlock your official green digital alumni pass.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div style={{ fontSize: '0.82rem', color: '#475569' }}>
+                <strong>Notifications & Alerts:</strong> Receive community announcements, giving drives & events.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

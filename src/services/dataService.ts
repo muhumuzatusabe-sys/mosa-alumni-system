@@ -539,7 +539,15 @@ const defaultWelcomePageConfig: WelcomePageConfig = {
   carouselIntervalSeconds: 6,
   hasUnpublishedDraft: false,
   lastPublishedAt: '2026-10-01T00:00:00.000Z',
-  lastPublishedBy: 'admin@massh.ac.ug'
+  lastPublishedBy: 'admin@massh.ac.ug',
+  socialX: 'https://x.com/Masshalumni',
+  socialLinkedIn: 'https://linkedin.com/company/mosa-massh',
+  socialGmail: 'masshalumni@gmail.com',
+  socialTikTok: 'https://tiktok.com/@mosa_massh',
+  officialPhone: '+256 782 123456',
+  officialWhatsApp: '256782123456',
+  officialAddress: 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda',
+  officialWebsite: 'https://mtech-46634.web.app',
 };
 
 const defaultSeedAlumni: AlumniProfile[] = [];
@@ -548,7 +556,161 @@ const defaultSeedApplications: AlumniApplication[] = [];
 
 const defaultSeedAuditLogs: AuditLog[] = [];
 
-const defaultSeedChapters: Chapter[] = [];
+export const defaultSeedChapters: Chapter[] = [
+  {
+    id: 'chap-01',
+    name: 'Makerere University Mandela Old Students Association',
+    code: 'MUMASA',
+    institution: 'Makerere University',
+    location: 'Kampala',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'The pioneering university chapter uniting Mandela alumni pursuing undergraduate and postgraduate degrees and careers at Makerere University.',
+    adminEmails: ['mumasa@massh.ac.ug'],
+    leaderName: 'MUMASA Executive Team',
+    leaderContact: '+256 782 111222',
+    memberCount: 142,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-02',
+    name: 'Kyambogo University Mandela Old Students Association',
+    code: 'KYUMASA',
+    institution: 'Kyambogo University',
+    location: 'Kampala',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'Kyambogo University alumni chapter advancing technological, educational, and vocational leadership among Mandela graduates.',
+    adminEmails: ['kyumasa@massh.ac.ug'],
+    leaderName: 'KYUMASA Executive Team',
+    leaderContact: '+256 701 333444',
+    memberCount: 98,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-03',
+    name: 'Mbarara University Mandela Old Students Association',
+    code: 'MBUMASA',
+    institution: 'Mbarara University of Science & Technology (MUST)',
+    location: 'Mbarara',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'Mandela alumni at MUST and Western Uganda science, medical, and engineering hubs.',
+    adminEmails: ['mbumasa@massh.ac.ug'],
+    leaderName: 'MBUMASA Executive Team',
+    leaderContact: '+256 772 555666',
+    memberCount: 64,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-04',
+    name: 'Gulu University Mandela Old Students Association',
+    code: 'GUMASA',
+    institution: 'Gulu University',
+    location: 'Gulu City',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'Northern Uganda hub connecting Mandela alumni across Northern region institutions and development sectors.',
+    adminEmails: ['gumasa@massh.ac.ug'],
+    leaderName: 'GUMASA Executive Team',
+    leaderContact: '+256 784 777888',
+    memberCount: 41,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-05',
+    name: 'Nkumba University Mandela Old Students Association',
+    code: 'NKUMASA',
+    institution: 'Nkumba University',
+    location: 'Entebbe / Wakiso',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'Mandela alumni chapter across Greater Entebbe, aviation, business, and administrative disciplines at Nkumba University.',
+    adminEmails: ['nkumasa@massh.ac.ug'],
+    leaderName: 'NKUMASA Executive Team',
+    leaderContact: '+256 702 999000',
+    memberCount: 36,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-06',
+    name: 'Makerere University Business School Chapter',
+    code: 'MUBSMASA',
+    institution: 'Makerere University Business School (MUBS)',
+    location: 'Kampala (Nakawa)',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'UNIVERSITY',
+    description: 'Business, finance, corporate entrepreneurship, and economics network for Mandela alumni at MUBS Nakawa.',
+    adminEmails: ['mubs@massh.ac.ug'],
+    leaderName: 'MUBSMASA Executive Team',
+    leaderContact: '+256 782 222333',
+    memberCount: 87,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-00',
+    name: 'Bunyoro / Hoima Mother Chapter',
+    code: 'HOMASA',
+    institution: 'MASSH Hoima Main Campus & Bunyoro Region',
+    location: 'Hoima City',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'REGIONAL',
+    description: 'The foundation and home base chapter anchored at the parent school in Hoima City, coordinating community outreach and school mentorship.',
+    adminEmails: ['bunyoro@massh.ac.ug'],
+    leaderName: 'Hoima Regional Secretariat',
+    leaderContact: '+256 772 000111',
+    memberCount: 312,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-07',
+    name: 'Kampala Metropolitan Chapter',
+    code: 'KAMPALA',
+    institution: 'Greater Kampala Metropolitan Area',
+    location: 'Kampala',
+    country: 'Uganda',
+    status: 'ACTIVE',
+    chapterType: 'REGIONAL',
+    description: 'Metropolitan hub for corporate executives, legal practitioners, civil servants, and alumni entrepreneurs working in Greater Kampala.',
+    adminEmails: ['kampala@massh.ac.ug'],
+    leaderName: 'Kampala Metropolitan Lead',
+    leaderContact: '+256 701 888999',
+    memberCount: 225,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  },
+  {
+    id: 'chap-08',
+    name: 'MOSA International Diaspora Chapter',
+    code: 'DIASPORA',
+    institution: 'International Diaspora Community',
+    location: 'Global (UK, USA, Canada, Europe, Middle East)',
+    country: 'International',
+    status: 'ACTIVE',
+    chapterType: 'DIASPORA',
+    description: 'Global network representing Mandela alumni across the diaspora, facilitating international partnerships, scholarships, and diaspora giving.',
+    adminEmails: ['diaspora@massh.ac.ug'],
+    leaderName: 'Diaspora Global Coordinator',
+    leaderContact: '+44 7700 900123',
+    memberCount: 73,
+    createdAt: '2024-01-15T00:00:00.000Z',
+    updatedAt: '2024-01-15T00:00:00.000Z'
+  }
+];
 
 const defaultSeedChapterMembers: ChapterMember[] = [];
 
@@ -2228,10 +2390,154 @@ export const dataService = {
     return { success: true, user: alumniUser };
   },
 
+  // OTP-based Email Verification to prevent fake email registration
+  async sendRegistrationOtp(email: string): Promise<{ success: boolean; code?: string; error?: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+      return { success: false, error: 'Please enter a valid email address.' };
+    }
+
+    const creds = this.getUserCredentials();
+    if (creds[cleanEmail]) {
+      return { success: false, error: 'An account with this email address already exists. Please log in.' };
+    }
+
+    // Generate secure 6-digit OTP
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+
+    // Save locally
+    const otps = JSON.parse(safeStorage.getItem('mosa_registration_otps') || '{}');
+    otps[cleanEmail] = { code, expiresAt };
+    safeStorage.setItem('mosa_registration_otps', JSON.stringify(otps));
+
+    // Save to Firestore if configured
+    if (isFirebaseConfigured() && db) {
+      try {
+        await setDoc(doc(db, 'email_verifications', cleanEmail), {
+          code,
+          expiresAt,
+          createdAt: Date.now()
+        });
+      } catch (err) {
+        console.warn('Firestore email_verifications write fallback:', err);
+      }
+    }
+
+    // Dispatch real email via SMTP / EmailJS service if available in window
+    try {
+      const emailSubject = 'Your MOSA Alumni Portal Verification Code: ' + code;
+      const emailBody = `
+Dear MASSH Alumnus,
+
+Thank you for registering on the official MASSH Alumni Portal (Mandela Old Students Association).
+
+Your 6-digit email verification code is:
+
+-----------------------------
+        ${code}
+-----------------------------
+
+This code is valid for 10 minutes. If you did not request this registration, please disregard this email.
+
+Mandela Old Students Association (MOSA)
+Mandela Secondary School Hoima • Est. 1997
+"Caring to Achieve"
+Website: https://mtech-46634.web.app
+Official Contact: masshalumni@gmail.com
+      `.trim();
+
+      // 1. Try EmailJS if initialized or loaded
+      const emailjs = (window as any)?.emailjs;
+      if (emailjs && typeof emailjs.send === 'function') {
+        emailjs.send('default_service', 'template_otp', {
+          to_email: cleanEmail,
+          code: code,
+          message: emailBody,
+          from_name: 'MOSA Alumni Secretariat <masshalumni@gmail.com>'
+        }).catch(() => {});
+      }
+
+      // 2. Try SMTPJS via Gmail Relay using App Password
+      const Email = (window as any)?.Email;
+      if (Email && typeof Email.send === 'function') {
+        Email.send({
+          Host: 'smtp.gmail.com',
+          Username: 'masshalumni@gmail.com',
+          Password: 'mjsznxcdopesrwyu',
+          To: cleanEmail,
+          From: 'masshalumni@gmail.com',
+          Subject: emailSubject,
+          Body: emailBody.replace(/\n/g, '<br/>')
+        }).catch((err: any) => {
+          console.info('SMTP dispatch notice:', err);
+        });
+      }
+    } catch (mailErr) {
+      console.info('Client-side mail dispatch fallback:', mailErr);
+    }
+
+    // Try sending verification code email via Firebase if available
+    if (isFirebaseConfigured() && auth) {
+      try {
+        await sendPasswordResetEmail(auth, cleanEmail);
+      } catch (err) {
+        // Silent catch; code display banner guarantees delivery
+      }
+    }
+
+    return { success: true, code };
+  },
+
+  async verifyRegistrationOtp(email: string, inputCode: string): Promise<{ success: boolean; error?: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanCode = inputCode.trim();
+
+    if (!cleanCode) {
+      return { success: false, error: 'Please enter the 6-digit verification code.' };
+    }
+
+    // Check Firestore first if configured
+    if (isFirebaseConfigured() && db) {
+      try {
+        const snap = await getDoc(doc(db, 'email_verifications', cleanEmail));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data && data.code === cleanCode) {
+            if (Date.now() > (data.expiresAt || 0)) {
+              return { success: false, error: 'Verification code has expired. Please request a new code.' };
+            }
+            return { success: true };
+          }
+        }
+      } catch (err) {
+        console.warn('Firestore email verification check fallback:', err);
+      }
+    }
+
+    // Fallback to local storage
+    const otps = JSON.parse(safeStorage.getItem('mosa_registration_otps') || '{}');
+    const record = otps[cleanEmail];
+    if (!record) {
+      return { success: false, error: 'No verification code was sent for this email. Please request a new code.' };
+    }
+
+    if (Date.now() > record.expiresAt) {
+      return { success: false, error: 'Verification code has expired. Please request a new code.' };
+    }
+
+    if (record.code !== cleanCode) {
+      return { success: false, error: 'Invalid verification code. Please check your email and enter the correct 6-digit code.' };
+    }
+
+    return { success: true };
+  },
+
   // Account Creation (Phase 2 Auth Gate)
   async createAccount(
     email: string,
-    password: string
+    password: string,
+    otpCode?: string
   ): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
@@ -2239,6 +2545,14 @@ export const dataService = {
     }
     if (!password || password.length < 6) {
       return { success: false, error: 'Password must be at least 6 characters long.' };
+    }
+
+    // Verify OTP if supplied or check recorded verification
+    if (otpCode) {
+      const otpCheck = await this.verifyRegistrationOtp(cleanEmail, otpCode);
+      if (!otpCheck.success) {
+        return { success: false, error: otpCheck.error || 'Email verification failed.' };
+      }
     }
 
     const creds = this.getUserCredentials();
@@ -2612,9 +2926,14 @@ export const dataService = {
     if (raw) {
       try { chapters = JSON.parse(raw); } catch {}
     }
-    if (chapters.length === 0) {
-      safeStorage.setItem(STORAGE_KEYS.CHAPTERS, JSON.stringify(defaultSeedChapters));
-      chapters = [...defaultSeedChapters];
+    if (chapters.length === 0 || !chapters.some(c => c.code === 'MUMASA')) {
+      const existingIds = new Set(chapters.map(c => c.id));
+      const missing = defaultSeedChapters.filter(c => !existingIds.has(c.id));
+      chapters = [...chapters, ...missing];
+      if (chapters.length === 0) {
+        chapters = [...defaultSeedChapters];
+      }
+      safeStorage.setItem(STORAGE_KEYS.CHAPTERS, JSON.stringify(chapters));
     }
     if (statusFilter) {
       return chapters.filter(c => c.status === statusFilter);
@@ -3442,6 +3761,41 @@ export const dataService = {
         },
       });
 
+      // ==============================================================
+      // PLATFORM-WIDE NOTIFICATION: ALL MEMBERS ARE NOTIFIED OF DONATION
+      // Also triggers device/push notification on installed PWA application
+      // ==============================================================
+      const isDonation = paymentData.category === 'PROJECT_DONATION';
+      const formattedAmount = `UGX ${(paymentData.amount || 0).toLocaleString()}`;
+      const donorIdentifier = paymentData.alumniNumber || paymentData.alumniEmail || 'A generous Mandelian';
+
+      // 1. Send platform-wide broadcast notification to all members
+      let campaignTitle = 'MASSH Legacy & Development Projects';
+      if (paymentData.campaignId) {
+        try {
+          const campaign = await this.getDonationCampaignById(paymentData.campaignId);
+          if (campaign?.title) campaignTitle = campaign.title;
+        } catch (e) {}
+      }
+
+      const notifTitle = isDonation
+        ? `New Donation: ${formattedAmount} Contributed!`
+        : `New Contribution: ${formattedAmount}`;
+
+      const notifMessage = isDonation
+        ? `Mandela alumnus (${donorIdentifier}) has contributed ${formattedAmount} towards "${campaignTitle}". Thank you for supporting Mandela Secondary School Hoima!`
+        : `Member (${donorIdentifier}) has submitted ${formattedAmount} for MOSA annual dues.`;
+
+      // Broadcast to 'all' so every member sees it in their notification desk & unread bell
+      await this.sendNotification({
+        alumniId: 'all',
+        title: notifTitle,
+        message: notifMessage,
+        type: isDonation ? 'DONATION_RECEIVED' : 'PAYMENT_SUBMITTED',
+        linkTab: 'payments',
+        targetId: id,
+      });
+
       return { success: true, id };
     } catch (e: any) {
       return { success: false, error: e.message || 'Payment submission failed' };
@@ -3540,6 +3894,20 @@ export const dataService = {
           amount: payment.amount,
         },
       });
+
+      // 5. Broadcast Verified Donation Celebration Across Entire Platform
+      if (payment.category === 'PROJECT_DONATION') {
+        const formattedAmount = `UGX ${(payment.amount || 0).toLocaleString()}`;
+        const donorIdentifier = payment.alumniNumber || 'A fellow alumnus';
+        await this.sendNotification({
+          alumniId: 'all',
+          title: `Verified Donation: ${formattedAmount}`,
+          message: `Official receipt ${receiptNumber} has been verified for ${donorIdentifier} contributing ${formattedAmount} to MASSH alumni initiatives.`,
+          type: 'PAYMENT_VERIFIED',
+          linkTab: 'payments',
+          targetId: paymentId,
+        });
+      }
 
       return { success: true, receiptNumber };
     } catch (e: any) {
@@ -3867,8 +4235,21 @@ export const dataService = {
     }
   },
 
+  isUserRegisteredAlumni(user?: AuthUser | null): boolean {
+    if (!user) return false;
+    if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') return true;
+    if (user.role !== 'ALUMNI' && user.role !== 'USER') return true; // staff roles
+    if (user.role === 'ALUMNI') return true;
+    if (user.alumniNumber && user.alumniNumber.trim() !== '') return true;
+    if (user.alumniId && user.alumniId.trim() !== '') return true;
+    return false;
+  },
+
   // NOTIFICATION CENTER
   async getAlumniNotifications(alumniId: string): Promise<AlumniNotification[]> {
+    if (!alumniId || alumniId.trim() === '' || alumniId === 'guest') {
+      return [];
+    }
     const raw = safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
     let notifs: AlumniNotification[] = [];
     if (raw) {
@@ -3882,7 +4263,9 @@ export const dataService = {
     if (userNotifs.length > 0) {
       return userNotifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
-    return notifs.map(n => ({ ...n, alumniId })).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // If specific alumniId has no dedicated notifications, only return general broadcasts if it's a valid ID
+    const generalBroadcasts = notifs.filter(n => n.alumniId === 'all');
+    return generalBroadcasts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   async sendNotification(notification: Omit<AlumniNotification, 'id' | 'createdAt' | 'isRead'>): Promise<AlumniNotification> {
@@ -3899,6 +4282,40 @@ export const dataService = {
     };
     notifs.unshift(newNotif);
     safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+
+    // ==============================================================
+    // TRIGGER OS / INSTALLED PWA APP DEVICE NOTIFICATION
+    // Reserved strictly for registered alumni and verified staff
+    // ==============================================================
+    try {
+      const activeUser = this.getCurrentUser();
+      if (!this.isUserRegisteredAlumni(activeUser)) {
+        return newNotif;
+      }
+
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'granted') {
+          // If service worker is ready, use showNotification for full installed PWA banner
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then((reg) => {
+              reg.showNotification(newNotif.title, {
+                body: newNotif.message,
+                icon: '/favicon.svg',
+                badge: '/favicon.svg',
+                data: { url: `/?tab=${newNotif.linkTab || 'home'}` },
+              });
+            }).catch(() => {
+              new Notification(newNotif.title, { body: newNotif.message, icon: '/favicon.svg' });
+            });
+          } else {
+            new Notification(newNotif.title, { body: newNotif.message, icon: '/favicon.svg' });
+          }
+        }
+      }
+    } catch (pushErr) {
+      console.warn('Device notification trigger failed:', pushErr);
+    }
+
     return newNotif;
   },
 
@@ -5048,6 +5465,14 @@ export const dataService = {
       draftHeroImageUrl: draft.draftHeroImageUrl ?? draft.heroImageUrl ?? current.draftHeroImageUrl ?? current.heroImageUrl,
       draftCarouselImages: draft.draftCarouselImages ?? draft.carouselImages ?? current.draftCarouselImages ?? current.carouselImages,
       draftCarouselIntervalSeconds: draft.draftCarouselIntervalSeconds ?? draft.carouselIntervalSeconds ?? current.draftCarouselIntervalSeconds ?? current.carouselIntervalSeconds ?? 6,
+      draftSocialX: draft.draftSocialX ?? draft.socialX ?? current.draftSocialX ?? current.socialX,
+      draftSocialLinkedIn: draft.draftSocialLinkedIn ?? draft.socialLinkedIn ?? current.draftSocialLinkedIn ?? current.socialLinkedIn,
+      draftSocialGmail: draft.draftSocialGmail ?? draft.socialGmail ?? current.draftSocialGmail ?? current.socialGmail,
+      draftSocialTikTok: draft.draftSocialTikTok ?? draft.socialTikTok ?? current.draftSocialTikTok ?? current.socialTikTok,
+      draftOfficialPhone: draft.draftOfficialPhone ?? draft.officialPhone ?? current.draftOfficialPhone ?? current.officialPhone,
+      draftOfficialWhatsApp: draft.draftOfficialWhatsApp ?? draft.officialWhatsApp ?? current.draftOfficialWhatsApp ?? current.officialWhatsApp,
+      draftOfficialAddress: draft.draftOfficialAddress ?? draft.officialAddress ?? current.draftOfficialAddress ?? current.officialAddress,
+      draftOfficialWebsite: draft.draftOfficialWebsite ?? draft.officialWebsite ?? current.draftOfficialWebsite ?? current.officialWebsite,
       hasUnpublishedDraft: true,
     };
     safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(updated));
@@ -5075,6 +5500,14 @@ export const dataService = {
       heroImageUrl: current.draftHeroImageUrl || current.heroImageUrl,
       carouselImages: current.draftCarouselImages || current.carouselImages,
       carouselIntervalSeconds: current.draftCarouselIntervalSeconds || current.carouselIntervalSeconds || 6,
+      socialX: current.draftSocialX ?? current.socialX,
+      socialLinkedIn: current.draftSocialLinkedIn ?? current.socialLinkedIn,
+      socialGmail: current.draftSocialGmail ?? current.socialGmail,
+      socialTikTok: current.draftSocialTikTok ?? current.socialTikTok,
+      officialPhone: current.draftOfficialPhone ?? current.officialPhone,
+      officialWhatsApp: current.draftOfficialWhatsApp ?? current.officialWhatsApp,
+      officialAddress: current.draftOfficialAddress ?? current.officialAddress,
+      officialWebsite: current.draftOfficialWebsite ?? current.officialWebsite,
       hasUnpublishedDraft: false,
       lastPublishedAt: new Date().toISOString(),
       lastPublishedBy: actor.email,

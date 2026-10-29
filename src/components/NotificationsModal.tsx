@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlumniNotification, AuthUser } from '../types';
 import { dataService } from '../services/dataService';
+import { isRegisteredAlumni } from '../services/governanceService';
 import { 
   X, 
   Bell, 
@@ -13,7 +14,8 @@ import {
   Megaphone,
   Info, 
   ExternalLink,
-  ArrowRight
+  ArrowRight,
+  HeartHandshake
 } from 'lucide-react';
 
 interface Props {
@@ -21,6 +23,7 @@ interface Props {
   onClose: () => void;
   currentUser: AuthUser | null;
   onNavigateTab?: (tab: any, targetId?: string) => void;
+  onOpenRegister?: () => void;
 }
 
 export const NotificationsModal: React.FC<Props> = ({
@@ -28,6 +31,7 @@ export const NotificationsModal: React.FC<Props> = ({
   onClose,
   currentUser,
   onNavigateTab,
+  onOpenRegister,
 }) => {
   if (!isOpen) return null;
 
@@ -35,9 +39,15 @@ export const NotificationsModal: React.FC<Props> = ({
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('ALL');
 
-  const alumniId = currentUser?.alumniId || 'alumni-0001';
+  const isRegistered = isRegisteredAlumni(currentUser);
+  const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
 
   const loadNotifications = async () => {
+    if (!isRegistered || !alumniId) {
+      setNotifications([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const list = await dataService.getAlumniNotifications(alumniId);
@@ -51,7 +61,7 @@ export const NotificationsModal: React.FC<Props> = ({
 
   useEffect(() => {
     loadNotifications();
-  }, [alumniId]);
+  }, [alumniId, isRegistered]);
 
   const handleNotificationClick = async (notif: AlumniNotification) => {
     await dataService.markNotificationAsRead(notif.id);
@@ -69,6 +79,8 @@ export const NotificationsModal: React.FC<Props> = ({
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
+      case 'DONATION_RECEIVED':
+        return <HeartHandshake size={20} color="#D97706" />;
       case 'ATTENDANCE_OPEN':
         return <ClipboardCheck size={20} color="#D97706" />;
       case 'MEMBERSHIP_APPROVED':
@@ -179,8 +191,48 @@ export const NotificationsModal: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div style={{ padding: '0.65rem 1.25rem', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
+        {!isRegistered ? (
+          <div style={{ padding: '2.5rem 1.75rem', textAlign: 'center', background: '#FFFFFF' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#FEF3C7', border: '2px solid #F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto', color: '#B45309' }}>
+              <Bell size={26} />
+            </div>
+            <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.5rem' }}>
+              Alumni Registration Required
+            </h4>
+            <p style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.55, maxWidth: '380px', margin: '0 auto 1.25rem auto' }}>
+              Notifications, official circulars, event invitations, and meeting roll calls are delivered exclusively to registered MASSH alumni.
+            </p>
+            <button
+              onClick={() => {
+                onClose();
+                if (onOpenRegister) onOpenRegister();
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.45rem',
+                background: '#113D2B',
+                color: '#FFFFFF',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.88rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(17, 61, 43, 0.25)',
+                width: '100%',
+                maxWidth: '280px'
+              }}
+            >
+              <Award size={16} />
+              <span>Register as an Alumnus</span>
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Filter Pills */}
+            <div style={{ padding: '0.65rem 1.25rem', background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
           {[
             { id: 'ALL', label: `All (${notifications.length})` },
             { id: 'UNREAD', label: `Unread (${unreadCount})` },
@@ -297,6 +349,8 @@ export const NotificationsModal: React.FC<Props> = ({
             })
           )}
         </div>
+          </>
+        )}
       </div>
     </div>
   );

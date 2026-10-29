@@ -1235,6 +1235,26 @@ export interface WelcomePageConfig {
   hasUnpublishedDraft?: boolean;
   lastPublishedAt?: string;
   lastPublishedBy?: string;
+
+  // Association Social Handles & Official Contacts (managed by Admin)
+  socialX?: string; // e.g. "https://x.com/mosa_massh" or "@mosa_massh"
+  socialLinkedIn?: string; // e.g. "https://linkedin.com/company/mosa-massh"
+  socialGmail?: string; // e.g. "secretariat@massh.ac.ug"
+  socialTikTok?: string; // e.g. "https://tiktok.com/@mosa_massh"
+  officialPhone?: string; // e.g. "+256 782 123456"
+  officialWhatsApp?: string; // e.g. "256782123456"
+  officialAddress?: string; // e.g. "Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda"
+  officialWebsite?: string; // e.g. "https://mtech-46634.web.app" or "https://massh.ac.ug"
+
+  // Draft handles & contacts
+  draftSocialX?: string;
+  draftSocialLinkedIn?: string;
+  draftSocialGmail?: string;
+  draftSocialTikTok?: string;
+  draftOfficialPhone?: string;
+  draftOfficialWhatsApp?: string;
+  draftOfficialAddress?: string;
+  draftOfficialWebsite?: string;
 }
 
 // ==========================================
