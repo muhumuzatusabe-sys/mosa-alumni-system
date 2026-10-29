@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { CampusPhoto, PhotoCategory, AuthUser } from '../types';
 import { dataService } from '../services/dataService';
+import { ImageUploader } from './ImageUploader';
 
 interface Props {
   currentUser: AuthUser | null;
@@ -623,42 +624,36 @@ export const CampusHeritageGallery: React.FC<Props> = ({ currentUser, onOpenAuth
                 />
               </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#1E293B', marginBottom: '0.35rem' }}>
-                  Image URL or Path *
-                </label>
-                <input 
-                  type="text"
-                  required
-                  placeholder="e.g. /images/massh-... or https://..."
-                  value={newImageUrl}
-                  onChange={e => setNewImageUrl(e.target.value)}
-                  style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem' }}
-                />
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>Quick Pick Authentic:</span>
-                  <button 
-                    type="button" 
-                    onClick={() => setNewImageUrl('/images/massh-foundation-stone-unveiled.jpg')} 
-                    style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #E2E8F0', padding: '0.15rem 0.45rem', borderRadius: '4px', cursor: 'pointer' }}
-                  >
-                    Foundation Stone
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setNewImageUrl('/images/massh-flag-unveiling-ceremony.jpg')} 
-                    style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #E2E8F0', padding: '0.15rem 0.45rem', borderRadius: '4px', cursor: 'pointer' }}
-                  >
-                    MASSH Flag
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setNewImageUrl('/images/massh-science-lab-inspection.jpg')} 
-                    style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #E2E8F0', padding: '0.15rem 0.45rem', borderRadius: '4px', cursor: 'pointer' }}
-                  >
-                    Science Lab
-                  </button>
-                </div>
+              <ImageUploader
+                value={newImageUrl}
+                onChange={setNewImageUrl}
+                label="Photograph * (Upload Directly or Link)"
+                required
+                helpText="Choose a photo directly from your device, take a photo with your phone camera, or drag and drop."
+              />
+              <div style={{ display: 'flex', gap: '0.45rem', marginTop: '-0.5rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.74rem', color: '#64748B' }}>Or pick school archive milestone:</span>
+                <button 
+                  type="button" 
+                  onClick={() => setNewImageUrl('/images/massh-foundation-stone-unveiled.jpg')} 
+                  style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '0.15rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Foundation Stone
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setNewImageUrl('/images/massh-flag-unveiling-ceremony.jpg')} 
+                  style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '0.15rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  MASSH Flag
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setNewImageUrl('/images/massh-science-lab-inspection.jpg')} 
+                  style={{ fontSize: '0.72rem', background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '0.15rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Science Lab
+                </button>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>

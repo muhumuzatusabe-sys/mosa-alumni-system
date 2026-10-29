@@ -504,7 +504,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
               overflowX: 'auto',
               flexShrink: 0
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '680px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 'max-content' }}>
                 {STEPS.map((s, idx) => {
                   const IconComponent = s.icon;
                   const isCompleted = step > s.id;

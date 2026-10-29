@@ -124,7 +124,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     : 0;
 
   return (
-    <div className="home-container" style={{ padding: '1rem 1rem 2.5rem 1rem', background: 'transparent', maxWidth: '1160px', margin: '0 auto' }}>
+    <div className="home-container" style={{ width: '100%', maxWidth: '1160px', margin: '0 auto', boxSizing: 'border-box' }}>
       
       {/* ============================================================== */}
       {/* 1. COMPACT MEMBER IDENTITY & PROFILE SUMMARY                   */}
@@ -132,7 +132,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 1. COMPACT MEMBER IDENTITY & DIGITAL ALUMNI PASS               */}
       {/* ============================================================== */}
-      <section style={{ marginBottom: '1.25rem' }}>
+      <section style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '100%' }}>
         <div
           className="member-identity-card"
           style={{
@@ -146,6 +146,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: '1.25rem',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
           }}
         >
           {/* CASE 1: VERIFIED ALUMNUS PROFILE */}
@@ -479,13 +482,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 2. COMPACT QUICK ACTIONS                                       */}
       {/* ============================================================== */}
-      <section style={{ marginBottom: '1.25rem' }}>
+      <section style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '100%' }}>
         <div
           className="quick-actions-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
             gap: '0.65rem',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
           }}
         >
           <button
@@ -589,8 +595,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 3. PRIMARY ONE-PAGE GRID: DONATIONS & GIVING + REGISTRY        */}
       {/* ============================================================== */}
-      <section>
-        <div className="home-primary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+      <section style={{ width: '100%', maxWidth: '100%' }}>
+        <div className="home-primary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
           
           {/* ------------------------------------------------------------ */}
           {/* SECTION A: DONATIONS & GIVING (VOLUNTARY, COMPACT)           */}
@@ -606,6 +612,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              overflow: 'hidden',
             }}
           >
             <div>
@@ -751,6 +761,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              overflow: 'hidden',
             }}
           >
             <div>

@@ -33,6 +33,7 @@ import {
   FaqItem,
   PhotoCategory
 } from '../types';
+import { ImageUploader } from './ImageUploader';
 import { dataService } from '../services/dataService';
 
 interface CMSManagerProps {
@@ -1618,17 +1619,13 @@ export const CMSManager: React.FC<CMSManagerProps> = ({ currentUser, onRefreshPo
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label required">Image URL or Path</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  required
-                  placeholder="/images/photo.jpg or https://..."
-                  value={editingPhoto.imageUrl || ''}
-                  onChange={e => setEditingPhoto({ ...editingPhoto, imageUrl: e.target.value })}
-                />
-              </div>
+              <ImageUploader
+                value={editingPhoto.imageUrl || ''}
+                onChange={url => setEditingPhoto({ ...editingPhoto, imageUrl: url })}
+                label="Photograph (Direct Upload or Link)"
+                required
+                helpText="Choose a photo directly from your device, capture with camera, or paste URL."
+              />
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                 <div className="form-group">

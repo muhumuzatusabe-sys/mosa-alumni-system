@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MOSAEvent, EventType, EventRegistrationRequirement } from '../types';
 import { dataService } from '../services/dataService';
 import { X, Calendar, Save, AlertCircle } from 'lucide-react';
+import { ImageUploader } from './ImageUploader';
 
 interface Props {
   isOpen: boolean;
@@ -277,14 +278,12 @@ export const EventFormModal: React.FC<Props> = ({
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Banner Image URL</label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
+              <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <ImageUploader
                   value={eventImage}
-                  onChange={e => setEventImage(e.target.value)}
-                  className="form-input"
+                  onChange={setEventImage}
+                  label="Event Banner Image (Direct Upload or Link)"
+                  helpText="Upload a banner directly from your device, or paste a banner image URL."
                 />
               </div>
             </div>

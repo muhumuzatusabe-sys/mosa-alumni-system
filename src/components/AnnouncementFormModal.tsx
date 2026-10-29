@@ -7,6 +7,7 @@ import {
   Chapter 
 } from '../types';
 import { dataService } from '../services/dataService';
+import { ImageUploader } from './ImageUploader';
 import { 
   X, 
   Send, 
@@ -365,18 +366,12 @@ export const AnnouncementFormModal: React.FC<Props> = ({
             </div>
 
             {/* Cover Image */}
-            <div style={{ marginBottom: '1.25rem' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.35rem' }}>
-                Cover Image URL (Optional)
-              </label>
-              <input
-                type="url"
-                placeholder="https://images.unsplash.com/..."
-                value={coverImage}
-                onChange={e => setCoverImage(e.target.value)}
-                style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem' }}
-              />
-            </div>
+            <ImageUploader
+              value={coverImage}
+              onChange={setCoverImage}
+              label="Cover Image (Direct Upload or Link)"
+              helpText="Upload a circular banner or notice image from your device."
+            />
 
             {/* Delivery Channels & Pinned */}
             <div style={{ background: '#F8FAFC', padding: '1rem', borderRadius: '10px', border: '1px solid #E2E8F0', marginBottom: '1.5rem' }}>

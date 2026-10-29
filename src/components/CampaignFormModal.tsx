@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DonationCampaign, CampaignCategory, CampaignStatus } from '../types';
 import { dataService } from '../services/dataService';
 import { X, AlertCircle } from 'lucide-react';
+import { ImageUploader } from './ImageUploader';
 
 interface Props {
   isOpen: boolean;
@@ -177,18 +178,12 @@ export const CampaignFormModal: React.FC<Props> = ({
             />
           </div>
 
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.35rem' }}>
-              Cover Image URL (Optional)
-            </label>
-            <input
-              type="url"
-              placeholder="https://images.unsplash.com/..."
-              value={coverImage}
-              onChange={e => setCoverImage(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.9rem' }}
-            />
-          </div>
+          <ImageUploader
+            value={coverImage}
+            onChange={setCoverImage}
+            label="Cover Image (Direct Upload or Link)"
+            helpText="Upload a campaign photo from your phone or computer, or paste a link."
+          />
 
           {campaignToEdit && (
             <div style={{ marginBottom: '1.25rem' }}>

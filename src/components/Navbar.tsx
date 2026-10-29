@@ -183,23 +183,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div 
           className="brand-wrapper" 
           onClick={() => handleTabClick('home')} 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', flexShrink: 0, textDecoration: 'none' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', flexShrink: 1, minWidth: 0, textDecoration: 'none' }}
         >
-          <div className="massh-crest" style={{ width: '40px', height: '40px', fontSize: '0.9rem', boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)' }}>
+          <div className="massh-crest" style={{ width: '38px', height: '38px', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)', flexShrink: 0 }}>
             <span>MASSH</span>
           </div>
-          <div className="brand-text">
-            <h1 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
-              MASSH ALUMNI PORTAL
+          <div className="brand-text" style={{ minWidth: 0, overflow: 'hidden' }}>
+            <h1 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span className="hidden sm:inline">MASSH ALUMNI PORTAL</span>
+              <span className="sm:hidden">MOSA PORTAL</span>
             </h1>
-            <div className="subtext" style={{ fontSize: '0.68rem', color: '#FCD34D', letterSpacing: '0.03em', fontWeight: 600 }}>
-              MOSA — Mandela Old Students Association • Est. 1997
+            <div className="subtext" style={{ fontSize: '0.68rem', color: '#FCD34D', letterSpacing: '0.03em', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              MOSA • Est. 1997
             </div>
           </div>
         </div>
 
         {/* Right Area: Actionable Notifications, Member Identity Pass / Auth, and Far-Right Admin Panel (Exclusively Staff) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0, marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0, marginLeft: 'auto' }}>
           
           {/* Notifications Button (Dedicated Notifications View Trigger) */}
           <button
