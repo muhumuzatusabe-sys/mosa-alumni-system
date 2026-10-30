@@ -1244,7 +1244,7 @@ export interface WelcomePageConfig {
   officialPhone?: string; // e.g. "+256 782 123456"
   officialWhatsApp?: string; // e.g. "256782123456"
   officialAddress?: string; // e.g. "Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda"
-  officialWebsite?: string; // e.g. "https://mtech-46634.web.app" or "https://massh.ac.ug"
+  officialWebsite?: string; // e.g. "https://mandelassalumni.com"
 
   // Draft handles & contacts
   draftSocialX?: string;
@@ -1266,4 +1266,46 @@ export interface MemberExportFilter {
   cohortYear?: number | 'ALL';
   officeId?: string | 'ALL';
   searchTerm?: string;
+}
+
+export interface MemberPdfExportResult {
+  filename: string;
+  doc: any;
+}
+
+// ==========================================
+// SECRETARIAT OFFICIAL CONTACTS
+// ==========================================
+
+export interface SecretariatContact {
+  id: string;
+  name: string;
+  title: string;
+  publishedPhone: string;
+  whatsAppNumber?: string;
+  email?: string;
+  officeCategory?: OfficeCategory;
+  status: 'ACTIVE' | 'INACTIVE';
+  displayOrder?: number;
+  notes?: string;
+  updatedAt?: string;
+}
+
+// ==========================================
+// LEGACY ALUMNI REGISTRY
+// ==========================================
+
+export interface LegacyAlumniRecord {
+  id?: string;
+  fullName: string;
+  membershipNumber: string;
+  cohortYear?: number | string;
+  phone?: string;
+  email?: string;
+  profession?: string;
+  chapter?: string;
+  notes?: string;
+  importedAt?: string;
+  verifiedStatus?: string;
+  [key: string]: any;
 }

@@ -106,7 +106,7 @@ export async function runAlumniRegistrationAccessGateTests() {
     'dataService.isUserRegisteredAlumni correctly returns true for registered alumnus'
   );
 
-  console.log('✅ ALL Alumni Registration Access Gate tests PASSED successfully!');
+  console.log('[SUCCESS] ALL Alumni Registration Access Gate tests PASSED successfully!');
 }
 
 if (typeof require !== 'undefined' && require.main === module) {

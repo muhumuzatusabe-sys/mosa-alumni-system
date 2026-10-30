@@ -31,7 +31,7 @@ import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { ElectionsHub } from './components/ElectionsHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
-import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2 } from 'lucide-react';
+import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2, Music } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Application Mode: Member Portal vs Dedicated Admin Control Panel
@@ -292,24 +292,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // ==============================================================
-  // 2.5. SUPER ADMIN FORCED PASSWORD CHANGE (Requirement Section 4)
-  // Blocks admin dashboard access until initial temporary password replaced
-  // ==============================================================
-  if (currentUser && currentUser.mustChangePassword && (currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN')) {
-    return (
-      <SuperAdminPasswordChangeModal
-        currentUser={currentUser}
-        onSuccess={() => {
-          const updated = dataService.getCurrentUser();
-          if (updated) setCurrentUser(updated);
-        }}
-        onCancel={() => {
-          handleLogout();
-        }}
-      />
-    );
-  }
+
 
   // ==============================================================
   // 3. OPTIONAL ALUMNI ONBOARDING (Requirement Section 3 & 4)
@@ -693,13 +676,13 @@ export const App: React.FC = () => {
                   fontWeight: 800,
                 }}
               >
-                ♪
+                <Music size={13} />
               </a>
 
               {/* Gmail / Email */}
               <a
-                href="mailto:masshalumni@gmail.com"
-                title="Email MOSA Secretariat"
+                href="mailto:mosaalumni31@gmail.com"
+                title="Email MOSA Secretariat (mosaalumni31@gmail.com)"
                 style={{
                   width: '28px',
                   height: '28px',
@@ -720,17 +703,22 @@ export const App: React.FC = () => {
             </div>
 
             <div style={{ color: '#94A3B8', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <span>Tel: +256 782 123456</span>
-              <span>•</span>
-              <span>WhatsApp: +256 782 123456</span>
+              <span>Tel: +256 772 411921, +256 706599793, +256 773432413</span>
               <span>•</span>
               <a 
-                href="https://mtech-46634.web.app" 
+                href="mailto:mosaalumni31@gmail.com" 
+                style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
+              >
+                mosaalumni31@gmail.com
+              </a>
+              <span>•</span>
+              <a 
+                href="https://mandelassalumni.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
               >
-                mtech-46634.web.app
+                mandelassalumni.com
               </a>
             </div>
           </div>

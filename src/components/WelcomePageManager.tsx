@@ -72,12 +72,12 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
       setSocialX(cfg.draftSocialX ?? cfg.socialX ?? 'https://x.com/Masshalumni');
       setSocialLinkedIn(cfg.draftSocialLinkedIn ?? cfg.socialLinkedIn ?? 'https://linkedin.com/company/mosa-massh');
-      setSocialGmail(cfg.draftSocialGmail ?? cfg.socialGmail ?? 'secretariat@massh.ac.ug');
+      setSocialGmail(cfg.draftSocialGmail ?? cfg.socialGmail ?? 'mosaalumni31@gmail.com');
       setSocialTikTok(cfg.draftSocialTikTok ?? cfg.socialTikTok ?? 'https://tiktok.com/@mosa_massh');
-      setOfficialPhone(cfg.draftOfficialPhone ?? cfg.officialPhone ?? '+256 782 123456');
-      setOfficialWhatsApp(cfg.draftOfficialWhatsApp ?? cfg.officialWhatsApp ?? '256782123456');
+      setOfficialPhone(cfg.draftOfficialPhone ?? cfg.officialPhone ?? '+256 772 411921');
+      setOfficialWhatsApp(cfg.draftOfficialWhatsApp ?? cfg.officialWhatsApp ?? '256772411921');
       setOfficialAddress(cfg.draftOfficialAddress ?? cfg.officialAddress ?? 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda');
-      setOfficialWebsite(cfg.draftOfficialWebsite ?? cfg.officialWebsite ?? 'https://mtech-46634.web.app');
+      setOfficialWebsite(cfg.draftOfficialWebsite ?? cfg.officialWebsite ?? 'https://mandelassalumni.com');
       setIntroMessage(cfg.draftIntroMessage || cfg.introMessage);
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
       setCarouselImages(
@@ -1008,7 +1008,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
                 type="text"
                 value={officialPhone}
                 onChange={(e) => setOfficialPhone(e.target.value)}
-                placeholder="+256 782 123456"
+                placeholder="+256 772 411921"
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.8rem',
@@ -1031,7 +1031,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
                 type="text"
                 value={officialWhatsApp}
                 onChange={(e) => setOfficialWhatsApp(e.target.value)}
-                placeholder="256782123456"
+                placeholder="256772411921"
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.8rem',
@@ -1054,7 +1054,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
                 type="url"
                 value={officialWebsite}
                 onChange={(e) => setOfficialWebsite(e.target.value)}
-                placeholder="https://mtech-46634.web.app"
+                placeholder="https://mandelassalumni.com"
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.8rem',

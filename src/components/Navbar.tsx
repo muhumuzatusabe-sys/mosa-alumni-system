@@ -122,14 +122,14 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  // Member Identity Card Details (matching Makerere portal format: MUHUMUZA Tusabe, STUDENT NO.: 2400707132)
+  // Member Identity Card Details
   const memberDisplayName = memberProfile?.fullName || 
     (memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : currentUser?.displayName) || 
-    (currentUser ? 'MUHUMUZA Tusabe' : 'GUEST ALUMNUS');
+    (currentUser?.email ? currentUser.email.split('@')[0] : 'Guest Visitor');
 
   const memberNumber = memberProfile?.alumniNumber || 
     currentUser?.alumniNumber || 
-    (currentUser ? 'ALUMNI NO.: 2400707132' : 'ALUMNI NO.: NOT VERIFIED');
+    (currentUser ? 'MA. PENDING' : 'NOT VERIFIED');
 
   const memberPhoto = memberProfile?.photoUrl || 
     currentUser?.photoUrl || 
@@ -203,11 +203,31 @@ export const Navbar: React.FC<NavbarProps> = ({
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
             }}
           />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748B' }}>Hi,</span>
-            <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', letterSpacing: '0.02em' }}>
-              {(memberProfile?.lastName || memberProfile?.firstName || currentUser?.displayName?.split(' ')[0] || 'ALUMNUS').toUpperCase()}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            {currentUser ? (
+              <span 
+                style={{ 
+                  fontSize: '0.84rem', 
+                  fontWeight: 800, 
+                  color: '#064E3B', 
+                  letterSpacing: '0.04em',
+                  background: '#ECFDF5',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '6px',
+                  border: '1px solid #A7F3D0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                <Award size={13} color="#059669" />
+                <span>{memberNumber}</span>
+              </span>
+            ) : (
+              <span style={{ fontSize: '0.84rem', fontWeight: 700, color: '#059669' }}>
+                Sign In
+              </span>
+            )}
             <ChevronDown size={14} color="#64748B" />
           </div>
         </div>
@@ -401,8 +421,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Top Header: MASSH Crest & Green Uppercase Institution Title */}
             <div className="mosa-portal-menu-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
-                <div className="massh-crest" style={{ width: '36px', height: '36px', fontSize: '0.8rem', flexShrink: 0 }}>
-                  <span>MASSH</span>
+                <div style={{ width: '36px', height: '41px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src="/images/mosa-logo.svg" alt="MASSH Crest" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
                 <div className="mosa-portal-inst-title">
                   MANDELA SECONDARY SCHOOL HOIMA

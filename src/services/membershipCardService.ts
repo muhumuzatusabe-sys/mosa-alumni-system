@@ -69,12 +69,12 @@ export const DEFAULT_CARD_SETTINGS: MembershipCardSettings = {
   chairmanMosa: {
     title: 'Chairman MOSA',
     name: 'Chairman MOSA',
-    signatureDataUrl: svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 120, 48)),
+    signatureDataUrl: svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 120, 48)),
   },
   chairmanBog: {
     title: 'Chairman BOG Massh',
-    name: 'Chairman BOG MASSH',
-    signatureDataUrl: svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 120, 48)),
+    name: 'Chairman BOG Massh',
+    signatureDataUrl: svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 120, 48)),
   },
   crestDataUrl: svgToDataUrl(getMosaCrestSvg(140)),
   validityYears: 0, // 0 = Permanent / Non-expiring by default
@@ -94,6 +94,19 @@ export const membershipCardService = {
     }
     try {
       const parsed = JSON.parse(raw);
+      // Auto-migrate if stored settings contain outdated email, website or crest
+      if (
+        !parsed.email || 
+        parsed.email.includes('masshalumni') || 
+        parsed.website?.includes('web.app') ||
+        !parsed.crestDataUrl
+      ) {
+        parsed.email = DEFAULT_CARD_SETTINGS.email;
+        parsed.website = DEFAULT_CARD_SETTINGS.website;
+        parsed.phoneNumbers = DEFAULT_CARD_SETTINGS.phoneNumbers;
+        parsed.crestDataUrl = DEFAULT_CARD_SETTINGS.crestDataUrl;
+        storage.set(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_CARD_SETTINGS, ...parsed }));
+      }
       return { ...DEFAULT_CARD_SETTINGS, ...parsed };
     } catch {
       return { ...DEFAULT_CARD_SETTINGS };

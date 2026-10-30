@@ -1466,8 +1466,8 @@ export const AdminApplicationReview: React.FC<Props> = ({
                             <td style={{ padding: '0.5rem 0.75rem' }}>{item.record.cohortYear || '-'}</td>
                             <td style={{ padding: '0.5rem 0.75rem' }}>
                               {item.duplicate ? (
-                                <span style={{ color: '#991B1B', fontWeight: 700 }}>
-                                  ⚠️ Duplicate: {item.reason}
+                                <span style={{ color: '#991B1B', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                  <AlertTriangle size={13} style={{ color: '#DC2626' }} /> Duplicate: {item.reason}
                                 </span>
                               ) : (
                                 <span style={{ color: '#166534', fontWeight: 700 }}>

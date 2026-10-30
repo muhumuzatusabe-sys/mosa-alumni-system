@@ -16,9 +16,9 @@ export async function runVerificationTests(): Promise<{ passed: boolean; report:
 
   const assert = (condition: boolean, msg: string) => {
     if (condition) {
-      report.push(`✅ PASS: ${msg}`);
+      report.push(`[PASS]: ${msg}`);
     } else {
-      report.push(`❌ FAIL: ${msg}`);
+      report.push(`[FAIL]: ${msg}`);
       allPassed = false;
     }
   };
@@ -159,7 +159,7 @@ export async function runVerificationTests(): Promise<{ passed: boolean; report:
     assert(finalAlumni.length === 0, `Purge baseline reset alumni count to 0 (found: ${finalAlumni.length})`);
 
   } catch (err: any) {
-    report.push(`❌ FATAL ERROR: ${err.message || String(err)}`);
+    report.push(`[FATAL ERROR]: ${err.message || String(err)}`);
     allPassed = false;
   }
 

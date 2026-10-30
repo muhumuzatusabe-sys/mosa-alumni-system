@@ -46,7 +46,8 @@ import {
   Key,
   Phone,
   BookOpen,
-  ShieldAlert
+  ShieldAlert,
+  Crown
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -138,6 +139,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [securityConfirmPass, setSecurityConfirmPass] = useState('');
   const [securityMsg, setSecurityMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [securityLoading, setSecurityLoading] = useState(false);
+
+  // Executive and Super Admin credential update states
+  const [execAdminPassInput, setExecAdminPassInput] = useState('');
+  const [confirmExecAdminPassInput, setConfirmExecAdminPassInput] = useState('');
+  const [execPassMsg, setExecPassMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [superAdminNewPassInput, setSuperAdminNewPassInput] = useState('');
+  const [confirmSuperAdminNewPassInput, setConfirmSuperAdminNewPassInput] = useState('');
+  const [superPassMsg, setSuperPassMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
   const [moduleSettings, setModuleSettings] = useState<ModuleSettings>({
@@ -234,21 +243,71 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [auditActionNotice, setAuditActionNotice] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [isProcessingAudit, setIsProcessingAudit] = useState(false);
 
-  // Permissions helper
-  const canAccessRegistry = governanceService.can(currentUser, 'REGISTRY', 'VIEW');
-  const canAccessAttendance = governanceService.can(currentUser, 'ATTENDANCE', 'VIEW');
-  const canAccessOpportunities = governanceService.can(currentUser, 'OPPORTUNITIES', 'VIEW');
-  const canAccessElections = governanceService.can(currentUser, 'ELECTIONS', 'VIEW');
-  const canAccessSettings = governanceService.can(currentUser, 'SETTINGS', 'VIEW');
-  const canAccessStaff = governanceService.can(currentUser, 'USERS', 'VIEW');
-  const canAccessDocs = governanceService.can(currentUser, 'DOCUMENTS', 'VIEW');
-  const canAccessAudit = governanceService.can(currentUser, 'AUDIT', 'VIEW');
-  const canAccessCMS = governanceService.can(currentUser, 'SETTINGS', 'EDIT') || currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role === 'PUBLICITY';
-  const canAccessLeadership = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'USERS', 'VIEW');
-  const canAccessSecretariat = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || currentUser.role === 'SECRETARY' || governanceService.can(currentUser, 'COMMUNICATIONS', 'EDIT');
-  const canAccessWelcomePage = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'SETTINGS', 'EDIT');
-  const canAccessExports = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN' || governanceService.can(currentUser, 'REPORTS', 'EXPORT');
-  const canAccessSecurity = currentUser.role === 'SUPER_ADMIN' || currentUser.role === 'ADMIN';
+  // Active Session & Super Admin Elevation State
+  const [activeUser, setActiveUser] = useState<AuthUser>(currentUser);
+  const [isElevateModalOpen, setIsElevateModalOpen] = useState(false);
+  const [superAdminPassInput, setSuperAdminPassInput] = useState('');
+  const [showSuperAdminPass, setShowSuperAdminPass] = useState(false);
+  const [superAdminError, setSuperAdminError] = useState('');
+  const [superAdminSuccess, setSuperAdminSuccess] = useState('');
+  const [isElevating, setIsElevating] = useState(false);
+
+  useEffect(() => {
+    setActiveUser(currentUser);
+  }, [currentUser]);
+
+  const handleElevateToSuperAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuperAdminError('');
+    setSuperAdminSuccess('');
+    if (!superAdminPassInput.trim()) {
+      setSuperAdminError('Please enter the Super Admin password.');
+      return;
+    }
+    setIsElevating(true);
+    try {
+      const res = await dataService.elevateToSuperAdmin(superAdminPassInput);
+      if (res.success && res.user) {
+        setActiveUser(res.user);
+        setSuperAdminSuccess('Super Admin elevation granted! Master administrative powers active.');
+        setTimeout(() => {
+          setIsElevateModalOpen(false);
+          setSuperAdminPassInput('');
+          setSuperAdminSuccess('');
+        }, 1200);
+      } else {
+        setSuperAdminError(res.error || 'Invalid Super Admin password.');
+      }
+    } catch (err: any) {
+      setSuperAdminError(err.message || 'Error verifying Super Admin password.');
+    } finally {
+      setIsElevating(false);
+    }
+  };
+
+  const handleDowngradeToAdmin = async () => {
+    const res = await dataService.downgradeToStandardAdmin();
+    if (res.user) {
+      setActiveUser(res.user);
+    }
+  };
+
+  // Permissions helpers evaluated against activeUser
+  const isSuperAdmin = activeUser.role === 'SUPER_ADMIN';
+  const canAccessRegistry = governanceService.can(activeUser, 'REGISTRY', 'VIEW');
+  const canAccessAttendance = governanceService.can(activeUser, 'ATTENDANCE', 'VIEW');
+  const canAccessOpportunities = governanceService.can(activeUser, 'OPPORTUNITIES', 'VIEW');
+  const canAccessElections = governanceService.can(activeUser, 'ELECTIONS', 'VIEW');
+  const canAccessSettings = governanceService.can(activeUser, 'SETTINGS', 'VIEW') || isSuperAdmin;
+  const canAccessStaff = governanceService.can(activeUser, 'USERS', 'VIEW') || isSuperAdmin;
+  const canAccessDocs = governanceService.can(activeUser, 'DOCUMENTS', 'VIEW');
+  const canAccessAudit = governanceService.can(activeUser, 'AUDIT', 'VIEW');
+  const canAccessCMS = governanceService.can(activeUser, 'SETTINGS', 'EDIT') || isSuperAdmin || activeUser.role === 'ADMIN' || activeUser.role === 'PUBLICITY';
+  const canAccessLeadership = isSuperAdmin || activeUser.role === 'ADMIN' || governanceService.can(activeUser, 'USERS', 'VIEW');
+  const canAccessSecretariat = isSuperAdmin || activeUser.role === 'ADMIN' || activeUser.role === 'SECRETARY' || governanceService.can(activeUser, 'COMMUNICATIONS', 'EDIT');
+  const canAccessWelcomePage = isSuperAdmin || activeUser.role === 'ADMIN' || governanceService.can(activeUser, 'SETTINGS', 'EDIT');
+  const canAccessExports = isSuperAdmin || activeUser.role === 'ADMIN' || governanceService.can(activeUser, 'REPORTS', 'EXPORT');
+  const canAccessSecurity = true; // Always visible in nav; content restricted to Super Admin
 
   useEffect(() => {
     loadAllAdminData();
@@ -734,13 +793,89 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            {/* Super Admin Status or Unlock Button */}
+            {isSuperAdmin ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.2)',
+                  border: '1.5px solid #F59E0B',
+                  color: '#FDE68A',
+                  padding: '0.4rem 0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  boxShadow: '0 0 12px rgba(245, 158, 11, 0.3)'
+                }}>
+                  <Crown size={15} color="#FBBF24" />
+                  <span>SUPER ADMIN (Master Powers Active)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDowngradeToAdmin}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    color: '#FFFFFF',
+                    borderRadius: '8px',
+                    padding: '0.4rem 0.7rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Relinquish Super Admin master powers and return to Executive Administrator mode"
+                >
+                  <Lock size={13} />
+                  <span>Lock</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                id="btn-unlock-super-admin"
+                onClick={() => {
+                  setSuperAdminPassInput('');
+                  setSuperAdminError('');
+                  setSuperAdminSuccess('');
+                  setIsElevateModalOpen(true);
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  color: '#0A271B',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.45rem 0.95rem',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  boxShadow: '0 2px 10px rgba(245, 158, 11, 0.35)',
+                  transition: 'transform 0.15s ease',
+                }}
+                title="Authenticate with Super Admin password to unlock overall system control"
+              >
+                <Crown size={15} color="#0A271B" />
+                <span>Sign In as Super Admin</span>
+              </button>
+            )}
+
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFFFFF' }}>{currentUser.displayName}</div>
-              <div style={{ fontSize: '0.72rem', color: '#FBBF24', fontWeight: 600 }}>{currentUser.role}</div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#FFFFFF' }}>{activeUser.displayName}</div>
+              <div style={{ fontSize: '0.72rem', color: isSuperAdmin ? '#FBBF24' : '#CBD5E1', fontWeight: 600 }}>
+                {isSuperAdmin ? 'Super Administrator' : 'Executive Administrator'}
+              </div>
             </div>
-            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#FFFFFF' }}>
-              {currentUser.displayName.charAt(0)}
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: isSuperAdmin ? '#D97706' : '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#FFFFFF' }}>
+              {activeUser.displayName.charAt(0)}
             </div>
           </div>
         </div>
@@ -1105,33 +1240,32 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             )}
 
             {/* 6. SUPER ADMIN SECURITY */}
-            {canAccessSecurity && (
-              <button
-                onClick={() => {
-                  setActiveSection('security');
-                  setRegistryDropdownOpen(false);
-                  setApprovalsDropdownOpen(false);
-                }}
-                style={{
-                  padding: '0.65rem 1.15rem',
-                  borderRadius: '10px',
-                  border: activeSection === 'security' ? '2px solid #0B203E' : '1px solid #CBD5E1',
-                  background: activeSection === 'security' ? '#0B203E' : '#FFFFFF',
-                  color: activeSection === 'security' ? '#FFFFFF' : '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.6rem',
-                  boxShadow: activeSection === 'security' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <Lock size={17} color={activeSection === 'security' ? '#FBBF24' : '#D97706'} />
-                <span>Security</span>
-              </button>
-            )}
+            <button
+              onClick={() => {
+                setActiveSection('security');
+                setRegistryDropdownOpen(false);
+                setApprovalsDropdownOpen(false);
+              }}
+              style={{
+                padding: '0.65rem 1.15rem',
+                borderRadius: '10px',
+                border: activeSection === 'security' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                background: activeSection === 'security' ? '#0B203E' : (isSuperAdmin ? '#FEF3C7' : '#FFFFFF'),
+                color: activeSection === 'security' ? '#FFFFFF' : (isSuperAdmin ? '#92400E' : '#334155'),
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                boxShadow: activeSection === 'security' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Crown size={17} color={activeSection === 'security' ? '#FBBF24' : '#D97706'} />
+              <span>Security & Passwords</span>
+              {!isSuperAdmin && <Lock size={12} color="#94A3B8" />}
+            </button>
 
           </div>
 
@@ -1527,7 +1661,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {/* SECTION: LEADERSHIP & OFFICES */}
         {activeSection === 'leadership' && canAccessLeadership && (
           <LeadershipOfficesManager
-            currentUser={currentUser}
+            currentUser={activeUser}
             onRefreshData={loadAllAdminData}
           />
         )}
@@ -1535,7 +1669,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {/* SECTION: WELCOME PAGE MANAGEMENT */}
         {activeSection === 'welcome_page' && canAccessWelcomePage && (
           <WelcomePageManager
-            currentUser={currentUser}
+            currentUser={activeUser}
             onRefreshPortal={onRefreshData}
           />
         )}
@@ -1543,153 +1677,279 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {/* SECTION: MEMBER DATA EXPORTS */}
         {activeSection === 'exports' && canAccessExports && (
           <MemberDataExportManager
-            currentUser={currentUser}
+            currentUser={activeUser}
           />
         )}
 
         {/* SECTION: SECRETARIAT & WHATSAPP COMMUNICATIONS */}
         {activeSection === 'secretariat' && canAccessSecretariat && (
           <SecretariatManager
-            currentUser={currentUser}
+            currentUser={activeUser}
           />
         )}
 
-        {/* SECTION: SUPER ADMIN SECURITY */}
-        {activeSection === 'security' && canAccessSecurity && (
+        {/* SECTION: SUPER ADMIN SECURITY & CREDENTIALS */}
+        {activeSection === 'security' && !isSuperAdmin && (
+          <div className="mosa-card" style={{ padding: '3.5rem 2rem', textAlign: 'center', maxWidth: '620px', margin: '2rem auto' }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: '#FEF3C7',
+              border: '2px solid #FCD34D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem auto'
+            }}>
+              <Crown size={32} color="#D97706" />
+            </div>
+            <h2 style={{ fontSize: '1.45rem', color: '#0B203E', margin: '0 0 0.5rem 0', fontWeight: 800 }}>
+              Super Admin Authentication Required
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '0.92rem', lineHeight: 1.55, margin: '0 0 1.75rem 0' }}>
+              Credential security, administrative master keys, and system governance overrides are restricted exclusively to the Super Admin. Please sign in with the Super Admin password to configure executive credentials and powers.
+            </p>
+            <button
+              onClick={() => {
+                setSuperAdminPassInput('');
+                setSuperAdminError('');
+                setSuperAdminSuccess('');
+                setIsElevateModalOpen(true);
+              }}
+              style={{
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                color: '#0A271B',
+                border: 'none',
+                borderRadius: '10px',
+                padding: '0.85rem 1.85rem',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.35)',
+              }}
+            >
+              <Crown size={18} />
+              <span>Unlock Super Admin Powers</span>
+            </button>
+          </div>
+        )}
+
+        {activeSection === 'security' && isSuperAdmin && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-            <div className="mosa-card" style={{ padding: '1.75rem' }}>
+            
+            {/* Header Card */}
+            <div className="mosa-card" style={{ padding: '1.75rem', borderLeft: '4px solid #D97706' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
-                <Lock size={22} color="#D97706" />
-                <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
-                  Super Admin Account & Credential Security
+                <Crown size={24} color="#D97706" />
+                <h2 style={{ fontSize: '1.4rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                  Super Admin Credential & Master Governance Suite
                 </h2>
               </div>
-              <p style={{ color: '#64748B', fontSize: '0.88rem', margin: '0 0 1.5rem 0' }}>
-                Manage administrator credentials, verify active security controls, and protect governance authorization.
+              <p style={{ color: '#64748B', fontSize: '0.88rem', margin: '0 0 0.5rem 0' }}>
+                As Super Admin, you hold overall system powers. Configure the single Executive Admin Password used by executive members to access the panel, as well as your Super Admin master password.
               </p>
+            </div>
 
-              {securityMsg && (
-                <div style={{
-                  padding: '0.85rem 1.15rem',
-                  borderRadius: '10px',
-                  marginBottom: '1.5rem',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  background: securityMsg.type === 'success' ? '#ECFDF5' : '#FEF2F2',
-                  color: securityMsg.type === 'success' ? '#065F46' : '#991B1B',
-                  border: `1px solid ${securityMsg.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
-                }}>
-                  {securityMsg.text}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+              {/* CARD 1: Executive Admin Password */}
+              <div className="mosa-card" style={{ padding: '1.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <ShieldCheck size={20} color="#059669" />
+                  <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                    1. Executive Admin Password
+                  </h3>
                 </div>
-              )}
+                <p style={{ color: '#64748B', fontSize: '0.82rem', margin: '0 0 1.25rem 0', lineHeight: 1.45 }}>
+                  The single password required for executive members to access the administration dashboard. Nothing else is asked at the gate.
+                </p>
 
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setSecurityMsg(null);
-                  if (!securityCurrentPass) {
-                    setSecurityMsg({ text: 'Please enter your current password.', type: 'error' });
-                    return;
-                  }
-                  if (securityNewPass.length < 8) {
-                    setSecurityMsg({ text: 'New password must be at least 8 characters long.', type: 'error' });
-                    return;
-                  }
-                  if (securityNewPass !== securityConfirmPass) {
-                    setSecurityMsg({ text: 'New password and confirmation do not match.', type: 'error' });
-                    return;
-                  }
-                  setSecurityLoading(true);
-                  try {
-                    const res = await dataService.changeSuperAdminPassword(
-                      securityNewPass,
-                      securityCurrentPass,
-                      currentUser.email
-                    );
-                    if (res.success) {
-                      setSecurityMsg({ text: 'Password successfully changed and updated in secure storage.', type: 'success' });
-                      setSecurityCurrentPass('');
-                      setSecurityNewPass('');
-                      setSecurityConfirmPass('');
-                    } else {
-                      setSecurityMsg({ text: res.error || 'Failed to update password.', type: 'error' });
+                {execPassMsg && (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    background: execPassMsg.type === 'success' ? '#ECFDF5' : '#FEF2F2',
+                    color: execPassMsg.type === 'success' ? '#065F46' : '#991B1B',
+                    border: `1px solid ${execPassMsg.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
+                  }}>
+                    {execPassMsg.text}
+                  </div>
+                )}
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setExecPassMsg(null);
+                    if (!execAdminPassInput || execAdminPassInput.length < 4) {
+                      setExecPassMsg({ text: 'Admin password must be at least 4 characters long.', type: 'error' });
+                      return;
                     }
-                  } catch (err: any) {
-                    setSecurityMsg({ text: err.message || 'Error updating password.', type: 'error' });
-                  } finally {
-                    setSecurityLoading(false);
-                  }
-                }}
-                style={{ maxWidth: '520px', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}
-              >
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                    Current Administrator Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={securityCurrentPass}
-                    onChange={e => setSecurityCurrentPass(e.target.value)}
-                    className="input-field"
-                    placeholder="Enter current password"
-                    style={{ width: '100%', padding: '0.65rem' }}
-                  />
-                </div>
+                    if (execAdminPassInput !== confirmExecAdminPassInput) {
+                      setExecPassMsg({ text: 'Passwords do not match.', type: 'error' });
+                      return;
+                    }
+                    dataService.setAdminPasswords({ adminPass: execAdminPassInput });
+                    setExecPassMsg({ text: 'Executive Admin password successfully updated!', type: 'success' });
+                    setExecAdminPassInput('');
+                    setConfirmExecAdminPassInput('');
+                  }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                >
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      New Executive Admin Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={execAdminPassInput}
+                      onChange={e => setExecAdminPassInput(e.target.value)}
+                      placeholder="e.g. admin123"
+                      style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', boxSizing: 'border-box' }}
+                    />
+                  </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                    New Super Admin Password (min 8 characters)
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={securityNewPass}
-                    onChange={e => setSecurityNewPass(e.target.value)}
-                    className="input-field"
-                    placeholder="Enter new strong password"
-                    style={{ width: '100%', padding: '0.65rem' }}
-                  />
-                </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Confirm New Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={confirmExecAdminPassInput}
+                      onChange={e => setConfirmExecAdminPassInput(e.target.value)}
+                      placeholder="Re-enter password"
+                      style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', boxSizing: 'border-box' }}
+                    />
+                  </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                    Confirm New Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={securityConfirmPass}
-                    onChange={e => setSecurityConfirmPass(e.target.value)}
-                    className="input-field"
-                    placeholder="Confirm new password"
-                    style={{ width: '100%', padding: '0.65rem' }}
-                  />
-                </div>
-
-                <div style={{ marginTop: '0.5rem' }}>
                   <button
                     type="submit"
-                    disabled={securityLoading}
                     style={{
-                      background: '#0B203E',
-                      color: '#FCD34D',
+                      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                      color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '8px',
-                      padding: '0.75rem 1.4rem',
+                      padding: '0.75rem',
                       fontWeight: 700,
                       fontSize: '0.9rem',
-                      cursor: securityLoading ? 'not-allowed' : 'pointer',
-                      display: 'inline-flex',
+                      cursor: 'pointer',
+                      display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '0.5rem',
+                      boxShadow: '0 4px 10px rgba(5, 150, 105, 0.25)',
                     }}
                   >
-                    <Lock size={16} />
-                    <span>{securityLoading ? 'Updating Password...' : 'Save New Administrator Password'}</span>
+                    <Save size={16} />
+                    <span>Save Executive Admin Password</span>
                   </button>
+                </form>
+              </div>
+
+              {/* CARD 2: Super Admin Master Password */}
+              <div className="mosa-card" style={{ padding: '1.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <Crown size={20} color="#D97706" />
+                  <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                    2. Super Admin Master Password
+                  </h3>
                 </div>
-              </form>
+                <p style={{ color: '#64748B', fontSize: '0.82rem', margin: '0 0 1.25rem 0', lineHeight: 1.45 }}>
+                  The master authorization password used inside the admin panel to elevate to overall powers and assign executive staff privileges.
+                </p>
+
+                {superPassMsg && (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    background: superPassMsg.type === 'success' ? '#ECFDF5' : '#FEF2F2',
+                    color: superPassMsg.type === 'success' ? '#065F46' : '#991B1B',
+                    border: `1px solid ${superPassMsg.type === 'success' ? '#A7F3D0' : '#FECACA'}`,
+                  }}>
+                    {superPassMsg.text}
+                  </div>
+                )}
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSuperPassMsg(null);
+                    if (!superAdminNewPassInput || superAdminNewPassInput.length < 6) {
+                      setSuperPassMsg({ text: 'Super Admin password must be at least 6 characters long.', type: 'error' });
+                      return;
+                    }
+                    if (superAdminNewPassInput !== confirmSuperAdminNewPassInput) {
+                      setSuperPassMsg({ text: 'Passwords do not match.', type: 'error' });
+                      return;
+                    }
+                    dataService.setAdminPasswords({ superAdminPass: superAdminNewPassInput });
+                    setSuperPassMsg({ text: 'Super Admin master password successfully updated!', type: 'success' });
+                    setSuperAdminNewPassInput('');
+                    setConfirmSuperAdminNewPassInput('');
+                  }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                >
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      New Super Admin Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={superAdminNewPassInput}
+                      onChange={e => setSuperAdminNewPassInput(e.target.value)}
+                      placeholder="e.g. superadmin123"
+                      style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                      Confirm Super Admin Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={confirmSuperAdminNewPassInput}
+                      onChange={e => setConfirmSuperAdminNewPassInput(e.target.value)}
+                      placeholder="Re-enter password"
+                      style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1.5px solid #CBD5E1', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    style={{
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                      color: '#0A271B',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '0.75rem',
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 10px rgba(217, 119, 6, 0.25)',
+                    }}
+                  >
+                    <Crown size={16} />
+                    <span>Save Super Admin Password</span>
+                  </button>
+                </form>
+              </div>
             </div>
 
             {/* Security Protections Summary */}
@@ -1719,8 +1979,8 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {activeSection === 'registry' && canAccessRegistry && (
           <div>
             <AdminApplicationReview
-              currentUser={currentUser}
-              adminEmail={currentUser.email}
+              currentUser={activeUser}
+              adminEmail={activeUser.email}
               activeTab={registrySubTab}
               onTabChange={(tab) => setRegistrySubTab(tab)}
               onAlumniCreated={() => {
@@ -1735,7 +1995,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             <ShieldAlert size={44} color="#DC2626" style={{ margin: '0 auto 1rem' }} />
             <h3 style={{ fontSize: '1.25rem', color: '#0B203E', margin: '0 0 0.5rem 0' }}>Registry Access Restricted</h3>
             <p style={{ color: '#64748B', maxWidth: '500px', margin: '0 auto' }}>
-              Your current administrative role (<strong>{currentUser.role}</strong>) does not have authorization to view or manage the alumni membership registry.
+              Your current administrative role (<strong>{activeUser.role}</strong>) does not have authorization to view or manage the alumni membership registry.
             </p>
           </div>
         )}
@@ -1743,14 +2003,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {/* SECTION 2: MEMBERS & APPROVALS (MEMBERSHIP ID CARDS) */}
         {activeSection === 'approvals' && approvalsSubTab === 'cards' && canAccessRegistry && (
           <div>
-            <MembershipCardAdmin currentUser={currentUser} />
+            <MembershipCardAdmin currentUser={activeUser} />
           </div>
         )}
 
         {/* SECTION 2: MEMBERS & APPROVALS (ATTENDANCE) */}
         {activeSection === 'approvals' && approvalsSubTab === 'attendance' && canAccessAttendance && (
           <div>
-            <AttendanceManager currentUser={currentUser} />
+            <AttendanceManager currentUser={activeUser} />
           </div>
         )}
 
@@ -2478,11 +2738,17 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             <div className="mosa-card" style={{ padding: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
-                  <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: 0 }}>Executive Leadership & Staff Accounts</h2>
-                  <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0 }}>
-                    Manage executive officers (Secretary, Treasurer, Publicity, Chapter Admins) and configure role-based access control.
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <h2 style={{ fontSize: '1.35rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>Executive Leadership & Admin Powers</h2>
+                    <span style={{ fontSize: '0.75rem', background: '#FEF3C7', color: '#92400E', padding: '0.2rem 0.55rem', borderRadius: '4px', fontWeight: 700 }}>
+                      Assigned by Super Admin
+                    </span>
+                  </div>
+                  <p style={{ color: '#64748B', fontSize: '0.88rem', margin: '0.2rem 0 0 0' }}>
+                    Executive members sign in using the Admin Password. The Super Admin assigns distinct roles and modular administrative powers to each officer.
                   </p>
-                </div>                {governanceService.can(currentUser, 'USERS', 'MANAGE') && (
+                </div>
+                {(isSuperAdmin || governanceService.can(activeUser, 'USERS', 'MANAGE')) && (
                   <button
                     className="btn btn-primary"
                     onClick={handleOpenAddStaff}
@@ -2492,6 +2758,57 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   </button>
                 )}
               </div>
+
+              {!isSuperAdmin && (
+                <div style={{
+                  background: '#FFFBEB',
+                  border: '1.5px solid #FCD34D',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1.15rem',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  flexWrap: 'wrap'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <Crown size={22} color="#D97706" style={{ flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#92400E' }}>
+                        Super Admin Powers Assignment
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#B45309', marginTop: '0.15rem' }}>
+                        Executive administrators receive different admin powers configured by the Super Admin. You are in standard view.
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSuperAdminPassInput('');
+                      setSuperAdminError('');
+                      setSuperAdminSuccess('');
+                      setIsElevateModalOpen(true);
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                      color: '#0A271B',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '0.5rem 1rem',
+                      fontWeight: 800,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <Crown size={15} />
+                    <span>Unlock Super Admin to Assign Powers</span>
+                  </button>
+                </div>
+              )}
 
               {staffSuccessMessage && (
                 <div style={{ marginBottom: '1.25rem', padding: '0.85rem', background: '#D1FAE5', border: '1px solid #10B981', borderRadius: '8px', color: '#065F46', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, fontSize: '0.85rem' }}>
@@ -2627,7 +2944,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                           </td>
                           <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-                              {governanceService.can(currentUser, 'USERS', 'MANAGE') && (
+                              {(isSuperAdmin || governanceService.can(activeUser, 'USERS', 'MANAGE')) && (
                                 <button
                                   onClick={() => handleOpenEditStaff(account)}
                                   style={{
@@ -2646,10 +2963,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                                   title="Edit Role & Permissions"
                                 >
                                   <Edit3 size={13} />
-                                  <span>Edit Scope</span>
+                                  <span>Edit Powers</span>
                                 </button>
                               )}
-                              {governanceService.can(currentUser, 'USERS', 'MANAGE') && account.role !== 'SUPER_ADMIN' && (
+                              {(isSuperAdmin || governanceService.can(activeUser, 'USERS', 'MANAGE')) && account.role !== 'SUPER_ADMIN' && (
                                 <button
                                   onClick={() => handleToggleStaffStatus(account)}
                                   style={{
@@ -3743,6 +4060,236 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      {/* ========================================================= */}
+      {/* SUPER ADMIN ELEVATION MODAL                                 */}
+      {/* ========================================================= */}
+      {isElevateModalOpen && (
+        <div 
+          className="modal-overlay" 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            background: 'rgba(10, 39, 27, 0.75)', 
+            backdropFilter: 'blur(5px)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 1200, 
+            padding: '1.25rem' 
+          }}
+        >
+          <div 
+            className="modal-content" 
+            style={{ 
+              maxWidth: '460px', 
+              width: '100%', 
+              background: '#FFFFFF', 
+              borderRadius: '16px', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(245, 158, 11, 0.3)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div 
+              style={{ 
+                background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)', 
+                borderBottom: '3px solid #D97706', 
+                padding: '1.5rem', 
+                color: '#FFFFFF',
+                position: 'relative'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div 
+                    style={{ 
+                      width: '42px', 
+                      height: '42px', 
+                      borderRadius: '50%', 
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+                    }}
+                  >
+                    <Crown size={22} color="#0A271B" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
+                      MOSA GOVERNANCE SUITE
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#FFFFFF' }}>
+                      Super Admin Authentication
+                    </h3>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsElevateModalOpen(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#FFFFFF'
+                  }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '1.5rem' }}>
+              <p style={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.5, margin: '0 0 1.25rem 0' }}>
+                Enter the Super Admin master password to elevate this session to overall system control, configure executive credentials, and assign administrative powers to executive officers.
+              </p>
+
+              {superAdminError && (
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                  background: '#FEF2F2',
+                  border: '1px solid #FECACA',
+                  color: '#991B1B',
+                  fontSize: '0.84rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <div>{superAdminError}</div>
+                </div>
+              )}
+
+              {superAdminSuccess && (
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  color: '#065F46',
+                  fontSize: '0.84rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontWeight: 600
+                }}>
+                  <CheckCircle2 size={16} color="#059669" style={{ flexShrink: 0 }} />
+                  <div>{superAdminSuccess}</div>
+                </div>
+              )}
+
+              <form onSubmit={handleElevateToSuperAdmin}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label 
+                    htmlFor="super-admin-pass-input"
+                    style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#1E293B', marginBottom: '0.45rem' }}
+                  >
+                    Super Admin Master Password
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <Lock
+                      size={18}
+                      color="#94A3B8"
+                      style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                    />
+                    <input
+                      id="super-admin-pass-input"
+                      type={showSuperAdminPass ? 'text' : 'password'}
+                      autoFocus
+                      required
+                      value={superAdminPassInput}
+                      onChange={e => setSuperAdminPassInput(e.target.value)}
+                      placeholder="Enter Super Admin password"
+                      style={{
+                        width: '100%',
+                        padding: '0.8rem 2.6rem 0.8rem 2.5rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #CBD5E1',
+                        fontSize: '0.95rem',
+                        boxSizing: 'border-box',
+                        outline: 'none',
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSuperAdminPass(!showSuperAdminPass)}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#94A3B8'
+                      }}
+                    >
+                      {showSuperAdminPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.45rem' }}>
+                    Default Master Password: <code style={{ background: '#F1F5F9', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>superadmin123</code>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsElevateModalOpen(false)}
+                    style={{
+                      padding: '0.75rem 1.15rem',
+                      borderRadius: '8px',
+                      background: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      color: '#475569',
+                      fontWeight: 600,
+                      fontSize: '0.88rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isElevating}
+                    style={{
+                      padding: '0.75rem 1.4rem',
+                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                      color: '#0A271B',
+                      border: 'none',
+                      fontWeight: 800,
+                      fontSize: '0.88rem',
+                      cursor: isElevating ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                      boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+                    }}
+                  >
+                    <Crown size={16} />
+                    <span>{isElevating ? 'Authenticating...' : 'Unlock Super Admin'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

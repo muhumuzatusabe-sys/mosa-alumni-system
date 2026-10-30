@@ -792,7 +792,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                             </span>
                             {isWinner && (
                               <span style={{ fontSize: '0.7rem', background: '#FEF3C7', color: '#B45309', fontWeight: 800, padding: '0.1rem 0.45rem', borderRadius: '4px', border: '1px solid #FDE68A' }}>
-                                ELECTED / LEADING 👑
+                                ELECTED / LEADING
                               </span>
                             )}
                           </div>

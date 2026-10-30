@@ -80,10 +80,11 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
   ];
 
   const faqs: FaqItem[] = content?.faqs && content.faqs.length > 0 ? content.faqs : defaultFaqs;
-  const emails: string[] = content?.emails && content.emails.length > 0 ? content.emails : ['info@massh.ac.ug', 'alumni@massh.ac.ug'];
+  const emails: string[] = content?.emails && content.emails.length > 0 ? content.emails : ['mosaalumni31@gmail.com'];
   const phoneNumbers: string[] = content?.phoneNumbers && content.phoneNumbers.length > 0 ? content.phoneNumbers : [
-    '+256 772 123 456 (General Secretariat)',
-    '+256 701 987 654 (Treasury & Membership)'
+    '+256 772 411921',
+    '+256 706599793',
+    '+256 773432413'
   ];
 
   return (
@@ -279,12 +280,12 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
                 <div>
                   <div style={{ fontWeight: 600, color: '#FFFFFF', fontSize: '0.95rem' }}>Official Alumni Portal</div>
                   <a 
-                    href="https://mtech-46634.web.app" 
+                    href="https://mandelassalumni.com" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     style={{ color: '#FDE68A', fontSize: '0.88rem', textDecoration: 'underline', fontWeight: 600 }}
                   >
-                    https://mtech-46634.web.app
+                    https://mandelassalumni.com
                   </a>
                 </div>
               </div>

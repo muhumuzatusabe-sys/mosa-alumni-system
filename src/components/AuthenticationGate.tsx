@@ -91,9 +91,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
       if (res.success) {
         setRegistrationStep('otp_verification');
         setSuccessMessage(`A 6-digit verification code has been dispatched to ${cleanEmail}. Please enter it below to confirm your email.`);
-        if (res.code) {
-          setSimulatedOtpNotice(res.code);
-        }
+        setSimulatedOtpNotice(null);
         setResendCooldown(60);
         const timer = setInterval(() => {
           setResendCooldown((prev) => {
@@ -182,22 +180,21 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
     setErrorMessage('');
     setSuccessMessage('');
 
-    const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail || !password) {
-      setErrorMessage('Please enter your administrator email and password.');
+    if (!password || !password.trim()) {
+      setErrorMessage('Please enter the administrative password.');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await dataService.login(cleanEmail, password, 'admin');
+      const res = await dataService.verifyAdminPasswordOnly(password);
       if (res.success && res.user) {
         setSuccessMessage('Administrator authenticated. Launching control console...');
         setTimeout(() => {
           onLoginSuccess(res.user!);
-        }, 500);
+        }, 400);
       } else {
-        setErrorMessage(res.error || 'Administrator authentication failed. Unauthorized credentials.');
+        setErrorMessage(res.error || 'Incorrect administrator password. Please try again.');
       }
     } catch (err: any) {
       setErrorMessage('Administrator authentication service error.');
@@ -367,8 +364,8 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
           </p>
         </div>
 
-        {/* Tab Switcher (Create Account vs Log In) */}
-        {authMode !== 'admin-login' && authMode !== 'reset-password' && (
+        {/* Tab Switcher (Create Account vs Log In) - Hidden in Admin Mode */}
+        {portal !== 'admin' && authMode !== 'admin-login' && authMode !== 'reset-password' && (
           <div
             style={{
               display: 'flex',
@@ -737,19 +734,23 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       {email}
                     </div>
 
-                    {simulatedOtpNotice && (
-                      <div style={{
-                        marginTop: '0.75rem',
-                        padding: '0.5rem 0.75rem',
-                        background: '#FEF3C7',
-                        border: '1px dashed #D97706',
-                        borderRadius: '8px',
-                        fontSize: '0.78rem',
-                        color: '#92400E'
-                      }}>
-                        Verification Code: <strong style={{ fontSize: '1rem', letterSpacing: '2px', color: '#78350F' }}>{simulatedOtpNotice}</strong>
+                    <div style={{
+                      marginTop: '0.75rem',
+                      padding: '0.65rem 0.85rem',
+                      background: '#F0FDF4',
+                      border: '1px solid #86EFAC',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      color: '#166534',
+                      lineHeight: 1.45,
+                      textAlign: 'left'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+                        <Mail size={16} />
+                        <span>Check Your Inbox</span>
                       </div>
-                    )}
+                      A 6-digit confirmation code was sent to your email. Please check your inbox (and spam/junk folder) and enter it below.
+                    </div>
                   </div>
 
                   <div style={{ marginBottom: '1.25rem' }}>
@@ -1148,130 +1149,58 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
             </form>
           )}
 
-          {/* VIEW 4: SEPARATE DISCREET ADMINISTRATOR ACCESS (Section 6) */}
+          {/* VIEW 4: PURE PASSWORD-ONLY ADMINISTRATOR ACCESS */}
           {authMode === 'admin-login' && (
             <form onSubmit={handleAdminLogin}>
               <div
                 style={{
                   background: '#FEF3C7',
-                  border: '1px solid #FDE68A',
-                  borderRadius: '10px',
-                  padding: '0.85rem 1rem',
-                  marginBottom: '1.25rem',
+                  border: '1.5px solid #FCD34D',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  marginBottom: '1.5rem',
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '0.65rem',
+                  gap: '0.75rem',
                 }}
               >
-                <ShieldCheck size={20} color="#B45309" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#92400E' }}>
-                    MOSA Secretariat & Administrator Gate
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#B45309', marginTop: '0.15rem' }}>
-                    Restricted to authorized MASSH executive officers and system administrators.
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Fill Credentials for Testing */}
-              <div style={{ marginBottom: '1.25rem', padding: '0.65rem 0.85rem', background: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '0.4rem' }}>
-                  Quick Access Demo Credentials:
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('admin@massh.ac.ug');
-                      setPassword('admin123');
-                    }}
-                    style={{
-                      background: '#0B203E',
-                      color: '#FCD34D',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.65rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Super Admin (admin@massh.ac.ug)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('secretary@massh.ac.ug');
-                      setPassword('admin123');
-                    }}
-                    style={{
-                      background: '#113D2B',
-                      color: '#FDE68A',
-                      border: 'none',
-                      borderRadius: '6px',
-                      padding: '0.35rem 0.65rem',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Secretary (secretary@massh.ac.ug)
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ marginBottom: '1.1rem' }}>
-                <label
-                  htmlFor="admin-email"
+                <div
                   style={{
-                    display: 'block',
-                    fontSize: '0.82rem',
-                    fontWeight: 700,
-                    color: '#1E293B',
-                    marginBottom: '0.4rem',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: '#B45309',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
                   }}
                 >
-                  Administrator Email
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <Mail
-                    size={18}
-                    color="#94A3B8"
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                  />
-                  <input
-                    id="admin-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@massh.ac.ug"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1rem 0.75rem 2.6rem',
-                      border: '1.5px solid #CBD5E1',
-                      borderRadius: '10px',
-                      fontSize: '0.92rem',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#92400E' }}>
+                    MOSA Secretariat & Administrator Gate
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#B45309', marginTop: '0.2rem', lineHeight: 1.4 }}>
+                    Executive members sign in using the Admin Password. Nothing else is required.
+                  </div>
                 </div>
               </div>
 
-              <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ marginBottom: '1.5rem' }}>
                 <label
                   htmlFor="admin-password"
                   style={{
                     display: 'block',
-                    fontSize: '0.82rem',
+                    fontSize: '0.86rem',
                     fontWeight: 700,
                     color: '#1E293B',
-                    marginBottom: '0.4rem',
+                    marginBottom: '0.45rem',
                   }}
                 >
-                  Administrator Password
+                  Admin Password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock
@@ -1284,17 +1213,20 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter administrator password"
+                    placeholder="Enter admin password"
                     required
+                    autoFocus
                     style={{
                       width: '100%',
-                      padding: '0.75rem 2.7rem 0.75rem 2.6rem',
+                      padding: '0.85rem 2.7rem 0.85rem 2.6rem',
                       border: '1.5px solid #CBD5E1',
                       borderRadius: '10px',
-                      fontSize: '0.92rem',
+                      fontSize: '0.96rem',
                       outline: 'none',
                       boxSizing: 'border-box',
                     }}
+                    onFocus={(e) => (e.target.style.borderColor = '#B45309')}
+                    onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                   />
                   <button
                     type="button"
@@ -1315,6 +1247,9 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.45rem' }}>
+                  Default Admin Password: <code style={{ background: '#F1F5F9', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>admin123</code>
+                </div>
               </div>
 
               <button
@@ -1323,12 +1258,12 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 disabled={loading}
                 style={{
                   width: '100%',
-                  padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #92400E 0%, #78350F 100%)',
+                  padding: '0.9rem',
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',
-                  fontSize: '0.95rem',
+                  fontSize: '0.98rem',
                   fontWeight: 700,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.75 : 1,
@@ -1336,32 +1271,12 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.5rem',
-                  boxShadow: '0 4px 12px rgba(146, 64, 14, 0.28)',
+                  boxShadow: '0 4px 14px rgba(5, 150, 105, 0.3)',
                 }}
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
-                <span>Authenticate Administrator</span>
+                <span>Access Admin Panel</span>
               </button>
-
-              <div style={{ marginTop: '1.15rem', textAlign: 'center' }}>
-                <button
-                  type="button"
-                  onClick={() => handleSwitchMode('login')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#64748B',
-                    fontSize: '0.84rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                  }}
-                >
-                  <ArrowLeft size={14} /> Return to Member Log In
-                </button>
-              </div>
             </form>
           )}
         </div>

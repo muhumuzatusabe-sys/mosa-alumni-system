@@ -176,7 +176,7 @@ export const ChaptersMap: React.FC<Props> = ({
               color: '#F8FAFC',
               fontWeight: 600
             }}>
-              ⭐ Hoima Mother Chapter
+              Hoima Mother Chapter
             </div>
           </div>
 
@@ -267,7 +267,7 @@ export const ChaptersMap: React.FC<Props> = ({
                     boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
                     marginBottom: '2px'
                   }}>
-                    {pin.isHomeCampus && '⭐ '}{ch.code}
+                    {ch.code}
                   </div>
 
                   {/* Pin Circle / Kob Star */}

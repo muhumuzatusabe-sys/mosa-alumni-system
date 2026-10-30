@@ -59,9 +59,11 @@ import {
   WelcomePageConfig,
   CarouselImageItem,
   MemberExportFilter,
+  MemberPdfExportResult,
   SecretariatContact,
   LegacyAlumniRecord,
 } from '../types';
+import { emailService } from './emailService';
 import { jsPDF } from 'jspdf';
 import { db, auth, isFirebaseConfigured } from './firebase';
 import {
@@ -335,8 +337,8 @@ const defaultWebsiteContent: WebsiteContent = {
     subtitle: 'Reach out to the Mandela Old Students Association Secretariat, executive committee, or campus coordinators in Hoima.',
     campusAddress: 'Mandela Secondary School Hoima (MASSH), Main Campus, Hoima City, Bunyoro Sub-Region, Uganda',
     poBox: 'P.O. Box 284, Hoima City, Uganda',
-    phoneNumbers: ['+256 782 123456', '+256 701 654321'],
-    emails: ['secretariat@mosa-massh.ac.ug', 'admin@massh.ac.ug'],
+    phoneNumbers: ['+256 772 411921', '+256 706599793', '+256 773432413'],
+    emails: ['mosaalumni31@gmail.com'],
     workingHours: 'Monday – Friday: 8:00 AM – 5:00 PM EAT | Saturday: 9:00 AM – 1:00 PM EAT',
     faqs: [
       {
@@ -375,14 +377,14 @@ const defaultSeedUsers: AuthUser[] = [
     email: 'admin@massh.ac.ug',
     role: 'SUPER_ADMIN',
     displayName: 'Head of ICT / MOSA Admin',
-    mustChangePassword: true,
+    mustChangePassword: false,
   },
   {
     uid: 'admin-super-02',
     email: 'superadmin@mosa.org',
     role: 'SUPER_ADMIN',
     displayName: 'Executive Super Admin',
-    mustChangePassword: true,
+    mustChangePassword: false,
   },
   { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true, officeId: 'off-registry', officeTitle: 'Membership, Registry & Verification' },
   { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true, officeId: 'off-treasury', officeTitle: 'Honorary Treasury & Finance' },
@@ -542,12 +544,12 @@ const defaultWelcomePageConfig: WelcomePageConfig = {
   lastPublishedBy: 'admin@massh.ac.ug',
   socialX: 'https://x.com/Masshalumni',
   socialLinkedIn: 'https://linkedin.com/company/mosa-massh',
-  socialGmail: 'masshalumni@gmail.com',
+  socialGmail: 'mosaalumni31@gmail.com',
   socialTikTok: 'https://tiktok.com/@mosa_massh',
-  officialPhone: '+256 782 123456',
-  officialWhatsApp: '256782123456',
+  officialPhone: '+256 772 411921',
+  officialWhatsApp: '256772411921',
   officialAddress: 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda',
-  officialWebsite: 'https://mtech-46634.web.app',
+  officialWebsite: 'https://mandelassalumni.com',
 };
 
 const defaultSeedAlumni: AlumniProfile[] = [];
@@ -2424,57 +2426,11 @@ export const dataService = {
       }
     }
 
-    // Dispatch real email via SMTP / EmailJS service if available in window
+    // Dispatch real email via official emailService
     try {
-      const emailSubject = 'Your MOSA Alumni Portal Verification Code: ' + code;
-      const emailBody = `
-Dear MASSH Alumnus,
-
-Thank you for registering on the official MASSH Alumni Portal (Mandela Old Students Association).
-
-Your 6-digit email verification code is:
-
------------------------------
-        ${code}
------------------------------
-
-This code is valid for 10 minutes. If you did not request this registration, please disregard this email.
-
-Mandela Old Students Association (MOSA)
-Mandela Secondary School Hoima • Est. 1997
-"Caring to Achieve"
-Website: https://mtech-46634.web.app
-Official Contact: masshalumni@gmail.com
-      `.trim();
-
-      // 1. Try EmailJS if initialized or loaded
-      const emailjs = (window as any)?.emailjs;
-      if (emailjs && typeof emailjs.send === 'function') {
-        emailjs.send('default_service', 'template_otp', {
-          to_email: cleanEmail,
-          code: code,
-          message: emailBody,
-          from_name: 'MOSA Alumni Secretariat <masshalumni@gmail.com>'
-        }).catch(() => {});
-      }
-
-      // 2. Try SMTPJS via Gmail Relay using App Password
-      const Email = (window as any)?.Email;
-      if (Email && typeof Email.send === 'function') {
-        Email.send({
-          Host: 'smtp.gmail.com',
-          Username: 'masshalumni@gmail.com',
-          Password: 'mjsznxcdopesrwyu',
-          To: cleanEmail,
-          From: 'masshalumni@gmail.com',
-          Subject: emailSubject,
-          Body: emailBody.replace(/\n/g, '<br/>')
-        }).catch((err: any) => {
-          console.info('SMTP dispatch notice:', err);
-        });
-      }
+      await emailService.sendVerificationEmail(cleanEmail, code);
     } catch (mailErr) {
-      console.info('Client-side mail dispatch fallback:', mailErr);
+      console.warn('Email dispatch warning:', mailErr);
     }
 
     // Try sending verification code email via Firebase if available
@@ -2482,7 +2438,7 @@ Official Contact: masshalumni@gmail.com
       try {
         await sendPasswordResetEmail(auth, cleanEmail);
       } catch (err) {
-        // Silent catch; code display banner guarantees delivery
+        // Silent catch
       }
     }
 
@@ -2792,6 +2748,144 @@ Official Contact: masshalumni@gmail.com
 
       return { success: true, user: adminUser };
     }
+
+  // ----------------------------------------------------
+  // DEDICATED PASSWORD-ONLY ADMIN & SUPER ADMIN ACCESS
+  // ----------------------------------------------------
+  getAdminPasswords(): { adminPass: string; superAdminPass: string } {
+    const raw = safeStorage.getItem('mosa_admin_passwords');
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        return {
+          adminPass: parsed.adminPass || 'admin123',
+          superAdminPass: parsed.superAdminPass || 'superadmin123',
+        };
+      } catch {}
+    }
+    return {
+      adminPass: 'admin123',
+      superAdminPass: 'superadmin123',
+    };
+  },
+
+  setAdminPasswords(passwords: { adminPass?: string; superAdminPass?: string }): void {
+    const current = this.getAdminPasswords();
+    const updated = {
+      adminPass: passwords.adminPass?.trim() || current.adminPass,
+      superAdminPass: passwords.superAdminPass?.trim() || current.superAdminPass,
+    };
+    safeStorage.setItem('mosa_admin_passwords', JSON.stringify(updated));
+  },
+
+  async verifyAdminPasswordOnly(password: string): Promise<{ success: boolean; error?: string; user?: AuthUser }> {
+    const { adminPass, superAdminPass } = this.getAdminPasswords();
+    const input = password ? password.trim() : '';
+
+    if (!input) {
+      return { success: false, error: 'Please enter the administrative password.' };
+    }
+
+    // Direct Super Admin Password entry
+    if (input === superAdminPass) {
+      const superUser: AuthUser = {
+        uid: 'superadmin-master',
+        email: 'superadmin@massh.ac.ug',
+        displayName: 'Executive Super Admin',
+        role: 'SUPER_ADMIN',
+        mustChangePassword: false,
+      };
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(superUser));
+      await this.logAudit({
+        action: 'SUPER_ADMIN_LOGIN',
+        performedBy: 'superadmin@massh.ac.ug',
+        affectedRecord: 'superadmin-master',
+        metadata: { role: 'SUPER_ADMIN' },
+      });
+      return { success: true, user: superUser };
+    }
+
+    // Standard Executive Admin Password entry
+    if (input === adminPass) {
+      const adminUser: AuthUser = {
+        uid: 'admin-exec',
+        email: 'admin@massh.ac.ug',
+        displayName: 'Executive Administrator',
+        role: 'ADMIN',
+        mustChangePassword: false,
+      };
+      safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(adminUser));
+      await this.logAudit({
+        action: 'ADMIN_LOGIN',
+        performedBy: 'admin@massh.ac.ug',
+        affectedRecord: 'admin-exec',
+        metadata: { role: 'ADMIN' },
+      });
+      return { success: true, user: adminUser };
+    }
+
+    return { 
+      success: false, 
+      error: 'Incorrect administrator password. Please check and try again.' 
+    };
+  },
+
+  async elevateToSuperAdmin(password: string): Promise<{ success: boolean; error?: string; user?: AuthUser }> {
+    const { superAdminPass } = this.getAdminPasswords();
+    const input = password ? password.trim() : '';
+
+    if (!input) {
+      return { success: false, error: 'Please enter the Super Admin password.' };
+    }
+
+    if (input !== superAdminPass) {
+      return { success: false, error: 'Invalid Super Admin password. Elevation denied.' };
+    }
+
+    const current = this.getCurrentUser();
+    const elevatedUser: AuthUser = {
+      ...(current || {
+        uid: 'superadmin-master',
+        email: 'superadmin@massh.ac.ug',
+      }),
+      displayName: current?.displayName || 'Executive Super Admin',
+      role: 'SUPER_ADMIN',
+      mustChangePassword: false,
+    };
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(elevatedUser));
+    await this.logAudit({
+      action: 'ELEVATE_SUPER_ADMIN',
+      performedBy: elevatedUser.email,
+      affectedRecord: elevatedUser.uid,
+      metadata: { role: 'SUPER_ADMIN' },
+    });
+
+    return { success: true, user: elevatedUser };
+  },
+
+  async downgradeToStandardAdmin(): Promise<{ success: boolean; user: AuthUser }> {
+    const current = this.getCurrentUser();
+    const downgradedUser: AuthUser = {
+      ...(current || {
+        uid: 'admin-exec',
+        email: 'admin@massh.ac.ug',
+      }),
+      displayName: 'Executive Administrator',
+      role: 'ADMIN',
+      mustChangePassword: false,
+    };
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(downgradedUser));
+    await this.logAudit({
+      action: 'DOWNGRADE_TO_ADMIN',
+      performedBy: downgradedUser.email,
+      affectedRecord: downgradedUser.uid,
+      metadata: { role: 'ADMIN' },
+    });
+
+    return { success: true, user: downgradedUser };
+  },
 
     // ----------------------------------------------------
     // PORTAL 2: ALUMNI & REGISTERED USERS SIGN IN
@@ -5445,7 +5539,15 @@ Official Contact: masshalumni@gmail.com
     const raw = safeStorage.getItem(STORAGE_KEYS.WELCOME_PAGE);
     if (!raw) return defaultWelcomePageConfig;
     try {
-      return { ...defaultWelcomePageConfig, ...JSON.parse(raw) };
+      const parsed = JSON.parse(raw);
+      if (parsed.socialGmail === 'masshalumni@gmail.com' || parsed.officialPhone?.includes('782 123456')) {
+        parsed.socialGmail = defaultWelcomePageConfig.socialGmail;
+        parsed.officialPhone = defaultWelcomePageConfig.officialPhone;
+        parsed.officialWhatsApp = defaultWelcomePageConfig.officialWhatsApp;
+        parsed.officialWebsite = defaultWelcomePageConfig.officialWebsite;
+        safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify({ ...defaultWelcomePageConfig, ...parsed }));
+      }
+      return { ...defaultWelcomePageConfig, ...parsed };
     } catch {
       return defaultWelcomePageConfig;
     }
@@ -6056,7 +6158,7 @@ Official Contact: masshalumni@gmail.com
   async exportMembersToPdf(
     filter: MemberExportFilter, 
     actor: AuthUser
-  ): Promise<{ filename: string; doc: jsPDF }> {
+  ): Promise<MemberPdfExportResult> {
     const data = await this.getMembersForExport(filter);
     const dateStr = new Date().toISOString().split('T')[0];
     const filename = `MOSA_Member_Report_${dateStr}.pdf`;

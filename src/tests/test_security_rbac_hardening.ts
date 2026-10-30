@@ -17,14 +17,14 @@ import { AuthUser, UserRole } from '../types';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
-    console.error(`❌ FAIL: ${message}`);
+    console.error(`[FAIL]: ${message}`);
     throw new Error(`Assertion failed: ${message}`);
   }
 }
 
 export async function runSecurityRBACHardeningTests() {
   console.log('================================================================');
-  console.log('🛡️  MOSA END-TO-END SECURITY & RBAC HARDENING AUDIT');
+  console.log('[SECURITY AUDIT] MOSA END-TO-END SECURITY & RBAC HARDENING AUDIT');
   console.log('================================================================\n');
 
   let passed = 0;
@@ -291,7 +291,7 @@ export async function runSecurityRBACHardeningTests() {
   // SUMMARY
   // -------------------------------------------------------------
   console.log('================================================================');
-  console.log(`🎉 AUDIT COMPLETE: ALL ${passed} SECURITY & RBAC TESTS PASSED 100%!`);
+  console.log(`[SUCCESS] AUDIT COMPLETE: ALL ${passed} SECURITY & RBAC TESTS PASSED 100%!`);
   console.log('STATUS: SECURE, CONSTITUTIONALLY SOUND & HARDENED');
   console.log('================================================================\n');
 

@@ -635,8 +635,9 @@ export const BroadcastDesk: React.FC<Props> = ({ currentUser, onOpenAuth }) => {
                   whiteSpace: 'pre-wrap'
                 }}>
                   {title && (
-                    <div style={{ fontWeight: 800, marginBottom: '0.35rem', color: '#0B203E', fontSize: '0.84rem' }}>
-                      📢 {title}
+                    <div style={{ fontWeight: 800, marginBottom: '0.35rem', color: '#0B203E', fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Radio size={14} style={{ color: '#0B203E' }} />
+                      <span>{title}</span>
                     </div>
                   )}
                   {previewText}

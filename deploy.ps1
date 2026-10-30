@@ -24,7 +24,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "`n[3/4] Staging and committing changes to Git..." -ForegroundColor Yellow
 git add .
-git commit -m "feat(chapters): populate university chapters in registration wizard, remove map section from chapters hub, and deduplicate career hub menu item"
+git commit -m "feat(id-card): update official MOSA ID card format, institutional crest logo, contacts, and remove emojis"
 Write-Host "[OK] Staged and committed changes." -ForegroundColor Green
 
 Write-Host "`n[4/4] Pushing to GitHub (origin/main)..." -ForegroundColor Yellow
@@ -37,6 +37,7 @@ if ($LASTEXITCODE -eq 0) {
 
 Write-Host "`n==========================================================" -ForegroundColor Cyan
 Write-Host "   DEPLOYMENT PROCESS COMPLETE!" -ForegroundColor Green
-Write-Host "   Live URL:    https://mtech-46634.web.app" -ForegroundColor Green
-Write-Host "   GitHub Repo: https://github.com/muhumuzatusabe-sys/mosa-alumni-system" -ForegroundColor Green
+Write-Host "   Live Website: https://mandelassalumni.com" -ForegroundColor Green
+Write-Host "   Firebase URL: https://mtech-46634.web.app" -ForegroundColor Green
+Write-Host "   GitHub Repo:  https://github.com/muhumuzatusabe-sys/mosa-alumni-system" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Cyan

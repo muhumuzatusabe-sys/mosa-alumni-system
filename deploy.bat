@@ -11,7 +11,9 @@ set NODE_OPTIONS=--max-old-space-size=4096
 
 echo.
 echo [1/4] Building production bundle (TypeScript + Vite)...
-call npm.cmd run build
+if exist "node_modules\.tmp" rd /s /q "node_modules\.tmp"
+call npm.cmd run build > deploy_build.log 2>&1
+type deploy_build.log
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] Build failed! Aborting deployment.
@@ -22,7 +24,8 @@ echo [OK] Production bundle compiled successfully into ./dist
 
 echo.
 echo [2/4] Deploying to Firebase Hosting (mtech-46634)...
-call npx.cmd -y firebase-tools deploy
+call npx.cmd -y firebase-tools deploy > deploy_firebase.log 2>&1
+type deploy_firebase.log
 if %errorlevel% neq 0 (
     echo [WARNING] Firebase deploy reported an issue.
 ) else (
@@ -32,12 +35,13 @@ if %errorlevel% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(chapters): populate university chapters in registration wizard, remove map section from chapters hub, and deduplicate career hub menu item"
+git commit -m "feat(id-card): update official MOSA ID card format, institutional crest logo, contacts, and remove emojis"
 echo [OK] Staged and committed changes.
 
 echo.
 echo [4/4] Pushing to GitHub (origin/main)...
-git push origin main
+call git push origin main > deploy_git.log 2>&1
+type deploy_git.log
 if %errorlevel% equ 0 (
     echo [OK] Successfully pushed to origin/main!
 ) else (
@@ -47,7 +51,8 @@ if %errorlevel% equ 0 (
 echo.
 echo ==========================================================
 echo    DEPLOYMENT PROCESS COMPLETE!
-echo    Live URL:    https://mtech-46634.web.app
-echo    GitHub Repo: https://github.com/muhumuzatusabe-sys/mosa-alumni-system
+echo    Live Website: https://mandelassalumni.com
+echo    Firebase URL: https://mtech-46634.web.app
+echo    GitHub Repo:  https://github.com/muhumuzatusabe-sys/mosa-alumni-system
 echo ==========================================================
 pause

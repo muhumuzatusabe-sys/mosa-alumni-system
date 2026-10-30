@@ -25,7 +25,8 @@ import {
   Upload,
   Trash2,
   Image as ImageIcon,
-  Search
+  Search,
+  Users
 } from 'lucide-react';
 
 interface Props {
@@ -1778,9 +1779,9 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                                 </span>
                               </div>
                               <div style={{ fontSize: '0.8rem', color: '#475569', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                                <span>🏛️ {chap.institution}</span>
-                                <span>📍 {chap.location}</span>
-                                <span style={{ fontWeight: 600, color: '#D97706' }}>👥 {chap.memberCount} members</span>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Building2 size={13} style={{ color: '#64748B' }} /> {chap.institution}</span>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><MapPin size={13} style={{ color: '#64748B' }} /> {chap.location}</span>
+                                <span style={{ fontWeight: 600, color: '#D97706', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><Users size={13} style={{ color: '#D97706' }} /> {chap.memberCount} members</span>
                               </div>
                               <div style={{ fontSize: '0.78rem', color: '#64748B', lineHeight: '1.4' }}>
                                 {chap.description}

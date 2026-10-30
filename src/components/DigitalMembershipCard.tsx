@@ -16,7 +16,7 @@ import {
   Layers
 } from 'lucide-react';
 import QRCode from 'qrcode';
-import { MOSA_COLORS, getMosaCrestSvg, getMosaSignatureSvg, svgToDataUrl } from '../utils/mosaCrest';
+import { MOSA_COLORS, getMosaCrestSvg, getMosaSignatureSvg, getMosaWatermarkSvg, svgToDataUrl } from '../utils/mosaCrest';
 
 interface Props {
   alumnus: AlumniProfile;
@@ -123,9 +123,9 @@ export const DigitalMembershipCard: React.FC<Props> = ({
   };
 
   const crestUrl = settings?.crestDataUrl || svgToDataUrl(getMosaCrestSvg(140));
-  const holderSigUrl = alumnus.signatureUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 90, 36));
-  const chairmanMosaSigUrl = settings?.chairmanMosa?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 90, 36));
-  const chairmanBogSigUrl = settings?.chairmanBog?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 90, 36));
+  const holderSigUrl = alumnus.signatureUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));
+  const chairmanMosaSigUrl = settings?.chairmanMosa?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));
+  const chairmanBogSigUrl = settings?.chairmanBog?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));
 
   // Render Status Badge
   const renderStatusBadge = () => {
@@ -257,6 +257,24 @@ export const DigitalMembershipCard: React.FC<Props> = ({
       <div style={{ position: 'absolute', right: '3.5%', top: '4%', width: '14%', zIndex: 2 }}>
         <img src={crestUrl} alt="MASSH Crest" style={{ width: '100%', height: 'auto', display: 'block' }} />
       </div>
+
+      {/* Background Watermark Crest */}
+      <div 
+        style={{
+          position: 'absolute',
+          right: '-4%',
+          top: '4%',
+          width: '66%',
+          height: '92%',
+          pointerEvents: 'none',
+          zIndex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: 0.1
+        }}
+        dangerouslySetInnerHTML={{ __html: getMosaWatermarkSvg(270, 270, 0.12) }}
+      />
 
       {/* Main Content Area */}
       <div 
@@ -472,10 +490,30 @@ export const DigitalMembershipCard: React.FC<Props> = ({
         padding: '3% 6% 4.5% 6%',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        position: 'relative'
       }}>
+        {/* Background Watermark Crest */}
+        <div 
+          style={{
+            position: 'absolute',
+            left: '50%',
+            bottom: '-10%',
+            transform: 'translateX(-50%)',
+            width: '60%',
+            height: '110%',
+            pointerEvents: 'none',
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0.1
+          }}
+          dangerouslySetInnerHTML={{ __html: getMosaWatermarkSvg(220, 220, 0.12) }}
+        />
+
         {/* Authorisation Signatures */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 2 }}>
           {/* Chairman MOSA */}
           <div>
             <div style={{ width: '85px', height: '22px', display: 'flex', alignItems: 'center' }}>
@@ -499,7 +537,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Validated Scannable QR Code */}
+        {/* Validated Scannable QR Code with 4 Green Corner Framing Brackets */}
         <div 
           onClick={() => {
             if (onOpenPublicVerification) {
@@ -510,13 +548,22 @@ export const DigitalMembershipCard: React.FC<Props> = ({
           style={{
             position: 'relative',
             background: '#FFFFFF',
-            padding: '5px',
-            borderRadius: '6px',
-            border: '2px solid #589152', // Green bracket border
+            padding: '6px',
+            borderRadius: '4px',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+            zIndex: 2
           }}
         >
+          {/* Top-Left Bracket */}
+          <div style={{ position: 'absolute', top: '-3px', left: '-3px', width: '12px', height: '12px', borderTop: '2.5px solid #3B873E', borderLeft: '2.5px solid #3B873E', pointerEvents: 'none' }} />
+          {/* Top-Right Bracket */}
+          <div style={{ position: 'absolute', top: '-3px', right: '-3px', width: '12px', height: '12px', borderTop: '2.5px solid #3B873E', borderRight: '2.5px solid #3B873E', pointerEvents: 'none' }} />
+          {/* Bottom-Left Bracket */}
+          <div style={{ position: 'absolute', bottom: '-3px', left: '-3px', width: '12px', height: '12px', borderBottom: '2.5px solid #3B873E', borderLeft: '2.5px solid #3B873E', pointerEvents: 'none' }} />
+          {/* Bottom-Right Bracket */}
+          <div style={{ position: 'absolute', bottom: '-3px', right: '-3px', width: '12px', height: '12px', borderBottom: '2.5px solid #3B873E', borderRight: '2.5px solid #3B873E', pointerEvents: 'none' }} />
+
           {qrDataUrl ? (
             <img src={qrDataUrl} alt="Verification QR" style={{ width: '70px', height: '70px', display: 'block' }} />
           ) : (

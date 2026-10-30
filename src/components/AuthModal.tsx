@@ -14,7 +14,8 @@ import {
   ArrowRight,
   GraduationCap,
   Sparkles,
-  Lock
+  Lock,
+  Mail
 } from 'lucide-react';
 
 interface Props {
@@ -169,10 +170,8 @@ export const AuthModal: React.FC<Props> = ({
       const res = await dataService.sendRegistrationOtp(email);
       if (res.success) {
         setPwdStep('otp_verify');
-        setSuccessMsg(`A 6-digit verification code has been dispatched to ${email}. Please enter it below.`);
-        if (res.code) {
-          setSimulatedOtpNotice(res.code);
-        }
+        setSuccessMsg(`A 6-digit verification code has been dispatched to ${email}. Please check your inbox and enter it below.`);
+        setSimulatedOtpNotice(null);
         setResendCooldown(60);
         const timer = setInterval(() => {
           setResendCooldown((prev) => {
@@ -230,15 +229,21 @@ export const AuthModal: React.FC<Props> = ({
     }
   };
 
-  // Handle Administrator Sign In
+  // Handle Administrator Sign In (Password Only - nothing else asked)
   const handleAdminSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
+
+    if (!password || !password.trim()) {
+      setErrorMsg('Please enter the administrative password.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await dataService.login(email, password, 'admin');
+      const res = await dataService.verifyAdminPasswordOnly(password);
       if (res.success && res.user) {
         setSuccessMsg('Administrative access granted. Welcome!');
         setTimeout(() => {
@@ -246,7 +251,7 @@ export const AuthModal: React.FC<Props> = ({
           onClose();
         }, 300);
       } else {
-        setErrorMsg(res.error || 'Administrator credentials invalid.');
+        setErrorMsg(res.error || 'Incorrect administrator password. Please try again.');
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'An error occurred during administrative sign in.');
@@ -348,67 +353,69 @@ export const AuthModal: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Portal Switcher Tabs */}
-          <div 
-            style={{ 
-              display: 'flex', 
-              background: 'rgba(0, 0, 0, 0.25)', 
-              padding: '0.25rem', 
-              borderRadius: '10px', 
-              marginTop: '1rem',
-              gap: '0.25rem'
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => handleSwitchPortal('alumni')}
-              style={{
-                flex: 1,
-                padding: '0.5rem 0.75rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: portal === 'alumni' ? '#FFFFFF' : 'transparent',
-                color: portal === 'alumni' ? '#113D2B' : '#E5DFD1',
-                fontWeight: portal === 'alumni' ? 700 : 500,
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.4rem',
-                transition: 'all 0.2s',
-                boxShadow: portal === 'alumni' ? '0 2px 4px rgba(0,0,0,0.15)' : 'none'
+          {/* Portal Switcher Tabs - Strictly Hidden in Admin Mode */}
+          {portal !== 'admin' && (
+            <div 
+              style={{ 
+                display: 'flex', 
+                background: 'rgba(0, 0, 0, 0.25)', 
+                padding: '0.25rem', 
+                borderRadius: '10px', 
+                marginTop: '1rem',
+                gap: '0.25rem'
               }}
             >
-              <UserCheck size={15} color={portal === 'alumni' ? '#113D2B' : '#E5DFD1'} />
-              <span>Alumni Member</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchPortal('alumni')}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: portal === 'alumni' ? '#FFFFFF' : 'transparent',
+                  color: portal === 'alumni' ? '#113D2B' : '#E5DFD1',
+                  fontWeight: portal === 'alumni' ? 700 : 500,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.2s',
+                  boxShadow: portal === 'alumni' ? '0 2px 4px rgba(0,0,0,0.15)' : 'none'
+                }}
+              >
+                <UserCheck size={15} color={portal === 'alumni' ? '#113D2B' : '#E5DFD1'} />
+                <span>Alumni Member</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => handleSwitchPortal('admin')}
-              style={{
-                flex: 1,
-                padding: '0.5rem 0.75rem',
-                borderRadius: '8px',
-                border: 'none',
-                background: portal === 'admin' ? '#FFFFFF' : 'transparent',
-                color: portal === 'admin' ? '#113D2B' : '#E5DFD1',
-                fontWeight: portal === 'admin' ? 700 : 500,
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.4rem',
-                transition: 'all 0.2s',
-                boxShadow: portal === 'admin' ? '0 2px 4px rgba(0,0,0,0.15)' : 'none'
-              }}
-            >
-              <ShieldCheck size={15} color={portal === 'admin' ? '#C68A24' : '#E5DFD1'} />
-              <span>Administrator</span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => handleSwitchPortal('admin')}
+                style={{
+                  flex: 1,
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: portal === 'admin' ? '#FFFFFF' : 'transparent',
+                  color: portal === 'admin' ? '#113D2B' : '#E5DFD1',
+                  fontWeight: portal === 'admin' ? 700 : 500,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.2s',
+                  boxShadow: portal === 'admin' ? '0 2px 4px rgba(0,0,0,0.15)' : 'none'
+                }}
+              >
+                <ShieldCheck size={15} color={portal === 'admin' ? '#C68A24' : '#E5DFD1'} />
+                <span>Administrator</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Modal Content Body */}
@@ -894,19 +901,23 @@ export const AuthModal: React.FC<Props> = ({
                       {email}
                     </div>
 
-                    {simulatedOtpNotice && (
-                      <div style={{
-                        marginTop: '0.65rem',
-                        padding: '0.45rem 0.65rem',
-                        background: '#FEF3C7',
-                        border: '1px dashed #D97706',
-                        borderRadius: '8px',
-                        fontSize: '0.76rem',
-                        color: '#92400E'
-                      }}>
-                        Verification Code: <strong style={{ fontSize: '0.95rem', letterSpacing: '2px', color: '#78350F' }}>{simulatedOtpNotice}</strong>
+                    <div style={{
+                      marginTop: '0.65rem',
+                      padding: '0.55rem 0.75rem',
+                      background: '#F0FDF4',
+                      border: '1px solid #86EFAC',
+                      borderRadius: '8px',
+                      fontSize: '0.78rem',
+                      color: '#166534',
+                      lineHeight: 1.45,
+                      textAlign: 'left'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+                        <Mail size={16} />
+                        <span>Check Your Inbox</span>
                       </div>
-                    )}
+                      A 6-digit confirmation code was sent to your email. Please check your inbox (and spam/junk folder) and enter it below.
+                    </div>
                   </div>
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
@@ -1016,60 +1027,65 @@ export const AuthModal: React.FC<Props> = ({
               {/* Admin Banner */}
               <div 
                 style={{ 
-                  background: '#FFFBEB', 
-                  border: '1px solid #FDE68A', 
-                  borderRadius: '10px', 
-                  padding: '0.85rem 1rem', 
+                  background: '#FEF3C7', 
+                  border: '1.5px solid #FCD34D', 
+                  borderRadius: '12px', 
+                  padding: '1rem', 
                   marginBottom: '1.25rem',
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: '0.75rem'
                 }}
               >
-                <Lock size={20} color="#B45309" style={{ flexShrink: 0 }} />
-                <div style={{ fontSize: '0.8rem', color: '#92400E', lineHeight: 1.45 }}>
-                  <strong>Restricted Administrative Access:</strong> This console is designated for MASSH Secretariat and system administrators with a dedicated administrative password.
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: '#B45309',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#92400E' }}>
+                    Executive Administrative Access
+                  </div>
+                  <div style={{ fontSize: '0.8rem', color: '#B45309', marginTop: '0.2rem', lineHeight: 1.4 }}>
+                    Authorized members sign in using the Admin Password. Nothing else is required.
+                  </div>
                 </div>
               </div>
 
               <form onSubmit={handleAdminSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
-                    Administrator Email
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    className="form-input"
-                    placeholder="e.g. admin@massh.ac.ug"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    style={{
-                      padding: '0.75rem 0.9rem',
-                      borderRadius: '8px',
-                      border: '1px solid #D1D5DB',
-                      fontSize: '0.9rem'
-                    }}
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
-                    Administrator Password
+                  <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#113D2B', display: 'block', marginBottom: '0.45rem' }}>
+                    Admin Password
                   </label>
                   <div style={{ position: 'relative' }}>
+                    <Lock
+                      size={18}
+                      color="#94A3B8"
+                      style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                    />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
+                      autoFocus
                       className="form-input"
-                      placeholder="••••••••"
+                      placeholder="Enter admin password"
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       style={{
-                        padding: '0.75rem 2.5rem 0.75rem 0.9rem',
-                        borderRadius: '8px',
-                        border: '1px solid #D1D5DB',
-                        fontSize: '0.9rem',
+                        padding: '0.8rem 2.6rem 0.8rem 2.6rem',
+                        borderRadius: '10px',
+                        border: '1.5px solid #CBD5E1',
+                        fontSize: '0.95rem',
                         width: '100%',
                         boxSizing: 'border-box'
                       }}
@@ -1091,6 +1107,9 @@ export const AuthModal: React.FC<Props> = ({
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
+                  <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.45rem' }}>
+                    Default Admin Password: <code style={{ background: '#F1F5F9', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>admin123</code>
+                  </div>
                 </div>
 
                 <button
@@ -1100,83 +1119,48 @@ export const AuthModal: React.FC<Props> = ({
                   style={{
                     marginTop: '0.5rem',
                     padding: '0.85rem',
-                    borderRadius: '8px',
-                    background: '#C68A24',
-                    color: '#0A271B',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                    color: '#FFFFFF',
                     fontWeight: 700,
-                    fontSize: '0.92rem',
+                    fontSize: '0.95rem',
                     border: 'none',
                     cursor: loading ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    boxShadow: '0 4px 10px rgba(198, 138, 36, 0.25)'
+                    boxShadow: '0 4px 12px rgba(5, 150, 105, 0.28)'
                   }}
                 >
                   <ShieldCheck size={18} />
-                  <span>{loading ? 'Authenticating...' : 'Sign In as Administrator'}</span>
+                  <span>{loading ? 'Authenticating...' : 'Access Admin Panel'}</span>
                 </button>
               </form>
             </div>
           )}
 
-          {/* Quick Administrator Credentials Panel */}
-          <div 
-            style={{ 
-              marginTop: '1.5rem', 
-              padding: '0.85rem', 
-              background: '#F8F6F0', 
-              border: '1px dashed #E5DFD1', 
-              borderRadius: '10px',
-              fontSize: '0.78rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.5rem' }}>
-              <ShieldCheck size={14} color="#C68A24" />
-              <span>Official Administrator Access:</span>
+          {/* Quick Member Help Panel only for alumni mode */}
+          {portal === 'alumni' && (
+            <div 
+              style={{ 
+                marginTop: '1.5rem', 
+                padding: '0.85rem', 
+                background: '#F8F6F0', 
+                border: '1px dashed #E5DFD1', 
+                borderRadius: '10px',
+                fontSize: '0.78rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.35rem' }}>
+                <GraduationCap size={14} color="#C68A24" />
+                <span>Need assistance signing into your alumni account?</span>
+              </div>
+              <div style={{ color: '#64748B', fontSize: '0.75rem', lineHeight: 1.45 }}>
+                Ensure you use the email address associated with your MASSH registration. For support, contact secretariat@massh.ac.ug.
+              </div>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('admin')}
-                style={{
-                  padding: '0.45rem 0.6rem',
-                  background: '#FFFFFF',
-                  border: '1px solid #FDE68A',
-                  borderRadius: '6px',
-                  fontSize: '0.73rem',
-                  color: '#B45309',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
-                🛡️ ICT Super Admin
-                <div style={{ fontSize: '0.67rem', color: '#92400E', fontWeight: 400 }}>admin@massh.ac.ug</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickFill('superadmin')}
-                style={{
-                  padding: '0.45rem 0.6rem',
-                  background: '#FFFFFF',
-                  border: '1px solid #FDE68A',
-                  borderRadius: '6px',
-                  fontSize: '0.73rem',
-                  color: '#B45309',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
-                🛡️ Executive Admin
-                <div style={{ fontSize: '0.67rem', color: '#92400E', fontWeight: 400 }}>superadmin@mosa.org</div>
-              </button>
-            </div>
-          </div>
+          )}
 
         </div>
       </div>
