@@ -2747,7 +2747,7 @@ export const dataService = {
       });
 
       return { success: true, user: adminUser };
-    }
+    },
 
   // ----------------------------------------------------
   // DEDICATED PASSWORD-ONLY ADMIN & SUPER ADMIN ACCESS
