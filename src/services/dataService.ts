@@ -2747,8 +2747,64 @@ export const dataService = {
       });
 
       return { success: true, user: adminUser };
-    },
+    }
 
+    // ----------------------------------------------------
+    // PORTAL 2: ALUMNI & MEMBER SIGN IN
+    // ----------------------------------------------------
+    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    let matchedUser = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+
+    if (!matchedUser) {
+      const alumniList = await this.getAlumniList();
+      const matchedAlumnus = alumniList.find(a => a.email && a.email.toLowerCase() === cleanEmail);
+      if (matchedAlumnus) {
+        matchedUser = {
+          uid: matchedAlumnus.internalId,
+          email: matchedAlumnus.email,
+          displayName: matchedAlumnus.fullName,
+          role: 'ALUMNI',
+          alumniId: matchedAlumnus.internalId,
+          alumniNumber: matchedAlumnus.alumniNumber,
+        };
+      }
+    }
+
+    if (!matchedUser) {
+      const app = await this.getApplicationByEmail(cleanEmail);
+      if (app) {
+        return {
+          success: false,
+          error: `Your application (${app.applicationNumber || 'Pending'}) is currently under Secretariat review. You will receive an email once approved.`,
+        };
+      }
+      return {
+        success: false,
+        error: 'No registered member account was found with this email address. Please register or verify your credentials.',
+      };
+    }
+
+    if (userCred?.password) {
+      if (!password || password !== userCred.password) {
+        return { success: false, error: 'Incorrect member password. Please check your credentials.' };
+      }
+    }
+
+    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(matchedUser));
+    await this.logAudit({
+      action: 'MEMBER_LOGIN',
+      performedBy: matchedUser.email,
+      affectedRecord: matchedUser.uid,
+      metadata: { role: matchedUser.role, alumniNumber: matchedUser.alumniNumber },
+    });
+
+    return { 
+      success: true, 
+      user: matchedUser,
+      alumnusName: matchedUser.displayName,
+      alumniNumber: matchedUser.alumniNumber,
+    };
+  },
   // ----------------------------------------------------
   // DEDICATED PASSWORD-ONLY ADMIN & SUPER ADMIN ACCESS
   // ----------------------------------------------------
@@ -2885,75 +2941,6 @@ export const dataService = {
     });
 
     return { success: true, user: downgradedUser };
-  },
-
-    // ----------------------------------------------------
-    // PORTAL 2: ALUMNI & REGISTERED USERS SIGN IN
-    // ----------------------------------------------------
-    // Try Firebase Authentication if configured
-    if (isFirebaseConfigured() && auth && password) {
-      try {
-        await signInWithEmailAndPassword(auth, cleanEmail, password);
-      } catch (err: any) {
-        console.warn('Firebase login attempt fallback:', err?.code);
-      }
-    }
-
-    const alumniList = await this.getAlumniList();
-    const alumnus = alumniList.find(a => !!a.email && a.email.toLowerCase() === cleanEmail);
-    const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
-    const matchedUser = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
-
-    // If an alumnus exists in the database but hasn't activated password yet
-    if (alumnus && (!userCred || !userCred.password)) {
-      return {
-        success: false,
-        needsPasswordCreation: true,
-        alumnusName: `${alumnus.firstName} ${alumnus.lastName}`,
-        alumniNumber: alumnus.alumniNumber,
-        error: `Welcome, ${alumnus.firstName}! You have not set a password yet. Please create your password below to activate sign in.`
-      };
-    }
-
-    // Verify Password safely
-    if (!userCred || !userCred.password || password !== userCred.password) {
-      return {
-        success: false,
-        error: 'Invalid email or password. Please verify your credentials and try again.'
-      };
-    }
-
-    // Build or restore AuthUser record
-    const authenticatedUser: AuthUser = matchedUser || {
-      uid: alumnus ? `user-${alumnus.internalId}` : `usr-${Date.now()}`,
-      email: cleanEmail,
-      role: alumnus ? 'ALUMNI' : 'USER',
-      displayName: alumnus ? (alumnus.fullName || `${alumnus.firstName} ${alumnus.lastName}`.trim()) : '',
-      alumniId: alumnus?.internalId,
-      alumniNumber: alumnus?.alumniNumber,
-      photoUrl: alumnus?.photoUrl,
-      phone: alumnus?.phone,
-      alumniOnboardingDecision: alumnus ? 'COMPLETED' : 'SKIPPED',
-    };
-
-    // If an alumnus record is found, ensure linked
-    if (alumnus && !authenticatedUser.alumniId) {
-      authenticatedUser.alumniId = alumnus.internalId;
-      authenticatedUser.alumniNumber = alumnus.alumniNumber;
-      authenticatedUser.role = 'ALUMNI';
-      authenticatedUser.photoUrl = alumnus.photoUrl;
-      authenticatedUser.alumniOnboardingDecision = 'COMPLETED';
-    }
-
-    safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(authenticatedUser));
-    await this.logAudit({
-      action: 'USER_LOGIN',
-      performedBy: authenticatedUser.email,
-      affectedRecord: authenticatedUser.uid,
-      metadata: { role: authenticatedUser.role, alumniNumber: authenticatedUser.alumniNumber },
-    });
-
-    return { success: true, user: authenticatedUser };
   },
 
   async setAdminPassword(newPassword: string, adminEmail = 'admin@massh.ac.ug'): Promise<{ success: boolean; error?: string }> {
