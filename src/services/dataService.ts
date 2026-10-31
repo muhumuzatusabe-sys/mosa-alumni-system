@@ -2762,7 +2762,7 @@ export const dataService = {
         matchedUser = {
           uid: matchedAlumnus.internalId,
           email: matchedAlumnus.email,
-          displayName: matchedAlumnus.fullName,
+          displayName: matchedAlumnus.fullName || cleanEmail,
           role: 'ALUMNI',
           alumniId: matchedAlumnus.internalId,
           alumniNumber: matchedAlumnus.alumniNumber,
@@ -2775,7 +2775,7 @@ export const dataService = {
       if (app) {
         return {
           success: false,
-          error: `Your application (${app.applicationNumber || 'Pending'}) is currently under Secretariat review. You will receive an email once approved.`,
+          error: `Your application (${(app as any).applicationNumber || app.id || 'Pending'}) is currently under Secretariat review. You will receive an email once approved.`,
         };
       }
       return {

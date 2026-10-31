@@ -126,6 +126,7 @@ export interface AlumniProfile {
 export interface AlumniApplication {
   id: string;
   referenceId?: string; // e.g. "MOSA-2026-00125"
+  applicationNumber?: string; // Alias for referenceId
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -550,7 +551,7 @@ export interface SecretariatContact {
   name: string;
   title: string;
   publishedPhone: string;
-  whatsAppNumber: string;
+  whatsAppNumber?: string;
   email?: string;
   officeCategory?: string;
   status: 'ACTIVE' | 'INACTIVE';
@@ -568,14 +569,17 @@ export interface LegacyAlumniRecord {
   level?: 'O_LEVEL' | 'A_LEVEL' | 'BOTH';
   phone?: string;
   email?: string;
+  profession?: string;
+  chapter?: string;
   physicalRegisterPage?: string;
-  verifiedStatus: 'TRUSTED' | 'FLAGGED' | 'LINKED' | 'VERIFIED';
+  verifiedStatus?: 'TRUSTED' | 'FLAGGED' | 'LINKED' | 'VERIFIED' | string;
   linkedUserId?: string;
   linkedAlumniId?: string;
   linkedDate?: string;
   verifiedDate?: string;
   importedAt?: string;
   notes?: string;
+  [key: string]: any;
 }
 
 // ==========================================
@@ -1273,39 +1277,3 @@ export interface MemberPdfExportResult {
   doc: any;
 }
 
-// ==========================================
-// SECRETARIAT OFFICIAL CONTACTS
-// ==========================================
-
-export interface SecretariatContact {
-  id: string;
-  name: string;
-  title: string;
-  publishedPhone: string;
-  whatsAppNumber?: string;
-  email?: string;
-  officeCategory?: OfficeCategory;
-  status: 'ACTIVE' | 'INACTIVE';
-  displayOrder?: number;
-  notes?: string;
-  updatedAt?: string;
-}
-
-// ==========================================
-// LEGACY ALUMNI REGISTRY
-// ==========================================
-
-export interface LegacyAlumniRecord {
-  id?: string;
-  fullName: string;
-  membershipNumber: string;
-  cohortYear?: number | string;
-  phone?: string;
-  email?: string;
-  profession?: string;
-  chapter?: string;
-  notes?: string;
-  importedAt?: string;
-  verifiedStatus?: string;
-  [key: string]: any;
-}

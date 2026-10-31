@@ -205,7 +205,7 @@ export const SecretariatManager: React.FC<SecretariatManagerProps> = ({ currentU
               </thead>
               <tbody>
                 {contacts.map((contact, idx) => {
-                  const cleanWA = contact.whatsAppNumber.replace(/[^0-9]/g, '');
+                  const cleanWA = (contact.whatsAppNumber || '').replace(/[^0-9]/g, '');
                   return (
                     <tr key={contact.id} style={{ borderBottom: '1px solid #E2E8F0', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
                       <td style={{ padding: '0.85rem 1rem', color: '#64748B', fontWeight: 700 }}>

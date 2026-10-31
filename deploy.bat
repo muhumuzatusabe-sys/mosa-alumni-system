@@ -13,13 +13,15 @@ echo.
 echo [1/4] Building production bundle (TypeScript + Vite)...
 if exist "node_modules\.tmp" rd /s /q "node_modules\.tmp"
 call npm.cmd run build > deploy_build.log 2>&1
+set BUILD_STATUS=%errorlevel%
 type deploy_build.log
-if %errorlevel% neq 0 (
+if %BUILD_STATUS% neq 0 (
     echo.
-    echo [ERROR] Build failed! Aborting deployment.
+    echo [ERROR] Build failed with exit code %BUILD_STATUS%! Aborting deployment.
     pause
-    exit /b %errorlevel%
+    exit /b %BUILD_STATUS%
 )
+echo.
 echo [OK] Production bundle compiled successfully into ./dist
 
 echo.

@@ -353,8 +353,8 @@ export const AuthModal: React.FC<Props> = ({
             </button>
           </div>
 
-          {/* Portal Switcher Tabs - Strictly Hidden in Admin Mode */}
-          {portal !== 'admin' && (
+          {/* Portal Switcher Tabs - Strictly Hidden if opened directly as Admin */}
+          {initialPortal !== 'admin' && (
             <div 
               style={{ 
                 display: 'flex', 
