@@ -65,7 +65,7 @@ export const DEFAULT_CARD_SETTINGS: MembershipCardSettings = {
   associationName: 'Mandela Old Students Association (MOSA)',
   phoneNumbers: ['+256 772 411921', '+256 706599793', '+256 773432413'],
   email: 'mosaalumni31@gmail.com',
-  website: 'mandelassalumni.com',
+  website: 'mtech-46634.web.app',
   chairmanMosa: {
     title: 'Chairman MOSA',
     name: 'Chairman MOSA',
@@ -98,7 +98,7 @@ export const membershipCardService = {
       if (
         !parsed.email || 
         parsed.email.includes('masshalumni') || 
-        parsed.website?.includes('web.app') ||
+        parsed.website?.includes('mandelassalumni') ||
         !parsed.crestDataUrl
       ) {
         parsed.email = DEFAULT_CARD_SETTINGS.email;
@@ -864,7 +864,7 @@ export const membershipCardService = {
     // Generate verified QR code data URL
     const baseUrl = typeof window !== 'undefined' && window.location?.origin
       ? window.location.origin
-      : 'https://mandelassalumni.com';
+      : 'https://mtech-46634.web.app';
     const qrTargetUrl = `${baseUrl}/?verify-card=${encodeURIComponent(card.verificationToken)}`;
     const qrDataUrl = await QRCode.toDataURL(qrTargetUrl, {
       margin: 1,
@@ -1242,7 +1242,7 @@ export const membershipCardService = {
       const snapshot = card.snapshot || this.buildCardSnapshot(alumnus, settings);
       const baseUrl = typeof window !== 'undefined' && window.location?.origin
         ? window.location.origin
-        : 'https://mandelassalumni.com';
+        : 'https://mtech-46634.web.app';
       const qrTargetUrl = `${baseUrl}/?verify-card=${encodeURIComponent(card.verificationToken)}`;
       const qrDataUrl = await QRCode.toDataURL(qrTargetUrl, {
         margin: 1,

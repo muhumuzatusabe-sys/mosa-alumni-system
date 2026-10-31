@@ -37,7 +37,6 @@ if ($LASTEXITCODE -eq 0) {
 
 Write-Host "`n==========================================================" -ForegroundColor Cyan
 Write-Host "   DEPLOYMENT PROCESS COMPLETE!" -ForegroundColor Green
-Write-Host "   Live Website: https://mandelassalumni.com" -ForegroundColor Green
-Write-Host "   Firebase URL: https://mtech-46634.web.app" -ForegroundColor Green
+Write-Host "   Live Website: https://mtech-46634.web.app" -ForegroundColor Green
 Write-Host "   GitHub Repo:  https://github.com/muhumuzatusabe-sys/mosa-alumni-system" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Cyan

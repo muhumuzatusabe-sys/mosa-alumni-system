@@ -46,7 +46,7 @@ async function runOfficialMosaIdCardTests() {
   assert(settings.associationName.includes('MOSA'), `Association name contains MOSA: "${settings.associationName}"`);
   assert(settings.phoneNumbers.includes('+256 772 411921'), `Contains official telephone +256 772 411921`);
   assert(settings.email === 'mosaalumni31@gmail.com', `Contains approved email mosaalumni31@gmail.com`);
-  assert(settings.website === 'mandelassalumni.com', `Contains approved website mandelassalumni.com`);
+  assert(settings.website === 'mtech-46634.web.app', `Contains approved website mtech-46634.web.app`);
   assert(settings.chairmanMosa.title === 'Chairman MOSA', `Signatory 1 is Chairman MOSA`);
   assert(settings.chairmanBog.title === 'Chairman BOG Massh', `Signatory 2 is Chairman BOG Massh`);
 
@@ -259,13 +259,13 @@ async function runOfficialMosaIdCardTests() {
   const updatedSettings = await membershipCardService.updateCardSettings(
     {
       chairmanMosa: { title: 'National Chairman MOSA', name: 'Dr. Bright A.' },
-      email: 'secretariat@mandelassalumni.com',
+      email: 'mosaalumni31@gmail.com',
     },
     mockAdminUser
   );
 
   assert(updatedSettings.chairmanMosa.title === 'National Chairman MOSA', 'Chairman title updated');
-  assert(updatedSettings.email === 'secretariat@mandelassalumni.com', 'Secretariat email updated');
+  assert(updatedSettings.email === 'mosaalumni31@gmail.com', 'Secretariat email updated');
 
   console.log('\n================================================================');
   console.log(`TEST RESULTS: ${passed} PASSED, ${failed} FAILED`);

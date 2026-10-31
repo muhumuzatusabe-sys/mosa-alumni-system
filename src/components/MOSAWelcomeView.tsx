@@ -579,14 +579,14 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
 
             {/* Official Website */}
             <a
-              href={welcomeConfig?.officialWebsite || 'https://mandelassalumni.com'}
+              href={welcomeConfig?.officialWebsite || 'https://mtech-46634.web.app'}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: '#B45309', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 700 }}
               title="Official Portal Website"
             >
               <Globe size={14} color="#D97706" />
-              <span>{(welcomeConfig?.officialWebsite || 'https://mandelassalumni.com').replace(/^https?:\/\//, '')}</span>
+              <span>{(welcomeConfig?.officialWebsite || 'https://mtech-46634.web.app').replace(/^https?:\/\//, '')}</span>
             </a>
           </div>
 

@@ -549,7 +549,7 @@ const defaultWelcomePageConfig: WelcomePageConfig = {
   officialPhone: '+256 772 411921',
   officialWhatsApp: '256772411921',
   officialAddress: 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda',
-  officialWebsite: 'https://mandelassalumni.com',
+  officialWebsite: 'https://mtech-46634.web.app',
 };
 
 const defaultSeedAlumni: AlumniProfile[] = [];
@@ -5527,7 +5527,11 @@ export const dataService = {
     if (!raw) return defaultWelcomePageConfig;
     try {
       const parsed = JSON.parse(raw);
-      if (parsed.socialGmail === 'masshalumni@gmail.com' || parsed.officialPhone?.includes('782 123456')) {
+      if (
+        parsed.socialGmail === 'masshalumni@gmail.com' || 
+        parsed.officialPhone?.includes('782 123456') ||
+        parsed.officialWebsite?.includes('mandelassalumni')
+      ) {
         parsed.socialGmail = defaultWelcomePageConfig.socialGmail;
         parsed.officialPhone = defaultWelcomePageConfig.officialPhone;
         parsed.officialWhatsApp = defaultWelcomePageConfig.officialWhatsApp;

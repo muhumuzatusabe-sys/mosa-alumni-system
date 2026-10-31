@@ -77,7 +77,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setOfficialPhone(cfg.draftOfficialPhone ?? cfg.officialPhone ?? '+256 772 411921');
       setOfficialWhatsApp(cfg.draftOfficialWhatsApp ?? cfg.officialWhatsApp ?? '256772411921');
       setOfficialAddress(cfg.draftOfficialAddress ?? cfg.officialAddress ?? 'Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda');
-      setOfficialWebsite(cfg.draftOfficialWebsite ?? cfg.officialWebsite ?? 'https://mandelassalumni.com');
+      setOfficialWebsite(cfg.draftOfficialWebsite ?? cfg.officialWebsite ?? 'https://mtech-46634.web.app');
       setIntroMessage(cfg.draftIntroMessage || cfg.introMessage);
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
       setCarouselImages(
@@ -1054,7 +1054,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
                 type="url"
                 value={officialWebsite}
                 onChange={(e) => setOfficialWebsite(e.target.value)}
-                placeholder="https://mandelassalumni.com"
+                placeholder="https://mtech-46634.web.app"
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.8rem',

@@ -713,12 +713,12 @@ export const App: React.FC = () => {
               </a>
               <span>•</span>
               <a 
-                href="https://mandelassalumni.com" 
+                href="https://mtech-46634.web.app" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
               >
-                mandelassalumni.com
+                mtech-46634.web.app
               </a>
             </div>
           </div>

@@ -119,7 +119,7 @@ export const sendVerificationEmail = async (
           P.O. Box 280, Hoima City, Uganda • Official: <a href="mailto:mosaalumni31@gmail.com" style="color: #059669; text-decoration: none;">mosaalumni31@gmail.com</a> • Tel: +256 772 411921
         </div>
         <div style="margin-top: 4px;">
-          Portal: <a href="https://mandelassalumni.com" style="color: #059669; text-decoration: none;">https://mandelassalumni.com</a>
+          Portal: <a href="https://mtech-46634.web.app" style="color: #059669; text-decoration: none;">https://mtech-46634.web.app</a>
         </div>
       </div>
     </div>

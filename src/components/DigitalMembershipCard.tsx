@@ -56,7 +56,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
 
       // Generate live QR
       const verToken = c?.verificationToken || alumnus.alumniNumber;
-      const targetUrl = `${window.location?.origin || 'https://mandelassalumni.com'}/?verify-card=${encodeURIComponent(verToken)}`;
+      const targetUrl = `${window.location?.origin || 'https://mtech-46634.web.app'}/?verify-card=${encodeURIComponent(verToken)}`;
       try {
         const url = await QRCode.toDataURL(targetUrl, {
           margin: 1,
@@ -481,7 +481,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
           Email: {settings?.email || 'mosaalumni31@gmail.com'}
         </div>
         <div style={{ fontSize: 'clamp(0.48rem, 1.4vw, 0.65rem)', color: '#F1F5F9', fontWeight: 500 }}>
-          Website: {settings?.website || 'mandelassalumni.com'}
+          Website: {settings?.website || 'mtech-46634.web.app'}
         </div>
       </div>
 

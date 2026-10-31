@@ -280,12 +280,12 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
                 <div>
                   <div style={{ fontWeight: 600, color: '#FFFFFF', fontSize: '0.95rem' }}>Official Alumni Portal</div>
                   <a 
-                    href="https://mandelassalumni.com" 
+                    href="https://mtech-46634.web.app" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     style={{ color: '#FDE68A', fontSize: '0.88rem', textDecoration: 'underline', fontWeight: 600 }}
                   >
-                    https://mandelassalumni.com
+                    https://mtech-46634.web.app
                   </a>
                 </div>
               </div>

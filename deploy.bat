@@ -51,8 +51,7 @@ if %errorlevel% equ 0 (
 echo.
 echo ==========================================================
 echo    DEPLOYMENT PROCESS COMPLETE!
-echo    Live Website: https://mandelassalumni.com
-echo    Firebase URL: https://mtech-46634.web.app
+echo    Live Website: https://mtech-46634.web.app
 echo    GitHub Repo:  https://github.com/muhumuzatusabe-sys/mosa-alumni-system
 echo ==========================================================
 pause

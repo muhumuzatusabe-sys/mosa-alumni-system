@@ -53,7 +53,7 @@ export const DigitalMembershipCardModal: React.FC<DigitalMembershipCardModalProp
         category: 'Official Membership ID',
         photoUrl: alumnus.photoUrl,
         verificationToken: `MOSA-PASS-${alumnus.alumniNumber}`,
-        qrPayload: `https://mandelassalumni.com/?verify-card=${encodeURIComponent(alumnus.alumniNumber)}`,
+        qrPayload: `https://mtech-46634.web.app/?verify-card=${encodeURIComponent(alumnus.alumniNumber)}`,
         issuedAt: alumnus.verifiedAt || new Date().toISOString(),
         isValidated: alumnus.membershipStatus === 'ACTIVE' || alumnus.membershipStatus === 'APPROVED',
       });

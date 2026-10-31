@@ -1244,7 +1244,7 @@ export interface WelcomePageConfig {
   officialPhone?: string; // e.g. "+256 782 123456"
   officialWhatsApp?: string; // e.g. "256782123456"
   officialAddress?: string; // e.g. "Mandela Secondary School Hoima • P.O. Box 280, Hoima City, Uganda"
-  officialWebsite?: string; // e.g. "https://mandelassalumni.com"
+  officialWebsite?: string; // e.g. "https://mtech-46634.web.app"
 
   // Draft handles & contacts
   draftSocialX?: string;
