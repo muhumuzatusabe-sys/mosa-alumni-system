@@ -31,6 +31,11 @@ if (fs.existsSync(srcLogo)) {
     const tsCode = `// Auto-generated official Mandela Secondary School Hoima logo data URI\nexport const MOSA_OFFICIAL_LOGO_DATA_URL = ${JSON.stringify(base64)};\nexport default MOSA_OFFICIAL_LOGO_DATA_URL;\n`;
     fs.writeFileSync(path.resolve('src/utils/mosaLogoDataUrl.ts'), tsCode, 'utf-8');
     console.log('[OK] Generated src/utils/mosaLogoDataUrl.ts with base64 data URI');
+
+    // Also overwrite mosa-logo.svg with the official logo image
+    const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="200" height="230"><image href="${base64}" x="0" y="0" width="200" height="230" preserveAspectRatio="xMidYMid meet" /></svg>`;
+    fs.writeFileSync(path.resolve('public/images/mosa-logo.svg'), svgCode, 'utf-8');
+    console.log('[OK] Overwrote public/images/mosa-logo.svg with official logo');
   } catch (err) {
     console.warn('Could not generate base64 module:', err);
   }

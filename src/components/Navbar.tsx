@@ -421,14 +421,25 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-hidden="true"
           />
 
-          {/* White Card Container Matching Screenshot */}
+          {/* Pale Green Institutional Menu Container */}
           <div 
             className="mosa-portal-menu-card"
+            style={{
+              background: '#E8F7ED',
+              border: '2px solid #86EFAC',
+              boxShadow: '0 16px 40px -8px rgba(22, 101, 52, 0.3), 0 4px 16px rgba(0, 0, 0, 0.08)',
+            }}
             role="dialog"
             aria-label="MOSA Institutional Navigation Menu"
           >
             {/* Top Header: MASSH Crest & Green Uppercase Institution Title */}
-            <div className="mosa-portal-menu-header">
+            <div 
+              className="mosa-portal-menu-header"
+              style={{
+                background: '#D1FAE5',
+                borderBottom: '2px solid #86EFAC',
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
                 <MosaLogo size={36} />
                 <div className="mosa-portal-inst-title">

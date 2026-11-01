@@ -349,8 +349,43 @@ export const dispatchEmail = async (params: {
     }
   }
 
+  // 5. Try FormSubmit public endpoint to send directly to recipient inbox
+  try {
+    const fsRes = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(cleanEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        _subject: params.subject,
+        _template: 'box',
+        _captcha: 'false',
+        Sender: 'Mandela Old Students Association (MOSA)',
+        Recipient: displayName,
+        Subject: params.subject,
+        Details: textMessage,
+      }),
+    });
+    if (fsRes.ok) {
+      await recordEmailLog({
+        id: `log-${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        to: cleanEmail,
+        toName: displayName,
+        subject: params.subject,
+        category: params.category,
+        provider: 'formsubmit_live',
+        status: 'DELIVERED',
+      });
+      return { success: true, provider: 'formsubmit_live' };
+    }
+  } catch (fsErr) {
+    console.warn('FormSubmit live dispatch attempt:', fsErr);
+  }
+
   // 6. Safe Offline / Local Verification Log
-  // When no external email provider is configured yet, record safely so the workflow never crashes or locks out users.
+  // When external email networks are unavailable, record safely so the workflow never crashes or locks out users.
   await recordEmailLog({
     id: `log-${Date.now()}`,
     timestamp: new Date().toISOString(),

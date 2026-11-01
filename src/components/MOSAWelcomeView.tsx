@@ -291,7 +291,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.06)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1.0)'; }}
             >
-              <img src="/images/mosa-logo.svg" alt="Mandela Secondary School Hoima Crest" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <MosaLogo size={120} />
             </div>
           </div>
 

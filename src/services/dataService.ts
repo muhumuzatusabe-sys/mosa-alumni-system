@@ -1169,6 +1169,17 @@ export const dataService = {
           currentSessionUser.role = 'ALUMNI';
         }
         safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(currentSessionUser));
+      } else if (!currentSessionUser && applicantEmail) {
+        const autoSessionUser: AuthUser = {
+          uid: `user-${Date.now()}`,
+          email: appData.email,
+          role: 'ALUMNI',
+          displayName: `${appData.firstName} ${appData.lastName}`,
+          alumniId: newProfile?.internalId || id,
+          alumniNumber: generatedNumber,
+          alumniOnboardingDecision: 'COMPLETED',
+        };
+        safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(autoSessionUser));
       }
 
       const storedUsers: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { MOSA_COLORS, getMosaCrestSvg, getMosaSignatureSvg, getMosaWatermarkSvg, svgToDataUrl } from '../utils/mosaCrest';
+import { MOSA_OFFICIAL_LOGO_DATA_URL } from '../utils/mosaLogoDataUrl';
 
 interface Props {
   alumnus: AlumniProfile;
@@ -122,7 +123,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
     window.print();
   };
 
-  const crestUrl = settings?.crestDataUrl || svgToDataUrl(getMosaCrestSvg(140));
+  const crestUrl = MOSA_OFFICIAL_LOGO_DATA_URL;
   const holderSigUrl = alumnus.signatureUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));
   const chairmanMosaSigUrl = settings?.chairmanMosa?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));
   const chairmanBogSigUrl = settings?.chairmanBog?.signatureDataUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 90, 36));

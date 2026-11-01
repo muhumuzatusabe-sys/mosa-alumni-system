@@ -33,6 +33,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  onNavigateToDashboard?: () => void;
   currentUser?: AuthUser | null;
 }
 
@@ -47,7 +48,7 @@ const STEPS = [
   { id: 8, label: 'Review & Submit', icon: FileCheck },
 ];
 
-export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onSuccess, currentUser }) => {
+export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onSuccess, onNavigateToDashboard, currentUser }) => {
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -791,10 +792,15 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                   type="button"
                   id="btn-registration-complete-close"
                   className="btn btn-primary"
-                  onClick={onClose}
-                  style={{ minWidth: '160px', padding: '0.75rem 1.5rem' }}
+                  onClick={() => {
+                    onClose();
+                    if (onNavigateToDashboard) {
+                      onNavigateToDashboard();
+                    }
+                  }}
+                  style={{ minWidth: '220px', padding: '0.85rem 1.85rem', fontSize: '0.96rem', fontWeight: 800 }}
                 >
-                  {successInfo.alumniNumber ? 'Go to Dashboard & View Pass' : 'Enter Alumni Portal'}
+                  Go to Dashboard &amp; Overview
                 </button>
               </div>
             </div>

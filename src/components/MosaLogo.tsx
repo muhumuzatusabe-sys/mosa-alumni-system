@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MOSA_OFFICIAL_LOGO_DATA_URL } from '../utils/mosaLogoDataUrl';
 
 interface MosaLogoProps {
   size?: number | string;
@@ -23,35 +24,30 @@ export const MosaLogo: React.FC<MosaLogoProps> = ({
   const dimension = typeof size === 'number' ? `${size}px` : size;
 
   const sources = [
+    MOSA_OFFICIAL_LOGO_DATA_URL,
     '/images/mosa-logo.png',
     '/images/mosa-logo.jpg',
-    '/images/mosa-logo.svg',
   ];
 
   if (sourceIndex >= sources.length) {
-    // High-fidelity fallback SVG matching the exact official crest colors
     return (
-      <svg
-        viewBox="0 0 200 230"
+      <img
+        src={MOSA_OFFICIAL_LOGO_DATA_URL}
+        alt={alt}
         width={dimension}
         height={dimension}
         className={className}
-        style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle', ...style }}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle cx="100" cy="100" r="76" fill="#FFFFFF" stroke="#137A38" strokeWidth="6" />
-        <circle cx="100" cy="100" r="54" fill="#FFDE00" stroke="#137A38" strokeWidth="3" />
-        {/* Open book */}
-        <path d="M 70 120 Q 85 110 100 118 Q 115 110 130 120 L 126 130 Q 115 122 100 128 Q 85 122 74 130 Z" fill="#FFFFFF" stroke="#137A38" strokeWidth="2.5" />
-        {/* Crested Crane outline */}
-        <ellipse cx="106" cy="98" rx="8" ry="12" fill="#137A38" />
-        <circle cx="112" cy="80" r="4.5" fill="#137A38" />
-        {/* Banner */}
-        <path d="M 30 195 Q 100 185 170 195 L 165 220 Q 100 210 35 220 Z" fill="#FFFFFF" stroke="#137A38" strokeWidth="3" />
-        <text x="100" y="212" textAnchor="middle" fill="#137A38" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
-          CARING TO ACHIEVE
-        </text>
-      </svg>
+        style={{
+          width: dimension,
+          height: dimension,
+          objectFit: 'contain',
+          flexShrink: 0,
+          display: 'inline-block',
+          verticalAlign: 'middle',
+          borderRadius: rounded ? '50%' : undefined,
+          ...style,
+        }}
+      />
     );
   }
 

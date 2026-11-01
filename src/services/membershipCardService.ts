@@ -30,6 +30,7 @@ import {
   getMosaSignatureSvg,
   svgToDataUrl,
 } from '../utils/mosaCrest';
+import { MOSA_OFFICIAL_LOGO_DATA_URL } from '../utils/mosaLogoDataUrl';
 
 const STORAGE_KEYS = {
   SETTINGS: 'mosa_membership_card_settings',
@@ -76,7 +77,7 @@ export const DEFAULT_CARD_SETTINGS: MembershipCardSettings = {
     name: 'Chairman BOG Massh',
     signatureDataUrl: svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.blueSignature, 120, 48)),
   },
-  crestDataUrl: svgToDataUrl(getMosaCrestSvg(140)),
+  crestDataUrl: MOSA_OFFICIAL_LOGO_DATA_URL,
   validityYears: 0, // 0 = Permanent / Non-expiring by default
   cohortYearBasis: 'ENTRY',
   verificationBaseUrl: '',
@@ -94,19 +95,18 @@ export const membershipCardService = {
     }
     try {
       const parsed = JSON.parse(raw);
-      // Auto-migrate if stored settings contain outdated email, website or crest
+      // Ensure crestDataUrl is always the official emblem
+      parsed.crestDataUrl = MOSA_OFFICIAL_LOGO_DATA_URL;
       if (
         !parsed.email || 
         parsed.email.includes('masshalumni') || 
-        parsed.website?.includes('mandelassalumni') ||
-        !parsed.crestDataUrl
+        parsed.website?.includes('mandelassalumni')
       ) {
         parsed.email = DEFAULT_CARD_SETTINGS.email;
         parsed.website = DEFAULT_CARD_SETTINGS.website;
         parsed.phoneNumbers = DEFAULT_CARD_SETTINGS.phoneNumbers;
-        parsed.crestDataUrl = DEFAULT_CARD_SETTINGS.crestDataUrl;
-        storage.set(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_CARD_SETTINGS, ...parsed }));
       }
+      storage.set(STORAGE_KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_CARD_SETTINGS, ...parsed }));
       return { ...DEFAULT_CARD_SETTINGS, ...parsed };
     } catch {
       return { ...DEFAULT_CARD_SETTINGS };
@@ -999,8 +999,8 @@ export const membershipCardService = {
 
     // 6. Top Right School Crest
     try {
-      const crestUrl = settings.crestDataUrl || svgToDataUrl(getMosaCrestSvg(120));
-      doc.addImage(crestUrl, 'PNG', x + w - 15.5, y + 3, 12.5, 12.5);
+      const crestUrl = MOSA_OFFICIAL_LOGO_DATA_URL;
+      doc.addImage(crestUrl, 'JPEG', x + w - 15.5, y + 3, 12.5, 12.5);
     } catch {
       // Fallback seal circle
       doc.setDrawColor(78, 135, 70);

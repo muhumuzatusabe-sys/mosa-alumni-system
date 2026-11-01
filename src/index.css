@@ -1070,10 +1070,10 @@ table tbody tr:hover {
   width: 295px;
   max-width: min(295px, 78vw);
   max-height: calc(100vh - 72px);
-  background: #F3FAF5;
-  border: 1.5px solid #BBF7D0;
+  background: #E8F7ED !important;
+  border: 2px solid #86EFAC !important;
   border-radius: 14px;
-  box-shadow: 0 16px 40px -8px rgba(22, 101, 52, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px -8px rgba(22, 101, 52, 0.28), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   z-index: 1210;
   display: flex;
   flex-direction: column;
@@ -1099,8 +1099,8 @@ table tbody tr:hover {
   justify-content: space-between;
   gap: 0.65rem;
   padding: 0.85rem 1rem 0.65rem 1rem;
-  background: #E8F7ED;
-  border-bottom: 1.5px solid #BBF7D0;
+  background: #D1FAE5 !important;
+  border-bottom: 2px solid #86EFAC !important;
   flex-shrink: 0;
 }
 
@@ -1359,8 +1359,8 @@ table tbody tr:hover {
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 0.95rem;
-  background: #E8F7ED;
-  border-top: 1.5px solid #BBF7D0;
+  background: #D1FAE5 !important;
+  border-top: 2px solid #86EFAC !important;
   flex-shrink: 0;
 }
 

@@ -750,11 +750,20 @@ export const App: React.FC = () => {
             setIsRegisterOpen(false);
             refreshUserData();
           }}
+          onNavigateToDashboard={() => {
+            setIsRegisterOpen(false);
+            setCurrentTab('home');
+            handleNavigate('home');
+            refreshUserData();
+          }}
           onSuccess={async () => {
             if (currentUser) {
               await dataService.completeAlumniOnboarding(currentUser.uid);
               setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
             }
+            setIsRegisterOpen(false);
+            setCurrentTab('home');
+            handleNavigate('home');
             refreshUserData();
           }}
           currentUser={currentUser}
