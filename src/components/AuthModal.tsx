@@ -17,6 +17,7 @@ import {
   Lock,
   Mail
 } from 'lucide-react';
+import { MosaLogo } from './MosaLogo';
 
 interface Props {
   isOpen: boolean;
@@ -171,7 +172,9 @@ export const AuthModal: React.FC<Props> = ({
       if (res.success) {
         setPwdStep('otp_verify');
         setSuccessMsg(`A 6-digit verification code has been dispatched to ${email}. Please check your inbox and enter it below.`);
-        setSimulatedOtpNotice(null);
+        if (res.code) {
+          setSimulatedOtpNotice(res.code);
+        }
         setResendCooldown(60);
         const timer = setInterval(() => {
           setResendCooldown((prev) => {
@@ -314,7 +317,7 @@ export const AuthModal: React.FC<Props> = ({
                 {portal === 'admin' ? (
                   <ShieldCheck size={22} color="#FCD34D" />
                 ) : (
-                  <GraduationCap size={22} color="#FCD34D" />
+                  <MosaLogo size={28} />
                 )}
               </div>
               <div>
@@ -918,6 +921,45 @@ export const AuthModal: React.FC<Props> = ({
                       </div>
                       A 6-digit confirmation code was sent to your email. Please check your inbox (and spam/junk folder) and enter it below.
                     </div>
+
+                    {simulatedOtpNotice && (
+                      <div style={{
+                        marginTop: '0.65rem',
+                        padding: '0.75rem',
+                        background: '#FEF3C7',
+                        border: '1.5px solid #F59E0B',
+                        borderRadius: '8px',
+                        fontSize: '0.8rem',
+                        color: '#92400E',
+                        textAlign: 'left'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                          <span style={{ fontWeight: 700 }}>Direct Verification Code:</span>
+                          <button
+                            type="button"
+                            onClick={() => setOtpCode(simulatedOtpNotice)}
+                            style={{
+                              background: '#D97706',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '0.2rem 0.6rem',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Auto-fill Code
+                          </button>
+                        </div>
+                        <div style={{ fontFamily: 'monospace', fontSize: '1.25rem', fontWeight: 800, letterSpacing: '3px', color: '#B45309' }}>
+                          {simulatedOtpNotice}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#78350F', marginTop: '0.25rem' }}>
+                          Use this code if external email routing is delayed or blocked by inbox filters.
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
@@ -1153,7 +1195,7 @@ export const AuthModal: React.FC<Props> = ({
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.35rem' }}>
-                <GraduationCap size={14} color="#C68A24" />
+                <MosaLogo size={16} />
                 <span>Need assistance signing into your alumni account?</span>
               </div>
               <div style={{ color: '#64748B', fontSize: '0.75rem', lineHeight: 1.45 }}>

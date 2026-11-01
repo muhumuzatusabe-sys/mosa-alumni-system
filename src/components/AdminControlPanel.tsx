@@ -48,7 +48,8 @@ import {
   Phone,
   BookOpen,
   ShieldAlert,
-  Crown
+  Crown,
+  Mail
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -76,6 +77,7 @@ import { WelcomePageManager } from './WelcomePageManager';
 import { LeadershipOfficesManager } from './LeadershipOfficesManager';
 import { MemberDataExportManager } from './MemberDataExportManager';
 import { SecretariatManager } from './SecretariatManager';
+import { EmailManager } from './EmailManager';
 
 const DEFAULT_MODULES_BY_ROLE: Record<string, PermissionModule[]> = {
   SUPER_ADMIN: ['REGISTRY', 'FINANCE', 'ATTENDANCE', 'EVENTS', 'COMMUNICATIONS', 'CHAPTERS', 'DOCUMENTS', 'USERS', 'REPORTS', 'SETTINGS', 'AUDIT', 'OPPORTUNITIES', 'ELECTIONS'],
@@ -116,9 +118,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   onRefreshData,
 }) => {
   // Consolidated navigation structure:
-  const [activeSection, setActiveSection] = useState<'overview' | 'registry' | 'leadership' | 'secretariat' | 'welcome_page' | 'exports' | 'approvals' | 'security'>('overview');
+  const [activeSection, setActiveSection] = useState<'overview' | 'registry' | 'leadership' | 'secretariat' | 'welcome_page' | 'exports' | 'approvals' | 'security' | 'email'>('overview');
   const [registrySubTab, setRegistrySubTab] = useState<'members' | 'ma_numbers' | 'legacy' | 'applications' | 'verification' | 'assisted'>('members');
-  const [approvalsSubTab, setApprovalsSubTab] = useState<'cards' | 'attendance' | 'opportunities' | 'elections' | 'modules' | 'staff' | 'documents' | 'audit' | 'cms'>('cards');
+  const [approvalsSubTab, setApprovalsSubTab] = useState<'cards' | 'attendance' | 'opportunities' | 'elections' | 'modules' | 'staff' | 'documents' | 'audit' | 'cms' | 'email'>('cards');
   const [registryDropdownOpen, setRegistryDropdownOpen] = useState(false);
   const [approvalsDropdownOpen, setApprovalsDropdownOpen] = useState(false);
 
@@ -1084,6 +1086,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       { key: 'documents', label: 'Documents Manager', icon: FileText, visible: canAccessDocs, desc: `${documents.length} Official publications` },
                       { key: 'audit', label: 'System Audit Trail', icon: History, visible: canAccessAudit, desc: 'Immutable log of system operations' },
                       { key: 'cms', label: 'Website Content CMS', icon: Globe, visible: canAccessCMS, desc: 'Live homepage & gallery management' },
+                      { key: 'email', label: 'Email Gateway & Verification', icon: Mail, visible: canAccessSettings, desc: 'Deliver codes & notices to inboxes' },
                     ].filter(i => i.visible).map(item => {
                       const Icon = item.icon;
                       const isSelected = activeSection === 'approvals' && approvalsSubTab === item.key;
@@ -1237,6 +1240,35 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               >
                 <Download size={17} color={activeSection === 'exports' ? '#FBBF24' : '#D97706'} />
                 <span>Data Exports</span>
+              </button>
+            )}
+
+            {/* EMAIL GATEWAY & DISPATCHER */}
+            {canAccessSettings && (
+              <button
+                onClick={() => {
+                  setActiveSection('email');
+                  setRegistryDropdownOpen(false);
+                  setApprovalsDropdownOpen(false);
+                }}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '10px',
+                  border: activeSection === 'email' ? '2px solid #0B203E' : '1px solid #CBD5E1',
+                  background: activeSection === 'email' ? '#0B203E' : '#FFFFFF',
+                  color: activeSection === 'email' ? '#FFFFFF' : '#334155',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  boxShadow: activeSection === 'email' ? '0 4px 12px rgba(11, 32, 62, 0.15)' : 'none',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Mail size={17} color={activeSection === 'email' ? '#FBBF24' : '#D97706'} />
+                <span>Email Gateway</span>
               </button>
             )}
 
@@ -3614,6 +3646,13 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         {activeSection === 'approvals' && approvalsSubTab === 'cms' && canAccessCMS && (
           <div>
             <CMSManager currentUser={currentUser} onRefreshPortal={loadAllAdminData} />
+          </div>
+        )}
+
+        {/* SECTION: EMAIL DISPATCH & VERIFICATION GATEWAY */}
+        {(activeSection === 'email' || (activeSection === 'approvals' && (approvalsSubTab as string) === 'email')) && (
+          <div>
+            <EmailManager />
           </div>
         )}
       </div>

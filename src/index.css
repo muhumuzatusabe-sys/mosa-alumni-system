@@ -1070,10 +1070,10 @@ table tbody tr:hover {
   width: 295px;
   max-width: min(295px, 78vw);
   max-height: calc(100vh - 72px);
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background: #F3FAF5;
+  border: 1.5px solid #BBF7D0;
   border-radius: 14px;
-  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px -8px rgba(22, 101, 52, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08);
   z-index: 1210;
   display: flex;
   flex-direction: column;
@@ -1099,8 +1099,8 @@ table tbody tr:hover {
   justify-content: space-between;
   gap: 0.65rem;
   padding: 0.85rem 1rem 0.65rem 1rem;
-  background: #FFFFFF;
-  border-bottom: 1px solid #F1F5F9;
+  background: #E8F7ED;
+  border-bottom: 1.5px solid #BBF7D0;
   flex-shrink: 0;
 }
 
@@ -1212,7 +1212,7 @@ table tbody tr:hover {
 }
 
 .mosa-portal-numbered-action:hover {
-  background: #F8FAFC;
+  background: #DCFCE7;
 }
 
 .mosa-portal-num-prefix {
@@ -1251,7 +1251,7 @@ table tbody tr:hover {
 }
 
 .mosa-portal-menu-row:hover {
-  background: #F8FAFC;
+  background: #DCFCE7;
 }
 
 /* Specific styling for Enrollment row (green in screenshot) */
@@ -1259,20 +1259,20 @@ table tbody tr:hover {
   color: #16A34A;
 }
 .mosa-portal-menu-row.enrollment:hover {
-  background: #F0FDF4;
+  background: #E1F8E8;
 }
 
 /* Specific styling for Payments row (soft grey pill in screenshot) */
 .mosa-portal-menu-row.pill-highlight {
-  background: #F1F3F5;
+  background: #E2F3E7;
 }
 .mosa-portal-menu-row.pill-highlight:hover {
-  background: #E5E7EB;
+  background: #D1EED8;
 }
 
 /* Active current row */
 .mosa-portal-menu-row.active {
-  background: #F0FDF4;
+  background: #DCFCE7;
   color: #15803D;
 }
 
@@ -1282,7 +1282,7 @@ table tbody tr:hover {
   flex-direction: column;
   padding-left: 1.85rem;
   margin: 0.15rem 0 0.4rem 0;
-  border-left: 2px solid #E2E8F0;
+  border-left: 2px solid #86EFAC;
   margin-left: 1.25rem;
   gap: 0.2rem;
 }
@@ -1305,12 +1305,12 @@ table tbody tr:hover {
 }
 
 .mosa-portal-subitem-btn:hover {
-  background: #F1F5F9;
+  background: #DCFCE7;
   color: #15803D;
 }
 
 .mosa-portal-subitem-btn.active {
-  background: #DCFCE7;
+  background: #BBF7D0;
   color: #15803D;
   font-weight: 700;
 }
@@ -1336,11 +1336,11 @@ table tbody tr:hover {
 }
 
 .mosa-portal-direct-row:hover {
-  background: #F8FAFC;
+  background: #DCFCE7;
 }
 
 .mosa-portal-direct-row.active {
-  background: #F0FDF4;
+  background: #DCFCE7;
   color: #15803D;
 }
 
@@ -1359,8 +1359,8 @@ table tbody tr:hover {
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 0.95rem;
-  background: #F8FAFC;
-  border-top: 1px solid #E2E8F0;
+  background: #E8F7ED;
+  border-top: 1.5px solid #BBF7D0;
   flex-shrink: 0;
 }
 
@@ -1375,14 +1375,14 @@ table tbody tr:hover {
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  border: 1px solid #CBD5E1;
+  border: 1px solid #86EFAC;
   background: #FFFFFF;
-  color: #1E293B;
+  color: #166534;
   transition: all 0.15s ease;
 }
 
 .mosa-portal-footer-action:hover {
-  background: #F1F5F9;
+  background: #DCFCE7;
 }
 
 .mosa-portal-footer-action.primary {

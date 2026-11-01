@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ArrowRight
 } from 'lucide-react';
+import { MosaLogo } from './MosaLogo';
 
 interface Props {
   isOpen: boolean;
@@ -227,7 +228,7 @@ export const AlumniRegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSu
         <div className="modal-header">
           <div>
             <h3 style={{ fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <GraduationCap color="#D97706" />
+              <MosaLogo size={26} />
               <span>MOSA Alumni Registration</span>
             </h3>
             <p style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>

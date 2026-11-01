@@ -32,6 +32,7 @@ import {
   HeartHandshake,
   Image as ImageIcon
 } from 'lucide-react';
+import { MosaLogo } from './MosaLogo';
 
 interface NavbarProps {
   currentTab: string;
@@ -138,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="mosa-header" style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
       <div className="mosa-nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', padding: '0.65rem 1.25rem' }}>
-        {/* Left: [MENU] Toggle Button matching screenshot format */}
+        {/* Left: [MENU] Toggle Button matching screenshot format + Official School Crest */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -164,6 +165,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Menu size={16} color="#15803D" strokeWidth={2.5} />
             <span style={{ fontWeight: 800 }}>MENU</span>
           </button>
+
+          <div
+            onClick={() => handleTabClick('home')}
+            style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '0.4rem' }}
+            title="Mandela Secondary School Hoima"
+          >
+            <MosaLogo size={32} />
+          </div>
         </div>
 
         {/* Center / User Header Section: Profile Photo, "Hi, [NAME] ▾" matching screenshot */}
@@ -421,9 +430,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Top Header: MASSH Crest & Green Uppercase Institution Title */}
             <div className="mosa-portal-menu-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 0 }}>
-                <div style={{ width: '36px', height: '41px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src="/images/mosa-logo.svg" alt="MASSH Crest" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </div>
+                <MosaLogo size={36} />
                 <div className="mosa-portal-inst-title">
                   MANDELA SECONDARY SCHOOL HOIMA
                 </div>

@@ -32,6 +32,7 @@ import { ElectionsHub } from './components/ElectionsHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
 import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2, Music } from 'lucide-react';
+import { MosaLogo } from './components/MosaLogo';
 
 export const App: React.FC = () => {
   // Application Mode: Member Portal vs Dedicated Admin Control Panel
@@ -189,19 +190,20 @@ export const App: React.FC = () => {
       >
         <div
           style={{
-            width: '64px',
-            height: '64px',
+            width: '68px',
+            height: '68px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #C68A24 0%, #9A6814 100%)',
+            background: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1.25rem',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-            border: '2px solid rgba(255, 255, 255, 0.25)',
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            padding: '4px'
           }}
         >
-          <GraduationCap size={34} color="#FFFFFF" />
+          <MosaLogo size={58} />
         </div>
         <div
           style={{

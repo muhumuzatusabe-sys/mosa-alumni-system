@@ -1219,6 +1219,34 @@ export const dataService = {
           type: 'MEMBERSHIP',
           linkTab: 'my-profile'
         });
+
+        // Dispatch real approval confirmation email to applicant's inbox
+        if (appData.email) {
+          try {
+            const applicantName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ') || 'Applicant';
+            await emailService.sendMembershipApprovalEmail(
+              appData.email,
+              applicantName,
+              generatedNumber,
+              newApp.referenceId || id
+            );
+          } catch (mailErr) {
+            console.warn('Failed to dispatch auto-approval email:', mailErr);
+          }
+        }
+      } else if (appData.email) {
+        // Dispatch application receipt acknowledgment email
+        try {
+          const applicantName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ') || 'Applicant';
+          await emailService.sendApplicationReceivedEmail(
+            appData.email,
+            applicantName,
+            newApp.referenceId || id,
+            appData
+          );
+        } catch (mailErr) {
+          console.warn('Failed to dispatch application acknowledgment email:', mailErr);
+        }
       }
 
       return { 
@@ -1515,6 +1543,21 @@ export const dataService = {
           applicationId,
         },
       });
+
+      // Dispatch real approval confirmation email to applicant's inbox
+      if (app.email) {
+        try {
+          const applicantName = [app.firstName, app.middleName, app.lastName].filter(Boolean).join(' ') || 'MASSH Alumnus';
+          await emailService.sendMembershipApprovalEmail(
+            app.email,
+            applicantName,
+            generatedNumber,
+            app.referenceId || applicationId
+          );
+        } catch (mailErr) {
+          console.warn('Failed to dispatch manual approval email:', mailErr);
+        }
+      }
 
       return { success: true, alumniNumber: generatedNumber };
     } catch (err: any) {
@@ -2393,7 +2436,13 @@ export const dataService = {
   },
 
   // OTP-based Email Verification to prevent fake email registration
-  async sendRegistrationOtp(email: string): Promise<{ success: boolean; code?: string; error?: string }> {
+  async sendRegistrationOtp(email: string): Promise<{ 
+    success: boolean; 
+    code?: string; 
+    error?: string; 
+    provider?: string; 
+    offlineNotice?: string; 
+  }> {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       return { success: false, error: 'Please enter a valid email address.' };
@@ -2427,8 +2476,9 @@ export const dataService = {
     }
 
     // Dispatch real email via official emailService
+    let dispatchRes: any = { success: true };
     try {
-      await emailService.sendVerificationEmail(cleanEmail, code);
+      dispatchRes = await emailService.sendVerificationEmail(cleanEmail, code);
     } catch (mailErr) {
       console.warn('Email dispatch warning:', mailErr);
     }
@@ -2442,7 +2492,12 @@ export const dataService = {
       }
     }
 
-    return { success: true, code };
+    return { 
+      success: true, 
+      code,
+      provider: dispatchRes?.provider,
+      offlineNotice: dispatchRes?.offlineNotice,
+    };
   },
 
   async verifyRegistrationOtp(email: string, inputCode: string): Promise<{ success: boolean; error?: string }> {

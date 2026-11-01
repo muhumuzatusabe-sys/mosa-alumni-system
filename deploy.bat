@@ -57,7 +57,7 @@ if %FIREBASE_STATUS% neq 0 (
 echo.
 echo [3/4] Staging and committing changes to Git...
 git add .
-git commit -m "feat(id-card): update official MOSA ID card format, institutional crest logo, contacts, and remove emojis"
+git commit -m "feat(branding): integrate official Mandela Secondary School emblem across platform, pale green menu panel, and email gateway"
 echo [OK] Staged and committed changes.
 
 echo.

@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Music
 } from 'lucide-react';
+import { MosaLogo } from './MosaLogo';
 import { AuthUser, WelcomePageConfig, CarouselImageItem } from '../types';
 import { dataService } from '../services/dataService';
 
@@ -234,22 +235,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
           }}
         >
           {/* MASSH Gold Emblem */}
-          <div
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(217, 119, 6, 0.3)',
-              color: '#FFFFFF',
-              flexShrink: 0
-            }}
-          >
-            <GraduationCap size={18} />
-          </div>
+          <MosaLogo size={36} />
 
           <div>
             <div style={{ fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#B45309', fontWeight: 800 }}>

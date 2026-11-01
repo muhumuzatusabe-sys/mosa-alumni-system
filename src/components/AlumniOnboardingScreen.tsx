@@ -8,6 +8,7 @@ import {
   Calendar,
   CheckCircle2
 } from 'lucide-react';
+import { MosaLogo } from './MosaLogo';
 import { AuthUser } from '../types';
 
 interface AlumniOnboardingScreenProps {
@@ -75,19 +76,14 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
         >
           <div
             style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #C68A24 0%, #9A6814 100%)',
               margin: '0 auto 1rem auto',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
+              filter: 'drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4))',
             }}
           >
-            <GraduationCap size={34} color="#FFFFFF" />
+            <MosaLogo size={68} />
           </div>
 
           <div
