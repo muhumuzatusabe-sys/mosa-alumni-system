@@ -40,10 +40,16 @@ echo [OK] Production bundle compiled successfully into ./dist (assets verified).
 
 echo.
 echo [2/4] Deploying to Firebase Hosting (mtech-46634)...
-call npx.cmd -y firebase-tools deploy > deploy_firebase.log 2>&1
-type deploy_firebase.log
-if %errorlevel% neq 0 (
-    echo [WARNING] Firebase deploy reported an issue.
+call npx.cmd -y firebase-tools deploy --only hosting
+set FIREBASE_STATUS=%errorlevel%
+if %FIREBASE_STATUS% neq 0 (
+    echo.
+    echo [RETRYING] Firebase deploy encountered a network glitch. Retrying upload...
+    call npx.cmd -y firebase-tools deploy --only hosting
+    set FIREBASE_STATUS=%errorlevel%
+)
+if %FIREBASE_STATUS% neq 0 (
+    echo [ERROR] Firebase deploy failed with code %FIREBASE_STATUS%. Check network connection.
 ) else (
     echo [OK] Deployed to Firebase Hosting successfully.
 )
@@ -56,12 +62,19 @@ echo [OK] Staged and committed changes.
 
 echo.
 echo [4/4] Pushing to GitHub (origin/main)...
-call git push origin main > deploy_git.log 2>&1
-type deploy_git.log
-if %errorlevel% equ 0 (
+call git push origin main
+set GIT_STATUS=%errorlevel%
+if %GIT_STATUS% neq 0 (
+    echo.
+    echo [RETRYING] Git push encountered a network timeout. Retrying...
+    timeout /t 3 /nobreak >nul
+    call git push origin main
+    set GIT_STATUS=%errorlevel%
+)
+if %GIT_STATUS% equ 0 (
     echo [OK] Successfully pushed to origin/main!
 ) else (
-    echo [WARNING] Git push encountered an issue. Check git credentials.
+    echo [WARNING] Git push encountered an issue. Check network/git credentials.
 )
 
 echo.

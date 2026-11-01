@@ -21,9 +21,13 @@ if (-not (Test-Path "dist\assets")) {
 Write-Host "[OK] Production bundle compiled successfully into ./dist (assets verified)" -ForegroundColor Green
 
 Write-Host "`n[2/4] Deploying to Firebase Hosting (mtech-46634)..." -ForegroundColor Yellow
-npx -y firebase-tools deploy
+npx -y firebase-tools deploy --only hosting
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[WARNING] Firebase deploy reported an issue." -ForegroundColor DarkYellow
+    Write-Host "`n[RETRYING] Retrying Firebase upload..." -ForegroundColor Yellow
+    npx -y firebase-tools deploy --only hosting
+}
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[WARNING] Firebase deploy reported an issue. Check network." -ForegroundColor DarkYellow
 } else {
     Write-Host "[OK] Deployed to Firebase Hosting successfully." -ForegroundColor Green
 }
@@ -35,6 +39,11 @@ Write-Host "[OK] Staged and committed changes." -ForegroundColor Green
 
 Write-Host "`n[4/4] Pushing to GitHub (origin/main)..." -ForegroundColor Yellow
 git push origin main
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "`n[RETRYING] Retrying Git push..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 2
+    git push origin main
+}
 if ($LASTEXITCODE -eq 0) {
     Write-Host "[OK] Successfully pushed to origin/main!" -ForegroundColor Green
 } else {

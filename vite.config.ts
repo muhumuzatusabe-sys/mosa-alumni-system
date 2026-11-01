@@ -25,9 +25,6 @@ export default defineConfig({
             if (id.includes('jspdf') || id.includes('qrcode')) {
               return 'vendor-pdf';
             }
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'vendor-react';
-            }
             return 'vendor';
           }
         },
