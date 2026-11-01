@@ -555,12 +555,12 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
 
             {/* Email */}
             <a
-              href={`mailto:${welcomeConfig?.socialGmail || 'mosaalumni31@gmail.com'}`}
+              href={`mailto:${welcomeConfig?.socialGmail || 'masshalumni@gmail.com'}`}
               style={{ color: '#0F172A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600 }}
               title="Email MOSA Secretariat"
             >
               <Mail size={14} color="#2563EB" />
-              <span>{welcomeConfig?.socialGmail || 'mosaalumni31@gmail.com'}</span>
+              <span>{welcomeConfig?.socialGmail || 'masshalumni@gmail.com'}</span>
             </a>
 
             {/* Official Website */}
@@ -670,9 +670,9 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
 
             {/* Gmail / Contact */}
             <a
-              href={`mailto:${welcomeConfig?.socialGmail || 'mosaalumni31@gmail.com'}`}
+              href={`mailto:${welcomeConfig?.socialGmail || 'masshalumni@gmail.com'}`}
               aria-label="Email MOSA Secretariat"
-              title="Email Secretariat (mosaalumni31@gmail.com)"
+              title="Email Secretariat (masshalumni@gmail.com)"
               style={{
                 width: '30px',
                 height: '30px',

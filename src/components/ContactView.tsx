@@ -80,7 +80,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
   ];
 
   const faqs: FaqItem[] = content?.faqs && content.faqs.length > 0 ? content.faqs : defaultFaqs;
-  const emails: string[] = content?.emails && content.emails.length > 0 ? content.emails : ['mosaalumni31@gmail.com'];
+  const emails: string[] = content?.emails && content.emails.length > 0 ? content.emails : ['masshalumni@gmail.com'];
   const phoneNumbers: string[] = content?.phoneNumbers && content.phoneNumbers.length > 0 ? content.phoneNumbers : [
     '+256 772 411921',
     '+256 706599793',

@@ -338,7 +338,7 @@ const defaultWebsiteContent: WebsiteContent = {
     campusAddress: 'Mandela Secondary School Hoima (MASSH), Main Campus, Hoima City, Bunyoro Sub-Region, Uganda',
     poBox: 'P.O. Box 284, Hoima City, Uganda',
     phoneNumbers: ['+256 772 411921', '+256 706599793', '+256 773432413'],
-    emails: ['mosaalumni31@gmail.com'],
+    emails: ['masshalumni@gmail.com'],
     workingHours: 'Monday – Friday: 8:00 AM – 5:00 PM EAT | Saturday: 9:00 AM – 1:00 PM EAT',
     faqs: [
       {
@@ -544,7 +544,7 @@ const defaultWelcomePageConfig: WelcomePageConfig = {
   lastPublishedBy: 'admin@massh.ac.ug',
   socialX: 'https://x.com/Masshalumni',
   socialLinkedIn: 'https://linkedin.com/company/mosa-massh',
-  socialGmail: 'mosaalumni31@gmail.com',
+  socialGmail: 'masshalumni@gmail.com',
   socialTikTok: 'https://tiktok.com/@mosa_massh',
   officialPhone: '+256 772 411921',
   officialWhatsApp: '256772411921',
@@ -2453,6 +2453,7 @@ export const dataService = {
     error?: string; 
     provider?: string; 
     offlineNotice?: string; 
+    deliveredToInbox?: boolean;
   }> {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
@@ -2503,11 +2504,19 @@ export const dataService = {
       }
     }
 
+    const isDeliveredToRealInbox = Boolean(
+      dispatchRes?.success && 
+      dispatchRes?.provider && 
+      dispatchRes.provider !== 'local_offline' && 
+      !dispatchRes.offlineNotice
+    );
+
     return { 
       success: true, 
       code,
-      provider: dispatchRes?.provider,
+      provider: dispatchRes?.provider || 'local_offline',
       offlineNotice: dispatchRes?.offlineNotice,
+      deliveredToInbox: isDeliveredToRealInbox,
     };
   },
 

@@ -72,7 +72,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       setHeroImageUrl(cfg.draftHeroImageUrl || cfg.heroImageUrl || '');
       setSocialX(cfg.draftSocialX ?? cfg.socialX ?? 'https://x.com/Masshalumni');
       setSocialLinkedIn(cfg.draftSocialLinkedIn ?? cfg.socialLinkedIn ?? 'https://linkedin.com/company/mosa-massh');
-      setSocialGmail(cfg.draftSocialGmail ?? cfg.socialGmail ?? 'mosaalumni31@gmail.com');
+      setSocialGmail(cfg.draftSocialGmail ?? cfg.socialGmail ?? 'masshalumni@gmail.com');
       setSocialTikTok(cfg.draftSocialTikTok ?? cfg.socialTikTok ?? 'https://tiktok.com/@mosa_massh');
       setOfficialPhone(cfg.draftOfficialPhone ?? cfg.officialPhone ?? '+256 772 411921');
       setOfficialWhatsApp(cfg.draftOfficialWhatsApp ?? cfg.officialWhatsApp ?? '256772411921');

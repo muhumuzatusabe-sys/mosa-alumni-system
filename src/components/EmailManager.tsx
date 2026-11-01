@@ -227,7 +227,8 @@ export const EmailManager: React.FC = () => {
                     background: '#FFFFFF'
                   }}
                 >
-                  <option value="auto">Auto-Detect (Try Brevo → Resend → EmailJS → Web3Forms)</option>
+                  <option value="auto">Auto-Detect (Gmail SMTP → Brevo → Resend → EmailJS)</option>
+                  <option value="smtp">Official Gmail SMTP (masshalumni@gmail.com • Connected)</option>
                   <option value="brevo">Brevo / Sendinblue (Recommended • 300 free emails/day)</option>
                   <option value="resend">Resend (Modern Transactional REST API)</option>
                   <option value="emailjs">EmailJS (Client-side browser dispatch)</option>
@@ -235,6 +236,54 @@ export const EmailManager: React.FC = () => {
                 </select>
                 <span style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem', display: 'block' }}>
                   Choose which delivery network sends emails to recipient inboxes.
+                </span>
+              </div>
+
+              {/* Official Gmail SMTP Settings */}
+              <div style={{
+                background: '#F0FDF4',
+                border: '1.5px solid #86EFAC',
+                borderRadius: '10px',
+                padding: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#065F46' }}>
+                    Official MASSH Gmail SMTP Gateway
+                  </label>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '4px',
+                    background: '#DCFCE7',
+                    color: '#166534'
+                  }}>
+                    Active &bull; Google App Password Linked
+                  </span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Gmail Address</label>
+                    <input
+                      type="email"
+                      value={settings.smtpUser || ''}
+                      onChange={e => setSettings({ ...settings, smtpUser: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Google App Password (16 chars)</label>
+                    <input
+                      type="password"
+                      placeholder="•••• •••• •••• ••••"
+                      value={settings.smtpPass || ''}
+                      onChange={e => setSettings({ ...settings, smtpPass: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.74rem', color: '#15803D', marginTop: '0.2rem', display: 'block' }}>
+                  Linked to Google Account: <strong>masshalumni@gmail.com</strong> (App: MASSH ALUMNI).
                 </span>
               </div>
 

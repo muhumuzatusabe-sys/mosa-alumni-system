@@ -479,7 +479,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
           Tel: {(settings?.phoneNumbers || ['+256 772 411921', '+256 706599793', '+256 773432413']).join(', ')}
         </div>
         <div style={{ fontSize: 'clamp(0.48rem, 1.4vw, 0.65rem)', color: '#F1F5F9', fontWeight: 500 }}>
-          Email: {settings?.email || 'mosaalumni31@gmail.com'}
+          Email: {settings?.email || 'masshalumni@gmail.com'}
         </div>
         <div style={{ fontSize: 'clamp(0.48rem, 1.4vw, 0.65rem)', color: '#F1F5F9', fontWeight: 500 }}>
           Website: {settings?.website || 'mtech-46634.web.app'}

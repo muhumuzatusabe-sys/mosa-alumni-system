@@ -683,8 +683,8 @@ export const App: React.FC = () => {
 
               {/* Gmail / Email */}
               <a
-                href="mailto:mosaalumni31@gmail.com"
-                title="Email MOSA Secretariat (mosaalumni31@gmail.com)"
+                href="mailto:masshalumni@gmail.com"
+                title="Email MOSA Secretariat (masshalumni@gmail.com)"
                 style={{
                   width: '28px',
                   height: '28px',
@@ -708,10 +708,10 @@ export const App: React.FC = () => {
               <span>Tel: +256 772 411921, +256 706599793, +256 773432413</span>
               <span>•</span>
               <a 
-                href="mailto:mosaalumni31@gmail.com" 
+                href="mailto:masshalumni@gmail.com" 
                 style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
               >
-                mosaalumni31@gmail.com
+                masshalumni@gmail.com
               </a>
               <span>•</span>
               <a 

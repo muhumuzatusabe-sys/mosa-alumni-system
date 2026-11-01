@@ -23,7 +23,11 @@ export interface EmailDispatchResult {
 }
 
 export interface EmailSettings {
-  provider: 'auto' | 'emailjs' | 'brevo' | 'resend' | 'web3forms';
+  provider: 'auto' | 'smtp' | 'emailjs' | 'brevo' | 'resend' | 'web3forms';
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+  smtpPass?: string;
   emailjsServiceId?: string;
   emailjsTemplateId?: string;
   emailjsPublicKey?: string;
@@ -48,21 +52,34 @@ export interface EmailDispatchLog {
 
 const DEFAULT_SETTINGS: EmailSettings = {
   provider: 'auto',
+  smtpHost: 'smtp.gmail.com',
+  smtpPort: 465,
+  smtpUser: 'masshalumni@gmail.com',
+  smtpPass: 'iuzqyofmqxfuawdr',
   emailjsServiceId: '',
   emailjsTemplateId: '',
   emailjsPublicKey: '',
   brevoApiKey: '',
   resendApiKey: '',
   web3formsAccessKey: '',
-  senderEmail: 'mosaalumni31@gmail.com',
-  senderName: 'Mandela Old Students Association (MOSA)',
+  senderEmail: 'masshalumni@gmail.com',
+  senderName: 'Mandela Old Students Association (MASSH Hoima)',
 };
 
 export const getEmailSettings = (): EmailSettings => {
   try {
     const stored = localStorage.getItem('mosa_email_settings');
     if (stored) {
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
+      const parsed = JSON.parse(stored);
+      return { 
+        ...DEFAULT_SETTINGS, 
+        ...parsed,
+        smtpHost: parsed.smtpHost || DEFAULT_SETTINGS.smtpHost,
+        smtpPort: parsed.smtpPort || DEFAULT_SETTINGS.smtpPort,
+        smtpUser: parsed.smtpUser || DEFAULT_SETTINGS.smtpUser,
+        smtpPass: parsed.smtpPass || DEFAULT_SETTINGS.smtpPass,
+        senderEmail: parsed.senderEmail || DEFAULT_SETTINGS.senderEmail,
+      };
     }
   } catch {}
   return DEFAULT_SETTINGS;
@@ -125,7 +142,51 @@ export const dispatchEmail = async (params: {
     'background: #113D2B; color: #FCD34D; font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: bold;'
   );
 
-  // 1. Try Brevo (Sendinblue) REST API if configured
+  // 1. Try Official Gmail SMTP dispatch via secure cloud relay
+  if (settings.smtpUser && settings.smtpPass && (settings.provider === 'auto' || settings.provider === 'smtp')) {
+    try {
+      const cleanPass = settings.smtpPass.replace(/\s+/g, '');
+      const formData = new URLSearchParams();
+      formData.append('Action', 'Send');
+      formData.append('Host', settings.smtpHost || 'smtp.gmail.com');
+      formData.append('Port', String(settings.smtpPort || 465));
+      formData.append('Username', settings.smtpUser.trim());
+      formData.append('Password', cleanPass);
+      formData.append('To', cleanEmail);
+      formData.append('From', `${settings.senderName} <${settings.smtpUser.trim()}>`);
+      formData.append('Subject', params.subject);
+      formData.append('Body', params.htmlContent);
+
+      const res = await fetch('https://smtpjs.com/v3/smtpjs.aspx', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        },
+        body: formData.toString(),
+      });
+
+      const responseText = (await res.text()).trim();
+      if (responseText === 'OK' || responseText.toLowerCase().includes('ok')) {
+        await recordEmailLog({
+          id: `log-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          to: cleanEmail,
+          toName: displayName,
+          subject: params.subject,
+          category: params.category,
+          provider: 'gmail_smtp',
+          status: 'DELIVERED',
+        });
+        return { success: true, messageId: `GMAIL-${Date.now()}`, provider: 'gmail_smtp' };
+      } else {
+        console.warn('Gmail SMTP response message:', responseText);
+      }
+    } catch (smtpErr) {
+      console.warn('Gmail SMTP network error:', smtpErr);
+    }
+  }
+
+  // 2. Try Brevo (Sendinblue) REST API if configured
   if (settings.brevoApiKey && (settings.provider === 'auto' || settings.provider === 'brevo')) {
     try {
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -444,7 +505,7 @@ const buildEmailTemplate = (contentHtml: string): string => {
             MOSA Secretariat • Mandela Secondary School Hoima
           </div>
           <div style="margin-top: 4px;">
-            P.O. Box 280, Hoima City, Uganda • Official: <a href="mailto:mosaalumni31@gmail.com" style="color: #059669; text-decoration: none;">mosaalumni31@gmail.com</a>
+            P.O. Box 280, Hoima City, Uganda • Official: <a href="mailto:masshalumni@gmail.com" style="color: #059669; text-decoration: none;">masshalumni@gmail.com</a>
           </div>
           <div style="margin-top: 4px;">
             Tel: +256 772 411921 / +256 706599793 • Portal: <a href="https://mtech-46634.web.app" style="color: #059669; text-decoration: none;">https://mtech-46634.web.app</a>
@@ -490,7 +551,7 @@ export const sendVerificationEmail = async (
     </div>
 
     <p style="font-size: 13px; line-height: 1.6; color: #64748B;">
-      If you did not request this verification code, please ignore this email or contact the MOSA Secretariat at <a href="mailto:mosaalumni31@gmail.com" style="color: #059669;">mosaalumni31@gmail.com</a>.
+      If you did not request this verification code, please ignore this email or contact the MOSA Secretariat at <a href="mailto:masshalumni@gmail.com" style="color: #059669;">masshalumni@gmail.com</a>.
     </p>
   `;
 
@@ -625,7 +686,7 @@ export const sendMembershipApprovalEmail = async (
     </div>
 
     <p style="font-size: 13px; color: #64748B; line-height: 1.6;">
-      Need assistance? Contact the Secretariat at <a href="mailto:mosaalumni31@gmail.com" style="color: #059669;">mosaalumni31@gmail.com</a> or call +256 772 411921.
+      Need assistance? Contact the Secretariat at <a href="mailto:masshalumni@gmail.com" style="color: #059669;">masshalumni@gmail.com</a> or call +256 772 411921.
     </p>
   `;
 

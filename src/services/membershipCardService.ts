@@ -65,7 +65,7 @@ export const DEFAULT_CARD_SETTINGS: MembershipCardSettings = {
   ownershipStatement: 'This is property of:',
   associationName: 'Mandela Old Students Association (MOSA)',
   phoneNumbers: ['+256 772 411921', '+256 706599793', '+256 773432413'],
-  email: 'mosaalumni31@gmail.com',
+  email: 'masshalumni@gmail.com',
   website: 'mtech-46634.web.app',
   chairmanMosa: {
     title: 'Chairman MOSA',
