@@ -1,7 +1,7 @@
-// MASSH ALUMNI PORTAL Service Worker v8.0.0
+// MASSH ALUMNI PORTAL Service Worker v9.0.0
 // Caches core application shells, fonts, brand assets, and offline membership card passes
 
-const CACHE_NAME = 'massh-alumni-cache-v8';
+const CACHE_NAME = 'massh-alumni-cache-v9';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -37,50 +37,22 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  const url = new URL(event.request.url);
-  const isHtml = event.request.mode === 'navigate' || event.request.headers.get('accept')?.includes('text/html');
-
-  // Network-First for HTML navigation so deployed updates are seen immediately
-  if (isHtml) {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          return caches.match('/index.html');
-        })
-    );
-    return;
-  }
-
-  // Cache-first for same-origin static assets
-  if (url.origin === location.origin) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-            }
-          }).catch(() => {});
-          return cachedResponse;
+  // Network-First for everything: always try network first, fall back to cache only when offline
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
-
-        return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return networkResponse;
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          return cached || caches.match('/index.html');
         });
       })
-    );
-  }
+  );
 });
 
 // ==============================================================

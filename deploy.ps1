@@ -4,15 +4,21 @@ Write-Host "   Automated Deployment: Firebase Hosting + GitHub" -ForegroundColor
 Write-Host "==========================================================" -ForegroundColor Cyan
 
 Set-Location -Path $PSScriptRoot
-$env:NODE_OPTIONS = "--max-old-space-size=4096"
+$env:NODE_OPTIONS = "--max-old-space-size=8192"
 
-Write-Host "`n[1/4] Building production bundle (TypeScript + Vite)..." -ForegroundColor Yellow
+Write-Host "`n[1/4] Building production bundle (TypeScript + Vite with 8GB memory)..." -ForegroundColor Yellow
 npm run build
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`n[ERROR] Build failed! Aborting deployment." -ForegroundColor Red
     exit $LASTEXITCODE
 }
-Write-Host "[OK] Production bundle compiled successfully into ./dist" -ForegroundColor Green
+
+if (-not (Test-Path "dist\assets")) {
+    Write-Host "`n[ERROR] dist\assets was not created! Aborting deployment." -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "[OK] Production bundle compiled successfully into ./dist (assets verified)" -ForegroundColor Green
 
 Write-Host "`n[2/4] Deploying to Firebase Hosting (mtech-46634)..." -ForegroundColor Yellow
 npx -y firebase-tools deploy

@@ -7,22 +7,36 @@ echo    Automated Deployment: Firebase Hosting + GitHub
 echo ==========================================================
 
 cd /d "%~dp0"
-set NODE_OPTIONS=--max-old-space-size=4096
+set NODE_OPTIONS=--max-old-space-size=8192
 
 echo.
-echo [1/4] Building production bundle (TypeScript + Vite)...
-if exist "node_modules\.tmp" rd /s /q "node_modules\.tmp"
-call npm.cmd run build > deploy_build.log 2>&1
+echo [1/4] Building production bundle (TypeScript + Vite with 8GB memory)...
+cmd /c "npm run build"
 set BUILD_STATUS=%errorlevel%
-type deploy_build.log
+
 if %BUILD_STATUS% neq 0 (
     echo.
     echo [ERROR] Build failed with exit code %BUILD_STATUS%! Aborting deployment.
     pause
     exit /b %BUILD_STATUS%
 )
+
+if not exist "dist\assets" (
+    echo.
+    echo [ERROR] dist\assets folder was not created by Vite! Aborting deployment.
+    pause
+    exit /b 1
+)
+
+if not exist "dist\index.html" (
+    echo.
+    echo [ERROR] dist\index.html was not created! Aborting deployment.
+    pause
+    exit /b 1
+)
+
 echo.
-echo [OK] Production bundle compiled successfully into ./dist
+echo [OK] Production bundle compiled successfully into ./dist (assets verified).
 
 echo.
 echo [2/4] Deploying to Firebase Hosting (mtech-46634)...
