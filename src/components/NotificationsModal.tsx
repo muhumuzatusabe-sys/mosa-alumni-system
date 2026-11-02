@@ -214,7 +214,7 @@ export const NotificationsModal: React.FC<Props> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.45rem',
-                background: '#166534',
+                background: '#0A271B',
                 color: '#FFFFFF',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

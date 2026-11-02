@@ -170,11 +170,11 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
       {/* 1. PERSONALIZED MEMBER PROFILE HEADER */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
+          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 60%, #14532D 100%)',
           borderRadius: '20px',
           padding: '1.75rem 2rem',
           color: '#ffffff',
-          boxShadow: '0 12px 28px rgba(22, 101, 52, 0.25)',
+          boxShadow: '0 12px 28px rgba(10, 39, 27, 0.25)',
           border: '1px solid rgba(198, 138, 36, 0.3)',
           position: 'relative',
           overflow: 'hidden'
@@ -668,7 +668,7 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
                         fontSize: '0.72rem',
                         fontWeight: 800,
                         background: req.status === 'ACCEPTED' ? '#DCFCE7' : req.status === 'DECLINED' ? '#FEE2E2' : '#FEF3C7',
-                        color: req.status === 'ACCEPTED' ? '#166534' : req.status === 'DECLINED' ? '#991B1B' : '#92400E',
+                        color: req.status === 'ACCEPTED' ? '#0A271B' : req.status === 'DECLINED' ? '#991B1B' : '#92400E',
                       }}>
                         {req.status}
                       </span>
@@ -701,7 +701,7 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
                         <div style={{ fontWeight: 800, color: '#0B203E' }}>{req.menteeName} ({req.menteeAlumniNumber})</div>
                         <div style={{ fontSize: '0.78rem', color: '#64748B' }}>Topic: {req.fieldOrTopic} &bull; Email: {req.menteeEmail}</div>
                       </div>
-                      <span style={{ padding: '0.25rem 0.65rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, background: req.status === 'ACCEPTED' ? '#DCFCE7' : '#FEF3C7', color: req.status === 'ACCEPTED' ? '#166534' : '#92400E' }}>
+                      <span style={{ padding: '0.25rem 0.65rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, background: req.status === 'ACCEPTED' ? '#DCFCE7' : '#FEF3C7', color: req.status === 'ACCEPTED' ? '#0A271B' : '#92400E' }}>
                         {req.status}
                       </span>
                     </div>

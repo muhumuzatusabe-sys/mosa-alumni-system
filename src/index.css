@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary-navy: #166534; /* MASSH Prestige Deep Green */
-  --primary-navy-dark: #14532D; /* Rich Deep Forest Green */
-  --primary-navy-light: #15803D; /* Forest Green Accent */
-  --primary-green: #166534;
-  --primary-green-dark: #14532D;
-  --primary-green-light: #15803D;
+  --primary-navy: #0A271B; /* MASSH Prestige Deep Dark Green */
+  --primary-navy-dark: #05160F; /* Rich Midnight Green */
+  --primary-navy-light: #14532D; /* Forest Green Accent */
+  --primary-green: #0A271B;
+  --primary-green-dark: #05160F;
+  --primary-green-light: #14532D;
   --cream-bg: #F8F6F0; /* Warm Rich Cream */
   --cream-surface: #FCFBF7;
   --cream-border: #E5DFD1;
@@ -14,16 +14,16 @@
   --gold-accent: #C68A24;
   --gold-light: #EAB308;
   --gold-soft: #FEF3C7;
-  --emerald-accent: #15803D;
+  --emerald-accent: #14532D;
   --emerald-soft: #DCFCE7;
   --slate-50: #F8F6F0; /* Cream Base */
   --slate-100: #F2EFE6; /* Warm Cream Surface */
   --slate-200: #E5DFD1; /* Cream Border */
   --slate-300: #D3CAB8;
-  --slate-600: #166534;
-  --slate-700: #15803D;
-  --slate-800: #166534;
-  --slate-900: #14532D;
+  --slate-600: #0A271B;
+  --slate-700: #14532D;
+  --slate-800: #0A271B;
+  --slate-900: #05160F;
   
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Cinzel', serif;
@@ -34,10 +34,10 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   
-  --shadow-sm: 0 1px 3px rgba(22, 101, 52, 0.08);
-  --shadow-md: 0 4px 12px rgba(22, 101, 52, 0.12);
-  --shadow-lg: 0 10px 25px rgba(22, 101, 52, 0.16);
-  --shadow-xl: 0 20px 35px rgba(22, 101, 52, 0.22);
+  --shadow-sm: 0 1px 3px rgba(10, 39, 27, 0.08);
+  --shadow-md: 0 4px 12px rgba(10, 39, 27, 0.12);
+  --shadow-lg: 0 10px 25px rgba(10, 39, 27, 0.16);
+  --shadow-xl: 0 20px 35px rgba(10, 39, 27, 0.22);
   --shadow-gold: 0 4px 14px rgba(198, 138, 36, 0.25);
 }
 
@@ -133,13 +133,13 @@ h1, h2, h3, h4, h5, h6 {
 .massh-crest {
   width: 50px;
   height: 50px;
-  background: radial-gradient(circle, #15803D 0%, #166534 100%);
+  background: radial-gradient(circle, #14532D 0%, #0A271B 100%);
   border: 2px solid #F3EFE6;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.35);
+  box-shadow: 0 4px 12px rgba(10, 39, 27, 0.35);
   font-family: var(--font-serif);
   font-weight: 800;
   color: #FAF6ED;
@@ -369,7 +369,7 @@ h1, h2, h3, h4, h5, h6 {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(22, 101, 52, 0.72);
+  background: rgba(10, 39, 27, 0.72);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -679,7 +679,7 @@ img, video, canvas, svg, iframe {
     right: 0 !important;
     height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
     padding-bottom: max(env(safe-area-inset-bottom, 0px), 4px) !important;
-    background: #166534 !important;
+    background: #0A271B !important;
     border-top: 1.5px solid rgba(198, 138, 36, 0.45) !important;
     box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45) !important;
     z-index: 1000 !important;
@@ -820,14 +820,18 @@ img, video, canvas, svg, iframe {
     font-size: 0.82rem !important;
   }
 
-  /* 2x2 Quick Actions Grid */
+  /* 2x2 Quick Actions Grid - strictly two per side (2 items per row) */
   .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.5rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.55rem !important;
+    width: 100% !important;
   }
 
   .quick-actions-grid button {
-    padding: 0.55rem 0.5rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0.6rem 0.5rem !important;
     min-height: 44px !important;
     font-size: 0.82rem !important;
   }
@@ -927,7 +931,7 @@ img, video, canvas, svg, iframe {
   .modal-overlay {
     padding: 0 !important;
     align-items: flex-end !important;
-    background: rgba(22, 101, 52, 0.82) !important;
+    background: rgba(10, 39, 27, 0.82) !important;
     backdrop-filter: blur(4px) !important;
   }
 
@@ -999,11 +1003,11 @@ html, body, #root {
 .mosa-card {
   background: #FFFFFF;
   border: 1px solid var(--cream-border) !important;
-  box-shadow: 0 4px 14px rgba(22, 101, 52, 0.05);
+  box-shadow: 0 4px 14px rgba(10, 39, 27, 0.05);
 }
 
 .mosa-card:hover {
-  box-shadow: 0 8px 24px rgba(22, 101, 52, 0.08);
+  box-shadow: 0 8px 24px rgba(10, 39, 27, 0.08);
   border-color: #D3CAB8 !important;
 }
 
@@ -1023,12 +1027,12 @@ html, body, #root {
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.25);
+  box-shadow: 0 2px 6px rgba(10, 39, 27, 0.25);
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-green-light) 0%, var(--primary-green) 100%) !important;
-  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
+  box-shadow: 0 4px 12px rgba(10, 39, 27, 0.3);
 }
 
 /* Table styling */
@@ -1077,7 +1081,7 @@ table tbody tr:hover {
   background: #E8F7ED !important;
   border: 2px solid #86EFAC !important;
   border-radius: 14px;
-  box-shadow: 0 16px 40px -8px rgba(22, 101, 52, 0.28), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 16px 40px -8px rgba(10, 39, 27, 0.28), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   z-index: 1210;
   display: flex;
   flex-direction: column;
@@ -1109,7 +1113,7 @@ table tbody tr:hover {
 }
 
 .mosa-portal-inst-title {
-  color: #15803D;
+  color: #14532D;
   font-weight: 800;
   font-size: 0.86rem;
   letter-spacing: 0.03em;
@@ -1260,7 +1264,7 @@ table tbody tr:hover {
 
 /* Specific styling for Enrollment row (green in screenshot) */
 .mosa-portal-menu-row.enrollment {
-  color: #166534;
+  color: #0A271B;
 }
 .mosa-portal-menu-row.enrollment:hover {
   background: #E1F8E8;
@@ -1277,7 +1281,7 @@ table tbody tr:hover {
 /* Active current row */
 .mosa-portal-menu-row.active {
   background: #DCFCE7;
-  color: #15803D;
+  color: #14532D;
 }
 
 /* Subitems Container */
@@ -1310,12 +1314,12 @@ table tbody tr:hover {
 
 .mosa-portal-subitem-btn:hover {
   background: #DCFCE7;
-  color: #15803D;
+  color: #14532D;
 }
 
 .mosa-portal-subitem-btn.active {
   background: #BBF7D0;
-  color: #15803D;
+  color: #14532D;
   font-weight: 700;
 }
 
@@ -1345,7 +1349,7 @@ table tbody tr:hover {
 
 .mosa-portal-direct-row.active {
   background: #DCFCE7;
-  color: #15803D;
+  color: #14532D;
 }
 
 .mosa-portal-unread-badge {
@@ -1381,7 +1385,7 @@ table tbody tr:hover {
   cursor: pointer;
   border: 1px solid #86EFAC;
   background: #FFFFFF;
-  color: #166534;
+  color: #0A271B;
   transition: all 0.15s ease;
 }
 
@@ -1390,13 +1394,13 @@ table tbody tr:hover {
 }
 
 .mosa-portal-footer-action.primary {
-  background: #15803D;
-  border-color: #15803D;
+  background: #14532D;
+  border-color: #14532D;
   color: #FFFFFF;
 }
 
 .mosa-portal-footer-action.primary:hover {
-  background: #166534;
+  background: #0A271B;
 }
 
 /* Mobile Responsive Adjustments */

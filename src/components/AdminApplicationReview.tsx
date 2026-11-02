@@ -1148,7 +1148,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                 padding: '0.75rem 1rem', 
                 borderRadius: '8px', 
                 background: settingsNotice.type === 'success' ? '#DCFCE7' : '#FEE2E2', 
-                color: settingsNotice.type === 'success' ? '#166534' : '#991B1B', 
+                color: settingsNotice.type === 'success' ? '#0A271B' : '#991B1B', 
                 fontSize: '0.85rem', 
                 marginBottom: '1rem', 
                 fontWeight: 600,
@@ -1276,7 +1276,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
               <p style={{ fontSize: '0.8rem', color: '#475569', lineHeight: 1.5, margin: 0 }}>
                 Every allocated membership number is permanently recorded in the database ledger. Even if a member record is deactivated or deleted, their number remains strictly reserved and is never reused for any future alumnus.
               </p>
-              <div style={{ marginTop: '0.85rem', padding: '0.5rem 0.75rem', background: '#DCFCE7', borderRadius: '6px', fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+              <div style={{ marginTop: '0.85rem', padding: '0.5rem 0.75rem', background: '#DCFCE7', borderRadius: '6px', fontSize: '0.75rem', color: '#0A271B', fontWeight: 600 }}>
                 ✓ Concurrency-safe unique ledger active. Zero collisions guaranteed.
               </div>
             </div>
@@ -1329,7 +1329,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                 fontSize: '0.85rem', 
                 fontWeight: 600,
                 background: legacyNotice.type === 'success' ? '#DCFCE7' : '#FEE2E2',
-                color: legacyNotice.type === 'success' ? '#166534' : '#991B1B',
+                color: legacyNotice.type === 'success' ? '#0A271B' : '#991B1B',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem'
@@ -1417,7 +1417,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                         </td>
                         <td style={{ padding: '0.85rem 1rem' }}>
                           {record.verifiedStatus === 'LINKED' || record.linkedAlumniId ? (
-                            <span style={{ background: '#DCFCE7', color: '#166534', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
+                            <span style={{ background: '#DCFCE7', color: '#0A271B', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700 }}>
                               Linked to Member
                             </span>
                           ) : (
@@ -1523,7 +1523,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                                   <AlertTriangle size={13} style={{ color: '#DC2626' }} /> Duplicate: {item.reason}
                                 </span>
                               ) : (
-                                <span style={{ color: '#166534', fontWeight: 700 }}>
+                                <span style={{ color: '#0A271B', fontWeight: 700 }}>
                                   ✓ Valid New Entry
                                 </span>
                               )}
@@ -2872,7 +2872,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                             </span>
                           </div>
                           {entry.reason && (
-                            <div style={{ color: isDis ? '#991B1B' : '#166534', marginTop: '0.35rem' }}>
+                            <div style={{ color: isDis ? '#991B1B' : '#0A271B', marginTop: '0.35rem' }}>
                               <strong>Reason:</strong> {entry.reason}
                             </div>
                           )}
@@ -3216,7 +3216,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
                                 </span>
                               </div>
                               {entry.reason && (
-                                <div style={{ color: isDis ? '#991B1B' : '#166534', marginTop: '0.35rem' }}>
+                                <div style={{ color: isDis ? '#991B1B' : '#0A271B', marginTop: '0.35rem' }}>
                                   <strong>Reason:</strong> {entry.reason}
                                 </div>
                               )}

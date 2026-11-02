@@ -159,7 +159,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 style={{ 
                   fontSize: '0.84rem', 
                   fontWeight: 800, 
-                  color: '#15803D', 
+                  color: '#14532D', 
                   letterSpacing: '0.04em',
                   background: '#ECFDF5',
                   padding: '0.2rem 0.55rem',
@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1.5px solid #166534',
+                  border: '1.5px solid #0A271B',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
                 }}
               >
@@ -287,11 +287,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 borderRadius: '8px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
-                background: '#15803D',
+                background: '#14532D',
                 color: '#FFFFFF',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 1px 4px rgba(21, 128, 61, 0.25)',
+                boxShadow: '0 1px 4px rgba(20, 83, 45, 0.25)',
               }}
             >
               <LogIn size={15} />

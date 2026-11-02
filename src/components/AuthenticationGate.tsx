@@ -251,7 +251,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         padding: '1.5rem 1rem',
-        background: 'radial-gradient(ellipse at top, #166534 0%, #15803D 60%, #166534 100%)',
+        background: 'radial-gradient(ellipse at top, #0A271B 0%, #14532D 60%, #0A271B 100%)',
         position: 'relative',
         boxSizing: 'border-box',
       }}
@@ -263,7 +263,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.08) 0%, rgba(22, 101, 52, 0) 70%)',
+          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.08) 0%, rgba(10, 39, 27, 0) 70%)',
           top: '10%',
           pointerEvents: 'none',
         }}
@@ -287,7 +287,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
         {/* Card Header Branding */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
+            background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)',
             padding: '2rem 1.75rem 1.75rem 1.75rem',
             textAlign: 'center',
             color: '#FFFFFF',
@@ -403,7 +403,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 justifyContent: 'center',
                 gap: '0.4rem',
                 background: authMode === 'create-account' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'create-account' ? '#15803D' : '#64748B',
+                color: authMode === 'create-account' ? '#14532D' : '#64748B',
                 boxShadow: authMode === 'create-account' ? '0 2px 6px rgba(0, 0, 0, 0.08)' : 'none',
               }}
             >
@@ -429,11 +429,11 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 justifyContent: 'center',
                 gap: '0.4rem',
                 background: authMode === 'login' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'login' ? '#15803D' : '#64748B',
+                color: authMode === 'login' ? '#14532D' : '#64748B',
                 boxShadow: authMode === 'login' ? '0 2px 6px rgba(0, 0, 0, 0.08)' : 'none',
               }}
             >
-              <LogIn size={16} color={authMode === 'login' ? '#15803D' : '#94A3B8'} />
+              <LogIn size={16} color={authMode === 'login' ? '#14532D' : '#94A3B8'} />
               Log In
             </button>
           </div>
@@ -473,7 +473,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 background: '#F0FDF4',
                 border: '1px solid #86EFAC',
                 borderRadius: '10px',
-                color: '#166534',
+                color: '#0A271B',
                 fontSize: '0.85rem',
                 lineHeight: 1.45,
                 marginBottom: '1.25rem',
@@ -525,7 +525,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
+                        onFocus={(e) => (e.target.style.borderColor = '#0A271B')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                     </div>
@@ -571,7 +571,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
+                        onFocus={(e) => (e.target.style.borderColor = '#0A271B')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                       <button
@@ -632,7 +632,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
+                        onFocus={(e) => (e.target.style.borderColor = '#0A271B')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                       <button
@@ -663,7 +663,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.85rem',
-                      background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
+                      background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '10px',
@@ -740,7 +740,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
                       We sent a 6-digit confirmation code to:
                     </div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#166534', marginTop: '0.15rem' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0A271B', marginTop: '0.15rem' }}>
                       {email}
                     </div>
 
@@ -773,7 +773,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           style={{
                             width: '100%',
                             padding: '0.55rem 0.75rem',
-                            background: '#166534',
+                            background: '#0A271B',
                             color: '#FCD34D',
                             border: 'none',
                             borderRadius: '8px',
@@ -799,7 +799,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                         border: '1px solid #86EFAC',
                         borderRadius: '8px',
                         fontSize: '0.8rem',
-                        color: '#166534',
+                        color: '#0A271B',
                         lineHeight: 1.45,
                         textAlign: 'left'
                       }}>
@@ -859,7 +859,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       style={{
                         width: '100%',
                         padding: '0.85rem',
-                        border: '2px solid #166534',
+                        border: '2px solid #0A271B',
                         borderRadius: '10px',
                         fontSize: '1.4rem',
                         fontWeight: 800,
@@ -880,7 +880,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.85rem',
-                      background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
+                      background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '10px',
@@ -991,7 +991,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       outline: 'none',
                       boxSizing: 'border-box',
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#166534')}
+                    onFocus={(e) => (e.target.style.borderColor = '#0A271B')}
                     onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                   />
                 </div>
@@ -1047,7 +1047,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       outline: 'none',
                       boxSizing: 'border-box',
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#166534')}
+                    onFocus={(e) => (e.target.style.borderColor = '#0A271B')}
                     onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                   />
                   <button
@@ -1079,7 +1079,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                   width: '100%',
                   marginTop: '0.75rem',
                   padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
+                  background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',
@@ -1132,7 +1132,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
             <form onSubmit={handleResetPassword}>
               <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
                 <KeyRound size={36} color="#C68A24" style={{ margin: '0 auto 0.5rem auto' }} />
-                <h3 style={{ fontSize: '1.15rem', margin: '0 0 0.35rem 0', color: '#15803D', fontWeight: 800 }}>
+                <h3 style={{ fontSize: '1.15rem', margin: '0 0 0.35rem 0', color: '#14532D', fontWeight: 800 }}>
                   Reset Your Password
                 </h3>
                 <p style={{ fontSize: '0.84rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
@@ -1186,7 +1186,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 style={{
                   width: '100%',
                   padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
+                  background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',

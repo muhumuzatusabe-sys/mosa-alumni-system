@@ -679,7 +679,7 @@ export const MembershipCardAdmin: React.FC<Props> = ({ currentUser }) => {
                                 onClick={() => handleToggleSuspension(card, alumnus)}
                                 style={{
                                   background: card.status === 'SUSPENDED' ? '#DCFCE7' : '#FEE2E2',
-                                  color: card.status === 'SUSPENDED' ? '#166534' : '#991B1B',
+                                  color: card.status === 'SUSPENDED' ? '#0A271B' : '#991B1B',
                                   border: 'none',
                                   borderRadius: '6px',
                                   padding: '4px 8px',
@@ -977,7 +977,7 @@ export const MembershipCardAdmin: React.FC<Props> = ({ currentUser }) => {
                       padding: '2px 6px',
                       borderRadius: '4px',
                       background: c.status === 'ISSUED' ? '#DCFCE7' : c.status === 'SUPERSEDED' ? '#FEF3C7' : '#FEE2E2',
-                      color: c.status === 'ISSUED' ? '#166534' : c.status === 'SUPERSEDED' ? '#92400E' : '#991B1B',
+                      color: c.status === 'ISSUED' ? '#0A271B' : c.status === 'SUPERSEDED' ? '#92400E' : '#991B1B',
                     }}>
                       {c.status}
                     </span>

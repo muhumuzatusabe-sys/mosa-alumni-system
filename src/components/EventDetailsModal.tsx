@@ -333,10 +333,10 @@ export const EventDetailsModal: React.FC<Props> = ({
               {/* Registration RSVP Banner */}
               <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px', padding: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div>
-                  <div style={{ fontWeight: 700, color: '#166534', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <div style={{ fontWeight: 700, color: '#0A271B', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <Users size={16} /> {event.registeredCount} Alumni Registered • {event.attendedCount} Attended
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#15803D', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#14532D', marginTop: '0.2rem' }}>
                     Requirement: <strong>{event.registrationRequirement.replace('_', ' ')}</strong>
                     {event.registrationDeadline && ` • RSVP Deadline: ${event.registrationDeadline}`}
                   </div>

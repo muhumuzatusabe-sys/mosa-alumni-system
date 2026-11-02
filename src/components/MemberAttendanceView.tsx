@@ -242,12 +242,12 @@ export const MemberAttendanceView: React.FC<Props> = ({
       <div 
         className="mosa-card" 
         style={{ 
-          background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)', 
+          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)', 
           color: '#FFFFFF', 
           padding: '2rem 1.5rem', 
           borderRadius: '14px',
           borderLeft: '5px solid #C68A24',
-          boxShadow: '0 8px 24px -6px rgba(22, 101, 52,0.3)',
+          boxShadow: '0 8px 24px -6px rgba(10, 39, 27,0.3)',
           marginBottom: '2rem'
         }}
       >
@@ -337,7 +337,7 @@ export const MemberAttendanceView: React.FC<Props> = ({
                         </h3>
                         <span style={{ 
                           background: '#DCFCE7', 
-                          color: '#166534', 
+                          color: '#0A271B', 
                           fontSize: '0.75rem', 
                           fontWeight: 700, 
                           padding: '0.2rem 0.65rem', 
@@ -394,7 +394,7 @@ export const MemberAttendanceView: React.FC<Props> = ({
                       alignItems: 'center',
                       gap: '0.5rem',
                       background: notice.isError ? '#FEE2E2' : '#DCFCE7', 
-                      color: notice.isError ? '#991B1B' : '#166534',
+                      color: notice.isError ? '#991B1B' : '#0A271B',
                       border: notice.isError ? '1px solid #FCA5A5' : '1px solid #86EFAC'
                     }}>
                       {notice.isError ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
@@ -420,11 +420,11 @@ export const MemberAttendanceView: React.FC<Props> = ({
                             gap: '1rem'
                           }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                              <div style={{ background: '#DCFCE7', color: '#166534', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <div style={{ background: '#DCFCE7', color: '#0A271B', width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                 <Check size={20} />
                               </div>
                               <div>
-                                <div style={{ fontWeight: 800, color: '#166534', fontSize: '0.95rem' }}>
+                                <div style={{ fontWeight: 800, color: '#0A271B', fontSize: '0.95rem' }}>
                                   Attendance Signed &amp; Logged
                                 </div>
                                 <div style={{ fontSize: '0.8rem', color: '#4B5563', marginTop: '0.1rem' }}>
@@ -435,7 +435,7 @@ export const MemberAttendanceView: React.FC<Props> = ({
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                               {myRecord.status === 'VERIFIED' ? (
-                                <span style={{ background: '#166534', color: '#FFFFFF', padding: '0.35rem 0.75rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <span style={{ background: '#0A271B', color: '#FFFFFF', padding: '0.35rem 0.75rem', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
                                   <ShieldCheck size={14} /> Verified by Secretary
                                 </span>
                               ) : (
@@ -770,7 +770,7 @@ export const MemberAttendanceView: React.FC<Props> = ({
                     {myRecord && (
                       <span style={{ 
                         background: myRecord.status === 'VERIFIED' ? '#DCFCE7' : '#FEF3C7', 
-                        color: myRecord.status === 'VERIFIED' ? '#166534' : '#92400E',
+                        color: myRecord.status === 'VERIFIED' ? '#0A271B' : '#92400E',
                         fontSize: '0.78rem', 
                         fontWeight: 700, 
                         padding: '0.3rem 0.65rem', 

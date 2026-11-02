@@ -151,12 +151,12 @@ export const NotificationsView: React.FC<Props> = ({
       {/* Top Header Card */}
       <div 
         style={{ 
-          background: 'linear-gradient(135deg, #166534 0%, #15803D 65%, #166534 100%)', 
+          background: 'linear-gradient(135deg, #0A271B 0%, #14532D 65%, #0A271B 100%)', 
           borderRadius: '16px', 
           padding: '1.75rem 1.5rem', 
           color: '#FFFFFF',
           marginBottom: '1.5rem',
-          boxShadow: '0 10px 25px -5px rgba(22, 101, 52, 0.25)',
+          boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.25)',
           border: '1.5px solid rgba(198, 138, 36, 0.3)',
         }}
       >
@@ -260,7 +260,7 @@ export const NotificationsView: React.FC<Props> = ({
           <button
             onClick={() => onOpenRegister ? onOpenRegister() : onNavigate('home')}
             style={{
-              background: '#166534',
+              background: '#0A271B',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '8px',

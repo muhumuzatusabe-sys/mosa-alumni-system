@@ -72,7 +72,7 @@ export const MobileBottomNav: React.FC<Props> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid #166534',
+                border: '1.5px solid #0A271B',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
               }}
             >

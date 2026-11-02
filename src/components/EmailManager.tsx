@@ -91,7 +91,7 @@ export const EmailManager: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
+        background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
         color: '#FFFFFF',
         padding: '1.5rem',
         borderRadius: '14px',
@@ -134,7 +134,7 @@ export const EmailManager: React.FC = () => {
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'config' ? '#FCD34D' : 'rgba(255,255,255,0.15)',
-              color: activeTab === 'config' ? '#15803D' : '#FFFFFF',
+              color: activeTab === 'config' ? '#14532D' : '#FFFFFF',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
@@ -159,7 +159,7 @@ export const EmailManager: React.FC = () => {
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'logs' ? '#FCD34D' : 'rgba(255,255,255,0.15)',
-              color: activeTab === 'logs' ? '#15803D' : '#FFFFFF',
+              color: activeTab === 'logs' ? '#14532D' : '#FFFFFF',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
@@ -256,7 +256,7 @@ export const EmailManager: React.FC = () => {
                     padding: '0.2rem 0.5rem',
                     borderRadius: '4px',
                     background: '#DCFCE7',
-                    color: '#166534'
+                    color: '#0A271B'
                   }}>
                     Active &bull; Google App Password Linked
                   </span>
@@ -282,7 +282,7 @@ export const EmailManager: React.FC = () => {
                     />
                   </div>
                 </div>
-                <span style={{ fontSize: '0.74rem', color: '#15803D', marginTop: '0.2rem', display: 'block' }}>
+                <span style={{ fontSize: '0.74rem', color: '#14532D', marginTop: '0.2rem', display: 'block' }}>
                   Linked to Google Account: <strong>masshalumni@gmail.com</strong> (App: MASSH ALUMNI).
                 </span>
               </div>
@@ -304,7 +304,7 @@ export const EmailManager: React.FC = () => {
                     padding: '0.2rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.brevoApiKey ? '#DCFCE7' : '#F1F5F9',
-                    color: settings.brevoApiKey ? '#166534' : '#64748B'
+                    color: settings.brevoApiKey ? '#0A271B' : '#64748B'
                   }}>
                     {settings.brevoApiKey ? 'Configured' : 'Optional'}
                   </span>
@@ -345,7 +345,7 @@ export const EmailManager: React.FC = () => {
                     padding: '0.2rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.resendApiKey ? '#DCFCE7' : '#F1F5F9',
-                    color: settings.resendApiKey ? '#166534' : '#64748B'
+                    color: settings.resendApiKey ? '#0A271B' : '#64748B'
                   }}>
                     {settings.resendApiKey ? 'Configured' : 'Optional'}
                   </span>
@@ -386,7 +386,7 @@ export const EmailManager: React.FC = () => {
                     padding: '0.2rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.emailjsPublicKey ? '#DCFCE7' : '#F1F5F9',
-                    color: settings.emailjsPublicKey ? '#166534' : '#64748B'
+                    color: settings.emailjsPublicKey ? '#0A271B' : '#64748B'
                   }}>
                     {settings.emailjsPublicKey ? 'Configured' : 'Optional'}
                   </span>
@@ -454,7 +454,7 @@ export const EmailManager: React.FC = () => {
               <button
                 type="submit"
                 style={{
-                  background: '#166534',
+                  background: '#0A271B',
                   color: '#FFFFFF',
                   padding: '0.85rem 1.5rem',
                   borderRadius: '8px',
@@ -656,7 +656,7 @@ export const EmailManager: React.FC = () => {
                           padding: '0.2rem 0.5rem',
                           borderRadius: '4px',
                           background: log.category === 'VERIFICATION' ? '#FEF3C7' : log.category === 'MEMBERSHIP_APPROVED' ? '#DCFCE7' : '#E0E7FF',
-                          color: log.category === 'VERIFICATION' ? '#92400E' : log.category === 'MEMBERSHIP_APPROVED' ? '#166534' : '#3730A3'
+                          color: log.category === 'VERIFICATION' ? '#92400E' : log.category === 'MEMBERSHIP_APPROVED' ? '#0A271B' : '#3730A3'
                         }}>
                           {log.category}
                         </span>
@@ -671,7 +671,7 @@ export const EmailManager: React.FC = () => {
                           padding: '0.2rem 0.5rem',
                           borderRadius: '4px',
                           background: log.status === 'DELIVERED' ? '#DCFCE7' : log.status === 'QUEUED' ? '#E0F2FE' : '#FEF3C7',
-                          color: log.status === 'DELIVERED' ? '#166534' : log.status === 'QUEUED' ? '#075985' : '#92400E',
+                          color: log.status === 'DELIVERED' ? '#0A271B' : log.status === 'QUEUED' ? '#075985' : '#92400E',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.25rem'

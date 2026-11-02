@@ -161,7 +161,7 @@ export const SecretariatManager: React.FC<SecretariatManagerProps> = ({ currentU
             fontSize: '0.85rem', 
             fontWeight: 600,
             background: notice.type === 'success' ? '#DCFCE7' : '#FEE2E2',
-            color: notice.type === 'success' ? '#166534' : '#991B1B',
+            color: notice.type === 'success' ? '#0A271B' : '#991B1B',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem'
@@ -233,7 +233,7 @@ export const SecretariatManager: React.FC<SecretariatManagerProps> = ({ currentU
                               alignItems: 'center',
                               gap: '0.35rem',
                               background: '#DCFCE7',
-                              color: '#166534',
+                              color: '#0A271B',
                               padding: '0.25rem 0.6rem',
                               borderRadius: '6px',
                               fontWeight: 700,

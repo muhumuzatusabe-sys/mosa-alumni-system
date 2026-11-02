@@ -88,7 +88,7 @@ export const AuditLogsModal: React.FC<Props> = ({ isOpen, onClose }) => {
                             borderRadius: '4px',
                             fontSize: '0.75rem',
                             background: isApproval ? '#DCFCE7' : '#E2E8F0',
-                            color: isApproval ? '#166534' : '#334155',
+                            color: isApproval ? '#0A271B' : '#334155',
                           }}
                         >
                           {log.action}

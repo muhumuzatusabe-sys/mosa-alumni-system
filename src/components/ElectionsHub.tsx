@@ -235,7 +235,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
               <span style={{
                 background: selectedElection.status === 'VOTING_ACTIVE' ? '#DCFCE7' : '#FEF3C7',
-                color: selectedElection.status === 'VOTING_ACTIVE' ? '#15803D' : '#B45309',
+                color: selectedElection.status === 'VOTING_ACTIVE' ? '#14532D' : '#B45309',
                 fontSize: '0.75rem',
                 fontWeight: 800,
                 padding: '0.2rem 0.6rem',
@@ -280,7 +280,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
 
       {/* Quorum & Turnout Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
+        background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)',
         borderRadius: '16px',
         padding: '1.5rem',
         color: '#FFFFFF',
@@ -289,7 +289,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '1.25rem',
         border: '1px solid #C68A24',
-        boxShadow: '0 8px 24px -6px rgba(22, 101, 52,0.3)'
+        boxShadow: '0 8px 24px -6px rgba(10, 39, 27,0.3)'
       }}>
         <div>
           <div style={{ fontSize: '0.75rem', color: '#FCD34D', fontWeight: 800, letterSpacing: '0.5px' }}>
@@ -439,7 +439,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
               marginBottom: '2rem'
             }}>
               <CheckCircle2 size={48} color="#047857" style={{ margin: '0 auto 0.75rem auto' }} />
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#15803D', margin: '0 0 0.35rem 0' }}>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#14532D', margin: '0 0 0.35rem 0' }}>
                 Your Official Ballot Has Been Securely Cast!
               </h2>
               <p style={{ color: '#047857', fontSize: '0.92rem', maxWidth: '580px', margin: '0 auto 1.25rem auto' }}>

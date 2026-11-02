@@ -62,7 +62,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
         const url = await QRCode.toDataURL(targetUrl, {
           margin: 1,
           width: 240,
-          color: { dark: '#166534', light: '#FFFFFF' }
+          color: { dark: '#0A271B', light: '#FFFFFF' }
         });
         if (isMounted) setQrDataUrl(url);
       } catch (err) {
@@ -133,7 +133,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
     switch (displayStatus) {
       case 'VALID':
         return (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#DCFCE7', color: '#166534', border: '1px solid #86EFAC', padding: '2px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#DCFCE7', color: '#0A271B', border: '1px solid #86EFAC', padding: '2px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800 }}>
             <CheckCircle2 size={12} /> VALID CARD
           </span>
         );

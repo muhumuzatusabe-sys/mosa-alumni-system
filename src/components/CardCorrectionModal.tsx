@@ -161,7 +161,7 @@ export const CardCorrectionModal: React.FC<Props> = ({
 
         {success ? (
           <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-            <div style={{ width: '54px', height: '54px', borderRadius: '50%', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+            <div style={{ width: '54px', height: '54px', borderRadius: '50%', background: '#DCFCE7', color: '#0A271B', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
               <CheckCircle2 size={32} />
             </div>
             <h3 style={{ color: '#0B203E', marginBottom: '0.5rem' }}>Correction Request Submitted</h3>

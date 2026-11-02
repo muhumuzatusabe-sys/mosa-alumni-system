@@ -126,7 +126,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
       >
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
+          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 60%, #14532D 100%)',
           color: '#ffffff',
           padding: '1.25rem 1.5rem',
           borderBottom: '3px solid #C68A24',
@@ -275,7 +275,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
                       <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#047857', fontWeight: 800 }}>
                         Official Verification Confirmed
                       </div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#15803D' }}>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#14532D' }}>
                         {result.fullName}
                       </div>
                     </div>
@@ -286,7 +286,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
                       <div style={{ fontSize: '0.72rem', color: '#047857', textTransform: 'uppercase', fontWeight: 700 }}>
                         Alumni Number
                       </div>
-                      <div style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: 800, color: '#15803D' }}>
+                      <div style={{ fontSize: '1.1rem', fontFamily: 'monospace', fontWeight: 800, color: '#14532D' }}>
                         {result.alumniNumber}
                       </div>
                     </div>
@@ -306,7 +306,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
                         <div style={{ fontSize: '0.72rem', color: '#047857', textTransform: 'uppercase', fontWeight: 700 }}>
                           ID Card Validation No.
                         </div>
-                        <div style={{ fontSize: '0.95rem', fontFamily: 'monospace', fontWeight: 800, color: '#15803D' }}>
+                        <div style={{ fontSize: '0.95rem', fontFamily: 'monospace', fontWeight: 800, color: '#14532D' }}>
                           {cardResult.validationNumber}
                         </div>
                       </div>
@@ -316,7 +316,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
                       <div style={{ fontSize: '0.72rem', color: '#047857', textTransform: 'uppercase', fontWeight: 700 }}>
                         Institution
                       </div>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#15803D' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#14532D' }}>
                         MASSH (Est. 1997)
                       </div>
                     </div>

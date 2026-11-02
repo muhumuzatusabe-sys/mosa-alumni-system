@@ -777,7 +777,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       case 'SECRETARY':
         return { bg: '#DBEAFE', fg: '#1E40AF', border: '#BFDBFE' };
       case 'TREASURER':
-        return { bg: '#DCFCE7', fg: '#166534', border: '#BBF7D0' };
+        return { bg: '#DCFCE7', fg: '#0A271B', border: '#BBF7D0' };
       case 'MEMBERSHIP_ADMIN':
         return { bg: '#FEE2E2', fg: '#B91C1C', border: '#FECACA' };
       case 'DIRECTORY_ADMIN':
@@ -816,14 +816,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       {/* Top Administrative Header Bar */}
       <header 
         style={{
-          background: 'linear-gradient(135deg, #166534 0%, #15803D 60%, #166534 100%)',
+          background: 'linear-gradient(135deg, #0A271B 0%, #14532D 60%, #0A271B 100%)',
           color: '#FFFFFF',
           borderBottom: '3px solid #C68A24',
           padding: '1.25rem 1.5rem',
           position: 'sticky',
           top: 0,
           zIndex: 90,
-          boxShadow: '0 4px 20px rgba(22, 101, 52, 0.25)',
+          boxShadow: '0 4px 20px rgba(10, 39, 27, 0.25)',
         }}
       >
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -904,7 +904,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1.5px solid #166534',
+                    border: '1.5px solid #0A271B',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
                   }}
                 >
@@ -967,7 +967,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 }}
                 style={{
                   background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                  color: '#15803D',
+                  color: '#14532D',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '0.45rem 0.95rem',
@@ -982,7 +982,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 }}
                 title="Authenticate with Super Admin password to unlock overall system control"
               >
-                <Crown size={15} color="#15803D" />
+                <Crown size={15} color="#14532D" />
                 <span>Sign In as Super Admin</span>
               </button>
             )}
@@ -1450,11 +1450,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
             {/* Header Greeting Banner */}
             <div style={{
-              background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
+              background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)',
               borderRadius: '16px',
               padding: '1.75rem 2rem',
               color: '#FFFFFF',
-              boxShadow: '0 8px 24px rgba(22, 101, 52, 0.25)',
+              boxShadow: '0 8px 24px rgba(10, 39, 27, 0.25)',
               border: '1px solid rgba(251, 191, 36, 0.2)',
               display: 'flex',
               justifyContent: 'space-between',
@@ -1482,7 +1482,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
                   style={{
                     background: '#FBBF24',
-                    color: '#15803D',
+                    color: '#14532D',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '0.65rem 1.1rem',
@@ -1868,7 +1868,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               }}
               style={{
                 background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                color: '#15803D',
+                color: '#14532D',
                 border: 'none',
                 borderRadius: '10px',
                 padding: '0.85rem 1.85rem',
@@ -2080,7 +2080,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     type="submit"
                     style={{
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#15803D',
+                      color: '#14532D',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.75rem',
@@ -2271,7 +2271,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                               fontSize: '0.72rem',
                               fontWeight: 700,
                               background: opp.status === 'PUBLISHED' ? '#DCFCE7' : opp.status === 'PENDING_REVIEW' ? '#FEF3C7' : '#F1F5F9',
-                              color: opp.status === 'PUBLISHED' ? '#166534' : opp.status === 'PENDING_REVIEW' ? '#92400E' : '#475569',
+                              color: opp.status === 'PUBLISHED' ? '#0A271B' : opp.status === 'PENDING_REVIEW' ? '#92400E' : '#475569',
                             }}>
                               {opp.status.replace('_', ' ')}
                             </span>
@@ -2348,7 +2348,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   <div key={m.id} style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '8px', padding: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
                       <div style={{ fontWeight: 700, color: '#0B203E' }}>{m.fullName}</div>
-                      <span style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem', borderRadius: '4px', background: m.status === 'ACTIVE' ? '#DCFCE7' : '#FEF3C7', color: m.status === 'ACTIVE' ? '#166534' : '#92400E', fontWeight: 700 }}>
+                      <span style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem', borderRadius: '4px', background: m.status === 'ACTIVE' ? '#DCFCE7' : '#FEF3C7', color: m.status === 'ACTIVE' ? '#0A271B' : '#92400E', fontWeight: 700 }}>
                         {m.status === 'ACTIVE' ? 'ACTIVE MENTOR' : 'PAUSED'}
                       </span>
                     </div>
@@ -2408,7 +2408,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                           fontWeight: 800,
                           letterSpacing: '0.04em',
                           background: ec.status === 'VOTING_ACTIVE' ? '#DCFCE7' : ec.status === 'CONCLUDED' ? '#E0E7FF' : '#FEF3C7',
-                          color: ec.status === 'VOTING_ACTIVE' ? '#166534' : ec.status === 'CONCLUDED' ? '#3730A3' : '#92400E',
+                          color: ec.status === 'VOTING_ACTIVE' ? '#0A271B' : ec.status === 'CONCLUDED' ? '#3730A3' : '#92400E',
                         }}>
                           {ec.status.replace('_', ' ')}
                         </span>
@@ -2530,7 +2530,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                             {c.seconderName} ({c.seconderAlumniNumber})
                           </td>
                           <td style={{ padding: '0.85rem 1rem' }}>
-                            <span style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: '#DCFCE7', color: '#166534', fontWeight: 700 }}>
+                            <span style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: '#DCFCE7', color: '#0A271B', fontWeight: 700 }}>
                               {c.status === 'APPROVED' ? 'VETTED' : c.status}
                             </span>
                           </td>
@@ -2600,17 +2600,17 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 600, color: isEnabled ? '#166534' : '#64748B', fontSize: '0.95rem' }}>
+                        <div style={{ fontWeight: 600, color: isEnabled ? '#0A271B' : '#64748B', fontSize: '0.95rem' }}>
                           {item.title}
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: isEnabled ? '#15803D' : '#94A3B8' }}>
+                        <div style={{ fontSize: '0.8rem', color: isEnabled ? '#14532D' : '#94A3B8' }}>
                           {item.desc}
                         </div>
                       </div>
 
                       <div style={{ flexShrink: 0 }}>
                         {isEnabled ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#166534', fontWeight: 700, fontSize: '0.85rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#0A271B', fontWeight: 700, fontSize: '0.85rem' }}>
                             <ToggleRight size={28} />
                             <span>ON</span>
                           </div>
@@ -2830,7 +2830,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 600, color: strat.value ? '#166534' : '#334155', fontSize: '0.9rem' }}>
+                        <div style={{ fontWeight: 600, color: strat.value ? '#0A271B' : '#334155', fontSize: '0.9rem' }}>
                           {strat.title}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: '#64748B' }}>
@@ -2839,7 +2839,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       </div>
                       <div style={{ flexShrink: 0 }}>
                         {strat.value ? (
-                          <ToggleRight size={26} color="#166534" />
+                          <ToggleRight size={26} color="#0A271B" />
                         ) : (
                           <ToggleLeft size={26} color="#94A3B8" />
                         )}
@@ -2941,7 +2941,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     }}
                     style={{
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#15803D',
+                      color: '#14532D',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.5rem 1rem',
@@ -3085,7 +3085,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                                 padding: '0.2rem 0.55rem', 
                                 borderRadius: '4px',
                                 background: account.active !== false ? '#DCFCE7' : '#FEE2E2',
-                                color: account.active !== false ? '#15803D' : '#B91C1C',
+                                color: account.active !== false ? '#14532D' : '#B91C1C',
                               }}
                             >
                               {account.active !== false ? 'Active' : 'Suspended'}
@@ -3121,7 +3121,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                                   style={{
                                     background: 'none',
                                     border: '1px solid #CBD5E1',
-                                    color: account.active !== false ? '#DC2626' : '#166534',
+                                    color: account.active !== false ? '#DC2626' : '#0A271B',
                                     borderRadius: '6px',
                                     padding: '0.35rem 0.65rem',
                                     cursor: 'pointer',
@@ -3158,7 +3158,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       <th style={{ padding: '0.75rem 1rem', color: '#475569' }}>System Module</th>
                       <th style={{ padding: '0.75rem 1rem', color: '#92400E' }}>Super Admin</th>
                       <th style={{ padding: '0.75rem 1rem', color: '#1E40AF' }}>Secretary General</th>
-                      <th style={{ padding: '0.75rem 1rem', color: '#166534' }}>Honorary Treasurer</th>
+                      <th style={{ padding: '0.75rem 1rem', color: '#0A271B' }}>Honorary Treasurer</th>
                       <th style={{ padding: '0.75rem 1rem', color: '#6B21A8' }}>Publicity Secretary</th>
                       <th style={{ padding: '0.75rem 1rem', color: '#3730A3' }}>Chapter Admin</th>
                     </tr>
@@ -3180,7 +3180,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                         <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: '#0B203E' }}>{row.module}</td>
                         <td style={{ padding: '0.75rem 1rem', color: '#92400E', fontWeight: 600 }}>{row.super}</td>
                         <td style={{ padding: '0.75rem 1rem', color: row.sec === 'None' ? '#94A3B8' : '#1E40AF', fontWeight: row.sec === 'None' ? 400 : 600 }}>{row.sec}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: row.treas === 'None' ? '#94A3B8' : '#166534', fontWeight: row.treas === 'None' ? 400 : 600 }}>{row.treas}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: row.treas === 'None' ? '#94A3B8' : '#0A271B', fontWeight: row.treas === 'None' ? 400 : 600 }}>{row.treas}</td>
                         <td style={{ padding: '0.75rem 1rem', color: row.pub === 'None' ? '#94A3B8' : '#6B21A8', fontWeight: row.pub === 'None' ? 400 : 600 }}>{row.pub}</td>
                         <td style={{ padding: '0.75rem 1rem', color: row.chap === 'None' ? '#94A3B8' : '#3730A3', fontWeight: row.chap === 'None' ? 400 : 600 }}>{row.chap}</td>
                       </tr>
@@ -3848,7 +3848,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                         <div style={{ fontSize: '0.8rem', color: '#047857', marginTop: '0.15rem' }}>
                           {selectedAlumnusForStaff.email || 'No email'} • {selectedAlumnusForStaff.phone || 'No phone'}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: '#15803D', fontWeight: 600, marginTop: '0.2rem' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#14532D', fontWeight: 600, marginTop: '0.2rem' }}>
                           ✓ Existing Alumnus Record Linked (No Duplicate Created)
                         </div>
                       </div>
@@ -4259,7 +4259,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             left: 0, 
             right: 0, 
             bottom: 0, 
-            background: 'rgba(22, 101, 52, 0.75)', 
+            background: 'rgba(10, 39, 27, 0.75)', 
             backdropFilter: 'blur(5px)',
             display: 'flex', 
             alignItems: 'center', 
@@ -4282,7 +4282,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             {/* Modal Header */}
             <div 
               style={{ 
-                background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)', 
+                background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)', 
                 borderBottom: '3px solid #D97706', 
                 padding: '1.5rem', 
                 color: '#FFFFFF',
@@ -4303,7 +4303,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
                     }}
                   >
-                    <Crown size={22} color="#15803D" />
+                    <Crown size={22} color="#14532D" />
                   </div>
                   <div>
                     <div style={{ fontSize: '0.7rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
@@ -4458,7 +4458,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       padding: '0.75rem 1.4rem',
                       borderRadius: '8px',
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#15803D',
+                      color: '#14532D',
                       border: 'none',
                       fontWeight: 800,
                       fontSize: '0.88rem',

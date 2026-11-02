@@ -249,7 +249,7 @@ export const App: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(ellipse at top, #166534 0%, #15803D 65%, #166534 100%)',
+          background: 'radial-gradient(ellipse at top, #0A271B 0%, #14532D 65%, #0A271B 100%)',
           color: '#FFFFFF',
           padding: '1.5rem',
         }}
@@ -457,7 +457,7 @@ export const App: React.FC = () => {
               top: 0, 
               zIndex: 90,
               padding: '0.65rem 1.25rem',
-              boxShadow: '0 2px 4px rgba(22, 101, 52, 0.04)'
+              boxShadow: '0 2px 4px rgba(10, 39, 27, 0.04)'
             }}
           >
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
@@ -468,7 +468,7 @@ export const App: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  background: '#166534',
+                  background: '#0A271B',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '8px',

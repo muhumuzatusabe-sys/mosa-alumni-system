@@ -83,7 +83,7 @@ export const SuperAdminPasswordChangeModal: React.FC<SuperAdminPasswordChangeMod
     >
       <div
         style={{
-          background: 'linear-gradient(145deg, #15803D 0%, #166534 100%)',
+          background: 'linear-gradient(145deg, #14532D 0%, #0A271B 100%)',
           border: '2px solid rgba(245, 158, 11, 0.5)',
           borderRadius: '16px',
           width: '100%',
@@ -294,7 +294,7 @@ export const SuperAdminPasswordChangeModal: React.FC<SuperAdminPasswordChangeMod
                 borderRadius: '8px',
                 border: 'none',
                 background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                color: '#166534',
+                color: '#0A271B',
                 fontWeight: 800,
                 fontSize: '0.88rem',
                 cursor: loading ? 'not-allowed' : 'pointer',

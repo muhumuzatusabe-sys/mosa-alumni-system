@@ -6270,10 +6270,10 @@ export const dataService = {
   <Style ss:ID="Header">
    <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
    <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#15803D"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#14532D"/>
    </Borders>
    <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>
-   <Interior ss:Color="#15803D" ss:Pattern="Solid"/>
+   <Interior ss:Color="#14532D" ss:Pattern="Solid"/>
   </Style>
   <Style ss:ID="RowEven">
    <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
@@ -6337,7 +6337,7 @@ export const dataService = {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
     // Brand Header banner
-    doc.setFillColor(22, 101, 52); // #15803D
+    doc.setFillColor(10, 39, 27); // #14532D
     doc.rect(0, 0, 297, 26, 'F');
 
     // Title

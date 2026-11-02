@@ -452,7 +452,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
       >
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
+          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 60%, #14532D 100%)',
           color: '#ffffff',
           padding: '1.25rem 1.75rem',
           borderBottom: '3px solid #C68A24',
@@ -667,12 +667,12 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
               <div style={{
                 maxWidth: '480px',
                 margin: '0 auto 1.75rem auto',
-                background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
+                background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)',
                 color: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '1.5rem',
                 textAlign: 'center',
-                boxShadow: '0 12px 24px -6px rgba(22, 101, 52, 0.35)',
+                boxShadow: '0 12px 24px -6px rgba(10, 39, 27, 0.35)',
                 border: '1.5px solid #C68A24'
               }}>
                 {successInfo.alumniNumber ? (
@@ -863,7 +863,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                         height: '42px',
                         borderRadius: '50%',
                         background: '#DCFCE7',
-                        color: '#166534',
+                        color: '#0A271B',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -872,13 +872,13 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                         <ShieldCheck size={22} />
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#166534', marginBottom: '0.25rem' }}>
+                        <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#0A271B', marginBottom: '0.25rem' }}>
                           Authenticated Account Linked
                         </div>
-                        <div style={{ fontSize: '0.86rem', color: '#15803D', lineHeight: 1.5, marginBottom: '0.6rem' }}>
+                        <div style={{ fontSize: '0.86rem', color: '#14532D', lineHeight: 1.5, marginBottom: '0.6rem' }}>
                           You are signed in as <strong>{currentUser.email}</strong>. Your alumni record will be permanently linked to this account upon submission.
                         </div>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#166534', background: '#DCFCE7', padding: '0.25rem 0.65rem', borderRadius: '6px', fontWeight: 600 }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: '#0A271B', background: '#DCFCE7', padding: '0.25rem 0.65rem', borderRadius: '6px', fontWeight: 600 }}>
                           <Check size={14} /> Active Session Verified • No password recreation required
                         </div>
                       </div>

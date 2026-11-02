@@ -155,12 +155,12 @@ export const AboutView: React.FC<AboutViewProps> = ({ onBack }) => {
         className="mosa-card"
         style={{
           padding: '2.5rem',
-          background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #15803D 100%)',
+          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 65%, #14532D 100%)',
           color: '#FFFFFF',
           marginBottom: '3rem',
           borderRadius: '16px',
           border: '1px solid rgba(198, 138, 36, 0.35)',
-          boxShadow: '0 12px 30px rgba(22, 101, 52, 0.2)',
+          boxShadow: '0 12px 30px rgba(10, 39, 27, 0.2)',
         }}
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
@@ -193,8 +193,8 @@ export const AboutView: React.FC<AboutViewProps> = ({ onBack }) => {
               <div>
                 <div style={{ fontSize: '0.78rem', color: '#D1FAE5', textTransform: 'uppercase', fontWeight: 600 }}>Official Colours</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', flexWrap: 'wrap' }}>
-                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#166534', border: '1.5px solid #F8F6F0' }}></span> Light Green
-                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#F8F6F0', border: '1.5px solid #166534' }}></span> Cream
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#0A271B', border: '1.5px solid #F8F6F0' }}></span> Light Green
+                  <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#F8F6F0', border: '1.5px solid #0A271B' }}></span> Cream
                   <span style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#C68A24', border: '1.5px solid #FFF' }}></span> Gold
                   <span style={{ fontSize: '0.8rem', color: '#FDE68A', marginLeft: '0.25rem' }}>({content?.colors || 'Light Green, Cream, and Gold'})</span>
                 </div>

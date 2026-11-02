@@ -13,7 +13,7 @@ interface Props {
 
 const stateColors: Record<string, { bg: string; fg: string }> = {
   CLOSED: { bg: '#F1F5F9', fg: '#475569' },
-  OPEN: { bg: '#DCFCE7', fg: '#166534' },
+  OPEN: { bg: '#DCFCE7', fg: '#0A271B' },
   CHECKIN_CLOSED: { bg: '#FEF3C7', fg: '#92400E' },
   FINALIZED: { bg: '#DBEAFE', fg: '#1E40AF' },
 };
@@ -231,12 +231,12 @@ export const AttendanceManager: React.FC<Props> = ({ currentUser }) => {
           </div>
         )}
         {meeting.attendanceState === 'OPEN' && (
-          <div style={{ marginTop: '0.85rem', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '8px', padding: '0.65rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.82rem', color: '#166534' }}>
+          <div style={{ marginTop: '0.85rem', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '8px', padding: '0.65rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.82rem', color: '#0A271B' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#166534', display: 'inline-block', boxShadow: '0 0 8px #166534' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0A271B', display: 'inline-block', boxShadow: '0 0 8px #0A271B' }} />
               <strong>Live Member Roll Call Active:</strong> Members can check in from their mobile phones or computers on the Attendance page.
             </div>
-            <span style={{ fontSize: '0.75rem', color: '#15803D' }}>Real-time synchronization enabled</span>
+            <span style={{ fontSize: '0.75rem', color: '#14532D' }}>Real-time synchronization enabled</span>
           </div>
         )}
         {meeting.reopenHistory && meeting.reopenHistory.length > 0 && (
@@ -247,7 +247,7 @@ export const AttendanceManager: React.FC<Props> = ({ currentUser }) => {
       </div>
 
       {(error || notice) && (
-        <div style={{ padding: '0.65rem 0.9rem', borderRadius: '8px', fontSize: '0.85rem', background: error ? '#FEE2E2' : '#DCFCE7', color: error ? '#991B1B' : '#166534', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ padding: '0.65rem 0.9rem', borderRadius: '8px', fontSize: '0.85rem', background: error ? '#FEE2E2' : '#DCFCE7', color: error ? '#991B1B' : '#0A271B', display: 'flex', justifyContent: 'space-between' }}>
           <span>{error || notice}</span>
           <button onClick={() => { setError(''); setNotice(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}><X size={14} /></button>
         </div>

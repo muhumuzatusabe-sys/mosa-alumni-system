@@ -1,27 +1,27 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-// Rich institutional green palette (darker than previous Kelly/lime green, but distinctly green, not black)
-// #166534 = Green-800 (Rich Prestige Academic Green, RGB 22, 101, 52)
-// #15803D = Green-700 (Forest Green Highlight, RGB 21, 128, 61)
-// #14532D = Green-900 (Deep Bottle Green for gradient shadows, RGB 20, 83, 45)
+// Rich deep dark prestigious institutional green palette
+// #0A271B = Deep Academic Forest Green (RGB 10, 39, 27)
+// #14532D = Deep Emerald Accent (RGB 20, 83, 45)
+// #05160F = Deep Midnight Green for shadow gradients (RGB 5, 22, 15)
+// #0F3D24 = Deep Forest Accent (RGB 15, 61, 36)
 const replacements = [
-  // Darken overly bright / neon light greens
-  [/#22C55E/gi, '#15803D'],
-  [/#16A34A/gi, '#166534'],
-  // Deepen original murky darks to rich institutional green
-  [/#0A271B/gi, '#166534'],
-  [/#113D2B/gi, '#166534'],
-  [/#18533B/gi, '#15803D'],
-  [/#05160F/gi, '#14532D'],
-  [/#064E3B/gi, '#166534'],
-  [/#2E5E28/gi, '#15803D'],
+  // Deepen medium and light greens to rich deep dark academic green
+  [/#22C55E/gi, '#14532D'],
+  [/#16A34A/gi, '#0A271B'],
+  [/#15803D/gi, '#14532D'],
+  [/#166534/gi, '#0A271B'],
+  [/#18533B/gi, '#0F3D24'],
+  [/#064E3B/gi, '#0A271B'],
+  [/#2E5E28/gi, '#14532D'],
   // RGBA replacements
-  [/rgba\(\s*22\s*,\s*163\s*,\s*74\s*,/g, 'rgba(22, 101, 52,'],
-  [/rgba\(\s*10\s*,\s*39\s*,\s*27\s*,/g, 'rgba(22, 101, 52,'],
+  [/rgba\(\s*22\s*,\s*101\s*,\s*52\s*,/g, 'rgba(10, 39, 27,'],
+  [/rgba\(\s*21\s*,\s*128\s*,\s*61\s*,/g, 'rgba(20, 83, 45,'],
+  [/rgba\(\s*22\s*,\s*163\s*,\s*74\s*,/g, 'rgba(10, 39, 27,'],
   // PDF generator fill colors
-  [/doc\.setFillColor\(22,\s*163,\s*74\);/g, 'doc.setFillColor(22, 101, 52);'],
-  [/doc\.setFillColor\(10,\s*39,\s*27\);/g, 'doc.setFillColor(22, 101, 52);'],
+  [/doc\.setFillColor\(22,\s*101,\s*52\);/g, 'doc.setFillColor(10, 39, 27);'],
+  [/doc\.setFillColor\(22,\s*163,\s*74\);/g, 'doc.setFillColor(10, 39, 27);'],
 ];
 
 function processDir(dir) {
@@ -50,16 +50,16 @@ function processDir(dir) {
   }
 }
 
-console.log('Tuning green palette to rich institutional medium-dark green (#166534 / #15803D)...');
+console.log('Deepening green palette to rich deep dark prestigious green (#0A271B / #14532D)...');
 processDir(path.resolve('src'));
 processDir(path.resolve('public'));
 
 const indexHtmlPath = path.resolve('index.html');
 if (fs.existsSync(indexHtmlPath)) {
   let html = fs.readFileSync(indexHtmlPath, 'utf-8');
-  html = html.replace(/#16A34A|#22C55E|#113D2B/gi, '#166534');
+  html = html.replace(/#16A34A|#22C55E|#166534|#15803D/gi, '#0A271B');
   fs.writeFileSync(indexHtmlPath, html, 'utf-8');
-  console.log('[UPDATED] index.html');
+  console.log('[UPDATED] index.html theme-color');
 }
 
-console.log('Green color palette tuned to rich institutional dark green successfully!');
+console.log('Green color palette darkened to rich deep dark institutional green successfully!');

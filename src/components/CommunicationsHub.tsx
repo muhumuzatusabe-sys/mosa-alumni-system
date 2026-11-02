@@ -122,12 +122,12 @@ export const CommunicationsHub: React.FC<Props> = ({ currentUser, onOpenAuth, on
       
       {/* Header Banner */}
       <div style={{ 
-        background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)', 
+        background: 'linear-gradient(135deg, #14532D 0%, #0A271B 60%, #14532D 100%)', 
         borderRadius: '16px', 
         padding: '2rem', 
         color: '#FFFFFF',
         marginBottom: '2rem',
-        boxShadow: '0 10px 25px -5px rgba(22, 101, 52, 0.3)'
+        boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.3)'
       }}>
         {onBack && (
           <button

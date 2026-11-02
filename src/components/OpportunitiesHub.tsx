@@ -680,7 +680,7 @@ export const OpportunitiesHub: React.FC<OpportunitiesHubProps> = ({
                           </span>
                           <span style={{
                             background: opp.workplaceType === 'REMOTE' ? '#F0FDF4' : opp.workplaceType === 'HYBRID' ? '#EFF6FF' : '#F8FAFC',
-                            color: opp.workplaceType === 'REMOTE' ? '#15803D' : opp.workplaceType === 'HYBRID' ? '#1D4ED8' : '#64748B',
+                            color: opp.workplaceType === 'REMOTE' ? '#14532D' : opp.workplaceType === 'HYBRID' ? '#1D4ED8' : '#64748B',
                             fontSize: '0.68rem',
                             fontWeight: 700,
                             padding: '0.2rem 0.5rem',

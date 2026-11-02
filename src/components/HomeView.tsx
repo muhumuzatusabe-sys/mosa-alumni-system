@@ -129,11 +129,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div
           className="member-identity-card"
           style={{
-            background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #14532D 100%)',
+            background: 'linear-gradient(135deg, #14532D 0%, #0F3D24 55%, #0A271B 100%)',
             borderRadius: '16px',
             padding: '1.25rem 1.4rem',
             color: '#FFFFFF',
-            boxShadow: '0 8px 24px rgba(22, 101, 52, 0.22)',
+            boxShadow: '0 8px 24px rgba(10, 39, 27, 0.35)',
             border: '1.5px solid #F59E0B',
             display: 'flex',
             alignItems: 'center',
@@ -475,7 +475,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           className="quick-actions-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
             gap: '0.65rem',
             width: '100%',
             maxWidth: '100%',
@@ -497,13 +497,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              width: '100%',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Users size={16} />
             </div>
-            <span>Registry</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Registry</span>
           </button>
 
           <button
@@ -521,13 +524,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              width: '100%',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#0A271B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Coins size={16} />
             </div>
-            <span>Donations</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Donations</span>
           </button>
 
           <button
@@ -545,13 +551,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              width: '100%',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#E8F5E9', color: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <ClipboardCheck size={16} />
             </div>
-            <span>Attendance</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Attendance</span>
           </button>
 
           <button
@@ -569,13 +578,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
+              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              width: '100%',
+              minWidth: 0,
+              boxSizing: 'border-box',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Award size={16} />
             </div>
-            <span>Membership</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Membership</span>
           </button>
         </div>
       </section>
@@ -591,7 +603,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             borderRadius: '14px',
             background: '#FFFFFF',
             border: '1px solid #E5DFD1',
-            boxShadow: '0 3px 10px rgba(22, 101, 52, 0.05)',
+            boxShadow: '0 3px 10px rgba(10, 39, 27, 0.05)',
             width: '100%',
             maxWidth: '100%',
             boxSizing: 'border-box',
@@ -601,7 +613,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-              <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#14532D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <Coins size={18} />
               </div>
               <div>
@@ -614,7 +626,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             </div>
             
-            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803D', background: '#DCFCE7', padding: '0.2rem 0.55rem', borderRadius: '999px', border: '1px solid #BBF7D0' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#14532D', background: '#DCFCE7', padding: '0.2rem 0.55rem', borderRadius: '999px', border: '1px solid #BBF7D0' }}>
               Contributions
             </span>
           </div>
@@ -622,12 +634,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Total Contributions Snippet */}
           <div 
             style={{ 
-              background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #14532D 100%)', 
+              background: 'linear-gradient(135deg, #14532D 0%, #0F3D24 55%, #0A271B 100%)', 
               borderRadius: '10px', 
               padding: '0.85rem 1rem', 
               color: '#FFFFFF',
               marginBottom: '0.85rem',
-              boxShadow: '0 4px 12px rgba(22, 101, 52, 0.16)',
+              boxShadow: '0 4px 12px rgba(10, 39, 27, 0.25)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -660,7 +672,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               
               {/* Progress Bar */}
               <div style={{ width: '100%', height: '7px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
-                <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #15803D, #C68A24)', borderRadius: '999px' }} />
+                <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #14532D, #C68A24)', borderRadius: '999px' }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.3rem' }}>
                 <span>Raised: UGX {featuredCampaign.raisedAmount.toLocaleString()}</span>
@@ -686,7 +698,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 flex: 1,
                 padding: '0.7rem 0.9rem',
                 borderRadius: '8px',
-                background: 'linear-gradient(135deg, #15803D, #166534)',
+                background: 'linear-gradient(135deg, #14532D, #0A271B)',
                 color: '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '0.84rem',
@@ -696,7 +708,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.45rem',
-                boxShadow: '0 2px 6px rgba(22, 101, 52, 0.25)',
+                boxShadow: '0 2px 6px rgba(10, 39, 27, 0.35)',
               }}
             >
               <HeartHandshake size={16} />

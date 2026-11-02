@@ -284,7 +284,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
           onClick={handleOpenCreateOffice}
           style={{
             background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-            color: '#166534',
+            color: '#0A271B',
             border: 'none',
             padding: '0.6rem 1.2rem',
             borderRadius: '8px',
@@ -326,7 +326,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
             <div
               key={office.id}
               style={{
-                background: 'rgba(22, 101, 52, 0.7)',
+                background: 'rgba(10, 39, 27, 0.7)',
                 border: '1.5px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '12px',
                 padding: '1.25rem 1.5rem',
@@ -562,7 +562,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
         >
           <div
             style={{
-              background: '#15803D',
+              background: '#14532D',
               border: '1.5px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '16px',
               width: '100%',
@@ -628,11 +628,11 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
                       boxSizing: 'border-box',
                     }}
                   >
-                    <option value="EXECUTIVE" style={{ background: '#15803D' }}>Executive</option>
-                    <option value="SECRETARIAT" style={{ background: '#15803D' }}>Secretariat</option>
-                    <option value="COMMITTEE" style={{ background: '#15803D' }}>Standing Committee</option>
-                    <option value="REGIONAL" style={{ background: '#15803D' }}>Regional Chapter</option>
-                    <option value="SPECIAL" style={{ background: '#15803D' }}>Special Assignment</option>
+                    <option value="EXECUTIVE" style={{ background: '#14532D' }}>Executive</option>
+                    <option value="SECRETARIAT" style={{ background: '#14532D' }}>Secretariat</option>
+                    <option value="COMMITTEE" style={{ background: '#14532D' }}>Standing Committee</option>
+                    <option value="REGIONAL" style={{ background: '#14532D' }}>Regional Chapter</option>
+                    <option value="SPECIAL" style={{ background: '#14532D' }}>Special Assignment</option>
                   </select>
                 </div>
               </div>
@@ -763,7 +763,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
         >
           <div
             style={{
-              background: '#15803D',
+              background: '#14532D',
               border: '1.5px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '16px',
               width: '100%',
@@ -919,7 +919,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
                 </button>
                 <button
                   type="submit"
-                  style={{ padding: '0.55rem 1.35rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', color: '#166534', fontWeight: 800, cursor: 'pointer' }}
+                  style={{ padding: '0.55rem 1.35rem', borderRadius: '6px', border: 'none', background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', color: '#0A271B', fontWeight: 800, cursor: 'pointer' }}
                 >
                   Confirm Appointment
                 </button>
