@@ -4,7 +4,7 @@
   "description": "Official Alumni Portal and Digital Credential Pass for Mandela Secondary School Hoima (Founded 1997)",
   "icons": [
     {
-      "src": "/images/mosa-logo.png",
+      "src": "/images/app-icon.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
@@ -12,8 +12,8 @@
     {
       "src": "/images/app-icon.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
       "src": "/favicon.png",

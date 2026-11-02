@@ -60,7 +60,7 @@ if (-not $deployed) {
 Write-Host ""
 Write-Host "[3/3] Committing & pushing to GitHub..." -ForegroundColor Cyan
 git add .
-git commit -m "feat(ui): limit homepage content up to giving history and optimize layout fit"
+git commit -m "feat(branding): restore Mandela School crest in system and set 3D MOSA icon as mobile and desktop app icon"
 git push origin main
 
 Write-Host ""

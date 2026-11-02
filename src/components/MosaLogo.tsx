@@ -25,6 +25,8 @@ export const MosaLogo: React.FC<MosaLogoProps> = ({
 
   const sources = [
     MOSA_OFFICIAL_LOGO_DATA_URL,
+    '/images/school-crest.png',
+    '/images/school-crest.jpg',
     '/images/mosa-logo.png',
     '/images/mosa-logo.jpg',
   ];
