@@ -28,24 +28,79 @@ import { dataService } from './services/dataService';
 import { isStaffRole, isRegisteredAlumni } from './services/governanceService';
 import { MemberAttendanceView } from './components/MemberAttendanceView';
 import { OpportunitiesHub } from './components/OpportunitiesHub';
-import { ElectionsHub } from './components/ElectionsHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
 import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2, Music } from 'lucide-react';
 import { MosaLogo } from './components/MosaLogo';
 
+const getInitialTab = (): string => {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    if (hash && hash !== 'admin' && hash !== 'elections') return hash;
+    const saved = localStorage.getItem('mosa_active_tab');
+    if (saved && saved !== 'admin' && saved !== 'elections') return saved;
+  }
+  return 'home';
+};
+
+const getInitialPortalMode = (): 'member' | 'admin' => {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    if (hash === 'admin') return 'admin';
+    const saved = localStorage.getItem('mosa_portal_mode');
+    if (saved === 'admin') return 'admin';
+  }
+  return 'member';
+};
+
 export const App: React.FC = () => {
-  // Application Mode: Member Portal vs Dedicated Admin Control Panel
-  const [portalMode, setPortalMode] = useState<'member' | 'admin'>('member');
+  // Application Mode: Member Portal vs Dedicated Admin Control Panel (Persisted across refreshes)
+  const [portalMode, setPortalMode] = useState<'member' | 'admin'>(getInitialPortalMode);
   
-  // Current Active Tab in Member Portal
-  const [currentTab, setCurrentTab] = useState<string>('home');
-  const [tabHistory, setTabHistory] = useState<string[]>(['home']);
+  // Current Active Tab in Member Portal (Persisted across refreshes)
+  const [currentTab, setCurrentTab] = useState<string>(getInitialTab);
+  const [tabHistory, setTabHistory] = useState<string[]>([getInitialTab()]);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [authResolving, setAuthResolving] = useState<boolean>(true);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState<number>(0);
   const [showAuthGate, setShowAuthGate] = useState<boolean>(false);
   const [authInitialMode, setAuthInitialMode] = useState<'create-account' | 'login' | 'reset-password' | 'admin-login'>('create-account');
+
+  // Keep URL hash and localStorage in sync so refresh keeps user on active page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mosa_active_tab', currentTab);
+      if (portalMode === 'member') {
+        window.history.replaceState(null, '', `#${currentTab}`);
+      }
+    }
+  }, [currentTab, portalMode]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mosa_portal_mode', portalMode);
+      if (portalMode === 'admin') {
+        window.history.replaceState(null, '', '#admin');
+      } else {
+        window.history.replaceState(null, '', `#${currentTab}`);
+      }
+    }
+  }, [portalMode]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      if (!hash) return;
+      if (hash === 'admin') {
+        setPortalMode('admin');
+      } else {
+        setPortalMode('member');
+        setCurrentTab(hash === 'elections' ? 'home' : hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleNavigate = (tab: string) => {
     if (tab === currentTab) return;
@@ -565,15 +620,6 @@ export const App: React.FC = () => {
             onOpenAuth={() => setIsAuthOpen(true)}
             onBack={handleBack}
             onNavigateTab={handleNavigate}
-          />
-        )}
-
-        {/* 11.6. ELECTIONS & DIGITAL VOTING */}
-        {currentTab === 'elections' && (moduleSettings.elections ?? true) && (
-          <ElectionsHub
-            currentUser={currentUser}
-            onOpenAuth={() => setIsAuthOpen(true)}
-            onBack={handleBack}
           />
         )}
 

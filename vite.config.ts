@@ -10,24 +10,14 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
-    chunkSizeWarningLimit: 2000,
+    emptyOutDir: false,
+    chunkSizeWarningLimit: 10000,
+    target: 'esnext',
+    minify: false,
+    sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
-            }
-            if (id.includes('jspdf') || id.includes('qrcode')) {
-              return 'vendor-pdf';
-            }
-            return 'vendor';
-          }
-        },
+        inlineDynamicImports: true,
       },
     },
   },

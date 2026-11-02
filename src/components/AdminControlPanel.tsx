@@ -225,6 +225,10 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [newDocDescription, setNewDocDescription] = useState('');
   const [newDocSize, setNewDocSize] = useState('1.2 MB');
   const [newDocRestricted, setNewDocRestricted] = useState(false);
+  const [newDocFileData, setNewDocFileData] = useState<string>('');
+  const [newDocFileName, setNewDocFileName] = useState<string>('');
+  const [newDocFileType, setNewDocFileType] = useState<string>('PDF Document');
+  const [isReadingDocFile, setIsReadingDocFile] = useState<boolean>(false);
 
   // Audit Logs State & Controls
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -666,6 +670,42 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
     }
   };
 
+  const handleDocFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!newDocTitle.trim()) {
+      const cleanTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      setNewDocTitle(cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1));
+    }
+
+    setNewDocFileName(file.name);
+    const mb = file.size / (1024 * 1024);
+    if (mb >= 1) {
+      setNewDocSize(`${mb.toFixed(1)} MB`);
+    } else {
+      setNewDocSize(`${Math.max(1, Math.round(file.size / 1024))} KB`);
+    }
+
+    if (file.name.endsWith('.pdf')) setNewDocFileType('PDF Document');
+    else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) setNewDocFileType('Word Document');
+    else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) setNewDocFileType('Excel Spreadsheet');
+    else if (file.type.startsWith('image/')) setNewDocFileType('Document Image');
+    else setNewDocFileType(file.type || 'Official Document');
+
+    setIsReadingDocFile(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setNewDocFileData(event.target?.result as string);
+      setIsReadingDocFile(false);
+    };
+    reader.onerror = () => {
+      alert('Failed to read the chosen file.');
+      setIsReadingDocFile(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleCreateDocument = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDocTitle.trim()) return;
@@ -676,7 +716,9 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
         category: newDocCategory,
         description: newDocDescription.trim() || undefined,
         fileSize: newDocSize.trim() || '1.0 MB',
-        fileType: 'PDF Document',
+        fileType: newDocFileType || 'PDF Document',
+        fileData: newDocFileData || undefined,
+        fileName: newDocFileName || undefined,
         isRestrictedToMembers: newDocRestricted,
       }, currentUser.email);
 
@@ -684,6 +726,8 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       setIsAddDocModalOpen(false);
       setNewDocTitle('');
       setNewDocDescription('');
+      setNewDocFileData('');
+      setNewDocFileName('');
       if (onRefreshData) onRefreshData();
     } catch (err) {
       console.error('Failed to add document:', err);
@@ -4011,6 +4055,34 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             </div>
 
             <form onSubmit={handleCreateDocument} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Document File Upload */}
+              <div style={{ background: '#F8FAFC', border: '2px dashed #94A3B8', borderRadius: '10px', padding: '1.25rem 1rem', textAlign: 'center' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: '#0B203E', marginBottom: '0.4rem', cursor: 'pointer' }}>
+                  Upload Document File (.pdf, .docx, .doc, .xlsx, scans) *
+                </label>
+                <input
+                  type="file"
+                  id="admin-doc-file-input"
+                  accept=".pdf,.doc,.docx,.xlsx,.xls,.txt,.png,.jpg,.jpeg"
+                  onChange={handleDocFileChange}
+                  style={{ display: 'block', margin: '0.5rem auto', fontSize: '0.82rem' }}
+                />
+                {isReadingDocFile && (
+                  <div style={{ fontSize: '0.78rem', color: '#D97706', fontWeight: 600, marginTop: '0.35rem' }}>
+                    Reading document file data...
+                  </div>
+                )}
+                {newDocFileName ? (
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.82rem', color: '#059669', fontWeight: 700 }}>
+                    Selected File: {newDocFileName} ({newDocSize} • {newDocFileType})
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.3rem' }}>
+                    Select the Constitution PDF, AGM report, circular, or guidelines file to enable instant download by members.
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#334155', marginBottom: '0.3rem' }}>
                   Document Title *
@@ -4019,7 +4091,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   type="text"
                   required
                   className="input-field"
-                  placeholder="e.g. 2026 Annual General Meeting Resolutions"
+                  placeholder="e.g. MOSA Constitution (Amended 2026)"
                   value={newDocTitle}
                   onChange={e => setNewDocTitle(e.target.value)}
                   style={{ width: '100%', padding: '0.65rem' }}

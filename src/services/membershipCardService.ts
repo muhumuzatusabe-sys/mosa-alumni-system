@@ -982,20 +982,21 @@ export const membershipCardService = {
     }
 
     // 4. Header: Mandela Old Students Association (MOSA)
-    const textStartX = x + 35;
+    const textStartX = x + 34;
+    const rightContentCenterX = textStartX + 18;
     doc.setTextColor(11, 32, 62); // Navy
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
-    doc.text('MANDELA OLD STUDENTS', textStartX + 12, y + 6.5, { align: 'center' });
-    doc.text('ASSOCIATION (MOSA)', textStartX + 12, y + 10.2, { align: 'center' });
+    doc.setFontSize(8.2);
+    doc.text('MANDELA OLD STUDENTS', rightContentCenterX, y + 6.2, { align: 'center' });
+    doc.text('ASSOCIATION (MOSA)', rightContentCenterX, y + 9.8, { align: 'center' });
 
     // 5. "Membership ID Card" Green Pill Badge
     doc.setFillColor(84, 140, 78); // #548C4E Green
-    doc.roundedRect(textStartX + 1, y + 12, 24, 3.8, 1.6, 1.6, 'F');
+    doc.roundedRect(rightContentCenterX - 13, y + 11.5, 26, 3.8, 1.6, 1.6, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(5.5);
-    doc.text('Membership ID Card', textStartX + 13, y + 14.7, { align: 'center' });
+    doc.text('Membership ID Card', rightContentCenterX, y + 14.1, { align: 'center' });
 
     // 6. Top Right School Crest
     try {
@@ -1008,115 +1009,117 @@ export const membershipCardService = {
       doc.circle(x + w - 9, y + 9, 6, 'S');
     }
 
-    // 7. Personal Data Fields Grid
-    const fX = textStartX - 1;
-    let currY = y + 19.5;
+    // 7. Personal Data Fields Grid (Precision-aligned to eliminate text overlap)
+    const fX = textStartX;
+    const col2X = fX + 24;
+    let currY = y + 18.8;
 
     // Surname
-    doc.setTextColor(90, 104, 116); // Label gray
+    doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5.2);
+    doc.setFontSize(5.0);
     doc.text('Surname:', fX, currY);
-    currY += 3.2;
+    currY += 2.8;
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    const surnameSize = snapshot.surname.length > 14 ? 5.8 : 7.0;
+    doc.setFontSize(surnameSize);
     doc.text(snapshot.surname, fX, currY);
-    currY += 4.2;
+    currY += 3.8;
 
     // Given Name
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5.2);
+    doc.setFontSize(5.0);
     doc.text('Given Name:', fX, currY);
-    currY += 3.2;
+    currY += 2.8;
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    const givenNameSize = snapshot.givenName.length > 15 ? 5.8 : 7.0;
+    doc.setFontSize(givenNameSize);
     doc.text(snapshot.givenName, fX, currY);
-    currY += 4.5;
+    currY += 4.0;
 
     // Row: Nationality & Sex
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
+    doc.setFontSize(4.8);
     doc.text('Nationality:', fX, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.8);
+    doc.setFontSize(5.5);
     doc.text(snapshot.nationality, fX + 11.5, currY);
 
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
-    doc.text('Sex:', fX + 27, currY);
+    doc.setFontSize(4.8);
+    doc.text('Sex:', col2X, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.8);
-    doc.text(snapshot.sex, fX + 32, currY);
-    currY += 3.8;
+    doc.setFontSize(5.5);
+    doc.text(snapshot.sex, col2X + 5.5, currY);
+    currY += 3.4;
 
     // Row: Cohort year & MA No.
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
+    doc.setFontSize(4.8);
     doc.text('Cohort year:', fX, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.8);
-    doc.text(snapshot.cohortYear, fX + 13, currY);
+    doc.setFontSize(5.5);
+    doc.text(snapshot.cohortYear, fX + 12.5, currY);
 
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
-    doc.text('MA No.', fX + 23.5, currY);
+    doc.setFontSize(4.8);
+    doc.text('MA No.', col2X, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.2);
-    doc.text(snapshot.alumniNumber, fX + 31.5, currY);
-    currY += 3.8;
+    doc.setFontSize(5.6);
+    doc.text(snapshot.alumniNumber, col2X + 8.5, currY);
+    currY += 3.4;
 
     // Row: Entry year & Departure year
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
+    doc.setFontSize(4.8);
     doc.text('Entry year:', fX, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.8);
+    doc.setFontSize(5.5);
     doc.text(snapshot.entryYear, fX + 11.5, currY);
 
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5);
-    doc.text('Departure year:', fX + 21, currY);
+    doc.setFontSize(4.8);
+    doc.text('Exit year:', col2X, currY);
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.8);
-    doc.text(snapshot.departureYear, fX + 37, currY);
-    currY += 4.2;
+    doc.setFontSize(5.5);
+    doc.text(snapshot.departureYear, col2X + 9.5, currY);
+    currY += 3.6;
 
     // Row: Issue Date & Holder's Signature
     doc.setTextColor(90, 104, 116);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(4.8);
+    doc.setFontSize(4.6);
     doc.text('Issue Date:', fX, currY);
 
-    doc.text("Holder's", fX + 21, currY);
-    doc.text('Signature', fX + 21, currY + 2.5);
+    doc.text("Holder's Signature:", col2X, currY);
 
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.4);
-    doc.text(issueDateStr, fX, currY + 3.2);
+    doc.setFontSize(5.2);
+    doc.text(issueDateStr, fX, currY + 2.8);
 
     // Holder's signature stroke
     const sigUrl = alumnus.signatureUrl || svgToDataUrl(getMosaSignatureSvg(MOSA_COLORS.navyDeep, 80, 32));
     try {
-      doc.addImage(sigUrl, 'PNG', fX + 31, currY - 2.5, 13, 6);
+      doc.addImage(sigUrl, 'PNG', col2X + 17, currY - 2.0, 11, 5);
     } catch {
       doc.setDrawColor(19, 50, 86);
-      doc.line(fX + 31, currY + 2.5, fX + 43, currY + 2.5);
+      doc.line(col2X + 17, currY + 2.5, col2X + 26, currY + 2.5);
     }
   },
 
@@ -1141,28 +1144,28 @@ export const membershipCardService = {
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
-    doc.text(settings.ownershipStatement || 'This is property of:', x + w / 2, y + 5.5, { align: 'center' });
+    doc.text(settings.ownershipStatement || 'This is property of:', x + w / 2, y + 5.2, { align: 'center' });
 
     // 3. Center Navy Banner across card
-    const bannerY = y + 8.5;
-    const bannerH = 14.5;
+    const bannerY = y + 7.8;
+    const bannerH = 15.0;
     doc.setFillColor(11, 32, 62); // #0B203E deep navy
     doc.rect(x, bannerY, w, bannerH, 'F');
 
     // Banner Text
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.text(settings.associationName || 'Mandela Old Students Association (MOSA)', x + w / 2, bannerY + 4, { align: 'center' });
+    doc.setFontSize(7.6);
+    doc.text(settings.associationName || 'Mandela Old Students Association (MOSA)', x + w / 2, bannerY + 3.8, { align: 'center' });
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5.2);
-    doc.text(`Tel: ${settings.phoneNumbers.join(', ')}`, x + w / 2, bannerY + 7.2, { align: 'center' });
-    doc.text(`Email: ${settings.email}`, x + w / 2, bannerY + 10.2, { align: 'center' });
-    doc.text(`Website: ${settings.website}`, x + w / 2, bannerY + 13.2, { align: 'center' });
+    doc.setFontSize(5.0);
+    doc.text(`Tel: ${settings.phoneNumbers.join(', ')}`, x + w / 2, bannerY + 6.8, { align: 'center' });
+    doc.text(`Email: ${settings.email}`, x + w / 2, bannerY + 9.8, { align: 'center' });
+    doc.text(`Website: ${settings.website}`, x + w / 2, bannerY + 12.8, { align: 'center' });
 
     // 4. Bottom Area: Authorisation Signatures on Left
-    const sigStartY = y + 26;
+    const sigStartY = y + 25.5;
 
     // Chairman MOSA signature
     try {
@@ -1176,7 +1179,7 @@ export const membershipCardService = {
 
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6);
+    doc.setFontSize(5.8);
     doc.text(settings.chairmanMosa.title || 'Chairman MOSA', x + 23, sigStartY + 8.8, { align: 'center' });
 
     // Chairman BOG Massh signature
@@ -1190,9 +1193,9 @@ export const membershipCardService = {
     doc.text(settings.chairmanBog.title || 'Chairman BOG Massh', x + 23, sig2Y + 8.8, { align: 'center' });
 
     // 5. Validated Scannable QR Code on Right
-    const qrSize = 17;
-    const qrX = x + w - 28;
-    const qrY = y + 27;
+    const qrSize = 16.5;
+    const qrX = x + w - 24.5;
+    const qrY = y + 26;
 
     try {
       doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
@@ -1204,20 +1207,20 @@ export const membershipCardService = {
     const bracketLen = 3;
 
     // Top-left corner
-    doc.line(qrX - 1.5, qrY - 1.5, qrX - 1.5 + bracketLen, qrY - 1.5);
-    doc.line(qrX - 1.5, qrY - 1.5, qrX - 1.5, qrY - 1.5 + bracketLen);
+    doc.line(qrX - 1.2, qrY - 1.2, qrX - 1.2 + bracketLen, qrY - 1.2);
+    doc.line(qrX - 1.2, qrY - 1.2, qrX - 1.2, qrY - 1.2 + bracketLen);
 
     // Top-right corner
-    doc.line(qrX + qrSize + 1.5, qrY - 1.5, qrX + qrSize + 1.5 - bracketLen, qrY - 1.5);
-    doc.line(qrX + qrSize + 1.5, qrY - 1.5, qrX + qrSize + 1.5, qrY - 1.5 + bracketLen);
+    doc.line(qrX + qrSize + 1.2, qrY - 1.2, qrX + qrSize + 1.2 - bracketLen, qrY - 1.2);
+    doc.line(qrX + qrSize + 1.2, qrY - 1.2, qrX + qrSize + 1.2, qrY - 1.2 + bracketLen);
 
     // Bottom-left corner
-    doc.line(qrX - 1.5, qrY + qrSize + 1.5, qrX - 1.5 + bracketLen, qrY + qrSize + 1.5);
-    doc.line(qrX - 1.5, qrY + qrSize + 1.5, qrX - 1.5, qrY + qrSize + 1.5 - bracketLen);
+    doc.line(qrX - 1.2, qrY + qrSize + 1.2, qrX - 1.2 + bracketLen, qrY + qrSize + 1.2);
+    doc.line(qrX - 1.2, qrY + qrSize + 1.2, qrX - 1.2, qrY + qrSize + 1.2 - bracketLen);
 
     // Bottom-right corner
-    doc.line(qrX + qrSize + 1.5, qrY + qrSize + 1.5, qrX + qrSize + 1.5 - bracketLen, qrY + qrSize + 1.5);
-    doc.line(qrX + qrSize + 1.5, qrY + qrSize + 1.5, qrX + qrSize + 1.5, qrY + qrSize + 1.5 - bracketLen);
+    doc.line(qrX + qrSize + 1.2, qrY + qrSize + 1.2, qrX + qrSize + 1.2 - bracketLen, qrY + qrSize + 1.2);
+    doc.line(qrX + qrSize + 1.2, qrY + qrSize + 1.2, qrX + qrSize + 1.2, qrY + qrSize + 1.2 - bracketLen);
   },
 
   /**

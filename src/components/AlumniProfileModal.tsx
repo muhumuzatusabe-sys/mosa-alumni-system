@@ -30,8 +30,15 @@ export const AlumniProfileModal: React.FC<Props> = ({ alumnus, onClose, currentU
   if (!alumnus) return null;
 
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN';
-  const isOwner = currentUser?.alumniId === alumnus.internalId || currentUser?.email.toLowerCase() === alumnus.email.toLowerCase();
-  const canEdit = isOwner || isAdmin;
+  const cleanAlumniNo = (no?: string) => (no || '').replace(/[\s\-\.]/g, '').toUpperCase();
+  const isOwner = Boolean(
+    currentUser && (
+      (currentUser.alumniId && currentUser.alumniId === alumnus.internalId) ||
+      (currentUser.email && alumnus.email && currentUser.email.trim().toLowerCase() === alumnus.email.trim().toLowerCase()) ||
+      (currentUser.alumniNumber && alumnus.alumniNumber && cleanAlumniNo(currentUser.alumniNumber) === cleanAlumniNo(alumnus.alumniNumber))
+    )
+  );
+  const canEdit = Boolean(isAdmin || isOwner);
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,6 +56,11 @@ export const AlumniProfileModal: React.FC<Props> = ({ alumnus, onClose, currentU
   const [showNickname, setShowNickname] = useState(alumnus.privacySettings.showNickname);
 
   const handleSave = async () => {
+    if (!canEdit) {
+      alert('Unauthorized: Members can only edit their own profile details.');
+      setIsEditing(false);
+      return;
+    }
     setLoading(true);
     try {
       const updates: Partial<AlumniProfile> = {

@@ -102,7 +102,7 @@ export const AuthModal: React.FC<Props> = ({
         setErrorMsg('');
       } else if (res.isAdmin) {
         setVerifiedAlumnus(null);
-        setErrorMsg('This is an administrator email. Please switch to the Administrator tab.');
+        setErrorMsg('');
       } else {
         setVerifiedAlumnus(null);
       }
@@ -279,7 +279,7 @@ export const AuthModal: React.FC<Props> = ({
     setSuccessMsg('');
     setPortal('admin');
     if (type === 'superadmin') {
-      setEmail('superadmin@mosa.org');
+      setEmail('masshalumni@gmail.com');
       setPassword('admin123');
     } else {
       setEmail('admin@massh.ac.ug');

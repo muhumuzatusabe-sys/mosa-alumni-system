@@ -338,6 +338,8 @@ export interface MOSADocument {
   publishedDate: string;
   downloadUrl?: string;
   fileType?: string;
+  fileData?: string; // Base64 data URI of uploaded document
+  fileName?: string; // Original name of uploaded document
   isRestrictedToMembers?: boolean;
 }
 

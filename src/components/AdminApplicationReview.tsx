@@ -334,6 +334,51 @@ export const AdminApplicationReview: React.FC<Props> = ({
     setVerifySearched(true);
   };
 
+  const handleExportPhysicalBook = () => {
+    if (legacyRecords.length === 0) {
+      alert('No physical register records available to export.');
+      return;
+    }
+
+    const headers = [
+      'Physical Register Number',
+      'Alumnus Full Name',
+      'Exit Cohort Year',
+      'Register Book Reference',
+      'Verification State',
+      'Linked Digital Alumni ID',
+      'Date Added'
+    ];
+
+    const escapeCsv = (str: any) => {
+      if (str === null || str === undefined) return '""';
+      const clean = String(str).replace(/"/g, '""');
+      return `"${clean}"`;
+    };
+
+    const rows = legacyRecords.map(r => [
+      escapeCsv(r.membershipNumber),
+      escapeCsv(r.fullName),
+      escapeCsv(r.cohortYear ? `Class of ${r.cohortYear}` : 'Historical Record'),
+      escapeCsv(r.physicalRegisterPage || 'Mandela SS Physical Register (Est. 1997)'),
+      escapeCsv(r.verifiedStatus || (r.linkedAlumniId ? 'LINKED' : 'UNMATCHED')),
+      escapeCsv(r.linkedAlumniId || 'Not Linked'),
+      escapeCsv(r.createdAt || new Date().toISOString().slice(0, 10))
+    ].join(','));
+
+    // UTF-8 BOM (\uFEFF) ensures Excel opens special characters correctly
+    const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `MOSA_Physical_Register_Book_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleAssistedSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assistedForm.firstName.trim() || !assistedForm.lastName.trim()) {
@@ -1257,7 +1302,15 @@ export const AdminApplicationReview: React.FC<Props> = ({
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleExportPhysicalBook}
+                  className="btn btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.6rem 1.15rem', background: '#ECFDF5', color: '#065F46', border: '1px solid #A7F3D0', fontWeight: 700 }}
+                  title="Export complete physical register records to Excel / CSV"
+                >
+                  <FileSpreadsheet size={16} color="#059669" /> Export to Excel / CSV
+                </button>
                 <button
                   onClick={() => setIsImportModalOpen(true)}
                   className="btn btn-primary"

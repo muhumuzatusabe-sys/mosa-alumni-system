@@ -24,21 +24,34 @@ if (fs.existsSync(srcLogo)) {
   console.log('     -> public/images/mosa-logo.png');
   console.log('     -> public/favicon.png');
 
-  // Generate base64 TypeScript module so PDFs & offline cards have zero latency
+  // Point to public logo asset to ensure lightning fast, crash-free compilation
   try {
-    const buffer = fs.readFileSync(srcLogo);
-    const base64 = `data:image/jpeg;base64,${buffer.toString('base64')}`;
-    const tsCode = `// Auto-generated official Mandela Secondary School Hoima logo data URI\nexport const MOSA_OFFICIAL_LOGO_DATA_URL = ${JSON.stringify(base64)};\nexport default MOSA_OFFICIAL_LOGO_DATA_URL;\n`;
+    const tsCode = `// Official Mandela Secondary School Hoima logo URL\nexport const MOSA_OFFICIAL_LOGO_DATA_URL = '/images/mosa-logo.png';\nexport default MOSA_OFFICIAL_LOGO_DATA_URL;\n`;
     fs.writeFileSync(path.resolve('src/utils/mosaLogoDataUrl.ts'), tsCode, 'utf-8');
-    console.log('[OK] Generated src/utils/mosaLogoDataUrl.ts with base64 data URI');
+    console.log('[OK] Generated src/utils/mosaLogoDataUrl.ts with image reference');
 
-    // Also overwrite mosa-logo.svg with the official logo image
-    const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="200" height="230"><image href="${base64}" x="0" y="0" width="200" height="230" preserveAspectRatio="xMidYMid meet" /></svg>`;
+    // Also write clean mosa-logo.svg referencing the official logo
+    const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="200" height="230"><image href="/images/mosa-logo.png" x="0" y="0" width="200" height="230" preserveAspectRatio="xMidYMid meet" /></svg>`;
     fs.writeFileSync(path.resolve('public/images/mosa-logo.svg'), svgCode, 'utf-8');
-    console.log('[OK] Overwrote public/images/mosa-logo.svg with official logo');
+    console.log('[OK] Overwrote public/images/mosa-logo.svg with official logo reference');
   } catch (err) {
-    console.warn('Could not generate base64 module:', err);
+    console.warn('Could not configure logo modules:', err);
   }
 } else {
   console.warn('[WARNING] Source logo file not found at:', srcLogo);
+}
+
+// Synchronize public directory directly into dist
+try {
+  const distDir = path.resolve('dist');
+  if (!fs.existsSync(distDir)) {
+    fs.mkdirSync(distDir, { recursive: true });
+  }
+  const publicDir = path.resolve('public');
+  if (fs.existsSync(publicDir)) {
+    fs.cpSync(publicDir, distDir, { recursive: true, force: true });
+    console.log('[OK] Pre-synced public assets into ./dist');
+  }
+} catch (err) {
+  console.warn('Note: dist sync skipped:', err?.message || err);
 }

@@ -58,7 +58,25 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
       onOpenAuth();
       return;
     }
-    // Create authentic simulated download with official header and watermark
+
+    // 1. If an actual document file was uploaded by Admin, download it directly
+    if (doc.fileData) {
+      const link = document.createElement('a');
+      link.href = doc.fileData;
+      link.download = doc.fileName || `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
+    // 2. If an external download URL was supplied, navigate to it
+    if (doc.downloadUrl && doc.downloadUrl.startsWith('http')) {
+      window.open(doc.downloadUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // 3. Otherwise generate authentic official Secretariat ratified release memo
     const content = `================================================================================
 MANDELA OLD STUDENTS ASSOCIATION (MOSA)
 MANDELA SECONDARY SCHOOL HOIMA (MASSH) • ESTABLISHED 1997

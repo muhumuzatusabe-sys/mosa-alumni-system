@@ -546,7 +546,7 @@ export const sendVerificationEmail = async (
         </span>
       </div>
       <div style="font-size: 12px; color: #64748B; margin-top: 8px;">
-        Valid for 10 minutes • Keep this code confidential
+        Valid for 5 minutes • Keep this code confidential
       </div>
     </div>
 
@@ -560,7 +560,7 @@ export const sendVerificationEmail = async (
     toName: displayName,
     subject,
     htmlContent: buildEmailTemplate(content),
-    textContent: `Your MOSA Alumni verification code is ${code}. Valid for 10 minutes.`,
+    textContent: `Your MOSA Alumni verification code is ${code}. Valid for 5 minutes.`,
     category: 'VERIFICATION',
   });
 };

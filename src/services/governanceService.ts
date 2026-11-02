@@ -241,19 +241,9 @@ export const governanceService = {
     return users.filter(u => isStaffRole(u.role));
   },
 
-  /** Make sure the role demo accounts exist even on installs created before roles were introduced. */
+  /** No-op: Blank system without demo staff accounts. */
   ensureSeedStaff(): void {
-    const users = readJSON<AuthUser[]>(KEYS.USERS, []);
-    const seeds: AuthUser[] = [
-      { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true },
-      { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true },
-      { uid: 'staff-publicity-01', email: 'publicity@massh.ac.ug', role: 'PUBLICITY', displayName: 'MOSA Publicity Secretary', active: true },
-    ];
-    let changed = false;
-    seeds.forEach(s => {
-      if (!users.some(u => u.email.toLowerCase() === s.email)) { users.push(s); changed = true; }
-    });
-    if (changed || users.length === 0) store.set(KEYS.USERS, JSON.stringify(users));
+    // Intentionally blank - no demo staff seeded
   },
 
   async saveStaffAccount(

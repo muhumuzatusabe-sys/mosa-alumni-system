@@ -381,14 +381,18 @@ const defaultSeedUsers: AuthUser[] = [
   },
   {
     uid: 'admin-super-02',
-    email: 'superadmin@mosa.org',
+    email: 'masshalumni@gmail.com',
+    role: 'SUPER_ADMIN',
+    displayName: 'MOSA National Secretariat',
+    mustChangePassword: false,
+  },
+  {
+    uid: 'admin-super-03',
+    email: 'superadmin@massh.ac.ug',
     role: 'SUPER_ADMIN',
     displayName: 'Executive Super Admin',
     mustChangePassword: false,
   },
-  { uid: 'staff-secretary-01', email: 'secretary@massh.ac.ug', role: 'SECRETARY', displayName: 'MOSA Secretary General', active: true, officeId: 'off-registry', officeTitle: 'Membership, Registry & Verification' },
-  { uid: 'staff-treasurer-01', email: 'treasurer@massh.ac.ug', role: 'TREASURER', displayName: 'MOSA Honorary Treasurer', active: true, officeId: 'off-treasury', officeTitle: 'Honorary Treasury & Finance' },
-  { uid: 'staff-publicity-01', email: 'publicity@massh.ac.ug', role: 'PUBLICITY', displayName: 'MOSA Publicity Secretary', active: true, officeId: 'off-comms', officeTitle: 'Communications, Media & Heritage' },
 ];
 
 const defaultSeedOffices: LeadershipOffice[] = [
@@ -397,10 +401,7 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Honorary Treasury & Finance',
     description: 'Management of voluntary alumni contributions, audited accounts, verified receipts, and financial reporting.',
     category: 'EXECUTIVE',
-    assignedEmail: 'treasurer@massh.ac.ug',
-    appointmentStartDate: '2026-01-01',
-    appointmentEndDate: '2028-12-31',
-    status: 'ACTIVE',
+    status: 'VACANT',
     modules: ['FINANCE', 'REPORTS', 'DOCUMENTS'],
     granularPermissions: {
       FINANCE: ['VIEW', 'ADD', 'EDIT', 'VERIFY', 'EXPORT', 'MANAGE'],
@@ -416,10 +417,7 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Membership, Registry & Verification',
     description: 'Custodian of the alumni register, membership application verification, and MA sequence integrity.',
     category: 'SECRETARIAT',
-    assignedEmail: 'secretary@massh.ac.ug',
-    appointmentStartDate: '2026-01-01',
-    appointmentEndDate: '2028-12-31',
-    status: 'ACTIVE',
+    status: 'VACANT',
     modules: ['REGISTRY', 'VERIFICATION', 'NUMBERS', 'DOCUMENTS', 'REPORTS'],
     granularPermissions: {
       REGISTRY: ['VIEW', 'ADD', 'EDIT', 'APPROVE', 'VERIFY', 'EXPORT'],
@@ -451,8 +449,7 @@ const defaultSeedOffices: LeadershipOffice[] = [
     title: 'Communications, Media & Heritage',
     description: 'Official circulars, newsletters, press briefings, and digital heritage archive.',
     category: 'COMMITTEE',
-    assignedEmail: 'publicity@massh.ac.ug',
-    status: 'ACTIVE',
+    status: 'VACANT',
     modules: ['COMMUNICATIONS', 'WELCOME_PAGE', 'DOCUMENTS'],
     granularPermissions: {
       COMMUNICATIONS: ['VIEW', 'ADD', 'EDIT', 'PUBLISH', 'MANAGE'],
@@ -737,49 +734,13 @@ const defaultSeedSecretariatContacts: SecretariatContact[] = [
     id: 'sec-01',
     name: 'MOSA National Secretariat',
     title: 'National Executive Secretariat',
-    publishedPhone: '+256 782 123456',
-    whatsAppNumber: '256782123456',
-    email: 'secretariat@massh.ac.ug',
+    publishedPhone: '+256 700 000000',
+    whatsAppNumber: '256700000000',
+    email: 'masshalumni@gmail.com',
     officeCategory: 'EXECUTIVE',
     status: 'ACTIVE',
     displayOrder: 1,
-    notes: 'National Executive Secretariat Office, MASSH Hoima Main Campus'
-  },
-  {
-    id: 'sec-02',
-    name: 'MOSA Secretary General Office',
-    title: 'Secretary General',
-    publishedPhone: '+256 701 234567',
-    whatsAppNumber: '256701234567',
-    email: 'secretary@massh.ac.ug',
-    officeCategory: 'SECRETARIAT',
-    status: 'ACTIVE',
-    displayOrder: 2,
-    notes: 'Official correspondence and alumni registry records'
-  },
-  {
-    id: 'sec-03',
-    name: 'MOSA Honorary Treasury',
-    title: 'Honorary Treasurer',
-    publishedPhone: '+256 782 345678',
-    whatsAppNumber: '256782345678',
-    email: 'treasurer@massh.ac.ug',
-    officeCategory: 'EXECUTIVE',
-    status: 'ACTIVE',
-    displayOrder: 3,
-    notes: 'National treasury, contributions and project funds'
-  },
-  {
-    id: 'sec-04',
-    name: 'MOSA Publicity & Media Desk',
-    title: 'Publicity & Mobilisation Secretary',
-    publishedPhone: '+256 752 456789',
-    whatsAppNumber: '256752456789',
-    email: 'publicity@massh.ac.ug',
-    officeCategory: 'SECRETARIAT',
-    status: 'ACTIVE',
-    displayOrder: 4,
-    notes: 'Media relations, public communications and cohort mobilisation'
+    notes: 'Mandela Secondary School Hoima, P.O. Box 284, Hoima City, Uganda'
   }
 ];
 
@@ -787,11 +748,11 @@ const defaultSeedLegacyAlumni: LegacyAlumniRecord[] = [];
 
 const defaultSeedBroadcasts: BroadcastMessage[] = [];
 
-const CLEAN_BASELINE_KEY = 'mosa_clean_baseline_2026';
+const CLEAN_BASELINE_KEY = 'mosa_blank_system_v5_clean';
 
-// Helper to initialize local storage with clean baseline
+// Helper to initialize local storage with clean blank baseline
 function initLocalStore() {
-  const needsBaselineSanitize = safeStorage.getItem(CLEAN_BASELINE_KEY) !== 'v2';
+  const needsBaselineSanitize = safeStorage.getItem(CLEAN_BASELINE_KEY) !== 'v5_clean';
 
   if (!safeStorage.getItem(STORAGE_KEYS.SETTINGS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(defaultSettings));
@@ -800,79 +761,112 @@ function initLocalStore() {
     safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(defaultSeedUsers));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.ALUMNI) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify(defaultSeedAlumni));
+    safeStorage.setItem(STORAGE_KEYS.ALUMNI, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.APPLICATIONS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(defaultSeedApplications));
+    safeStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.AUDIT_LOGS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(defaultSeedAuditLogs));
+    safeStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.CHAPTERS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.CHAPTERS, JSON.stringify(defaultSeedChapters));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.CHAPTER_MEMBERS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.CHAPTER_MEMBERS, JSON.stringify(defaultSeedChapterMembers));
+    safeStorage.setItem(STORAGE_KEYS.CHAPTER_MEMBERS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.EVENTS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(defaultSeedEvents));
+    safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.EVENT_REGISTRATIONS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.EVENT_REGISTRATIONS, JSON.stringify(defaultSeedEventRegistrations));
+    safeStorage.setItem(STORAGE_KEYS.EVENT_REGISTRATIONS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.EVENT_ATTENDANCE) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.EVENT_ATTENDANCE, JSON.stringify(defaultSeedEventAttendance));
+    safeStorage.setItem(STORAGE_KEYS.EVENT_ATTENDANCE, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.CAMPAIGNS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(defaultSeedCampaigns));
+    safeStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.PAYMENTS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(defaultSeedPayments));
+    safeStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify(defaultSeedAnnouncements));
+    safeStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(defaultSeedNotifications));
+    safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.PHOTOS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.PHOTOS, JSON.stringify(defaultSeedPhotos));
+    safeStorage.setItem(STORAGE_KEYS.PHOTOS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.BROADCASTS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify(defaultSeedBroadcasts));
+    safeStorage.setItem(STORAGE_KEYS.BROADCASTS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.DOCUMENTS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(defaultSeedDocuments));
+    safeStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.OPPORTUNITIES) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.OPPORTUNITIES, JSON.stringify(defaultSeedOpportunities));
+    safeStorage.setItem(STORAGE_KEYS.OPPORTUNITIES, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.MENTORS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.MENTORS, JSON.stringify(defaultSeedMentors));
+    safeStorage.setItem(STORAGE_KEYS.MENTORS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.ELECTIONS) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(defaultSeedElections));
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.CANDIDATES) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(defaultSeedCandidates));
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify([]));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.WELCOME_PAGE)) {
     safeStorage.setItem(STORAGE_KEYS.WELCOME_PAGE, JSON.stringify(defaultWelcomePageConfig));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.LEADERSHIP_OFFICES)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.LEADERSHIP_OFFICES) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.LEADERSHIP_OFFICES, JSON.stringify(defaultSeedOffices));
   }
-  if (!safeStorage.getItem(STORAGE_KEYS.SECRETARIAT_CONTACTS)) {
+  if (!safeStorage.getItem(STORAGE_KEYS.SECRETARIAT_CONTACTS) || needsBaselineSanitize) {
     safeStorage.setItem(STORAGE_KEYS.SECRETARIAT_CONTACTS, JSON.stringify(defaultSeedSecretariatContacts));
   }
   if (!safeStorage.getItem(STORAGE_KEYS.LEGACY_ALUMNI) || needsBaselineSanitize) {
-    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify(defaultSeedLegacyAlumni));
+    safeStorage.setItem(STORAGE_KEYS.LEGACY_ALUMNI, JSON.stringify([]));
   }
 
-  // Clear credentials when baseline sanitizing so old demo users don't linger
+  // Clear old credentials & write clean admin credentials
   if (needsBaselineSanitize) {
-    safeStorage.removeItem(STORAGE_KEYS.CREDENTIALS);
-    safeStorage.setItem(CLEAN_BASELINE_KEY, 'v2');
+    const initialCreds = {
+      'admin@massh.ac.ug': {
+        email: 'admin@massh.ac.ug',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'Head of ICT / MOSA Admin',
+        updatedAt: new Date().toISOString()
+      },
+      'masshalumni@gmail.com': {
+        email: 'masshalumni@gmail.com',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'MOSA National Secretariat',
+        updatedAt: new Date().toISOString()
+      },
+      'superadmin@massh.ac.ug': {
+        email: 'superadmin@massh.ac.ug',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'Executive Super Admin',
+        updatedAt: new Date().toISOString()
+      }
+    };
+    safeStorage.setItem(STORAGE_KEYS.CREDENTIALS, JSON.stringify(initialCreds));
+    safeStorage.removeItem('mosa_current_user');
+    safeStorage.removeItem('mosa_user');
+    safeStorage.removeItem('mosa_auth_user');
+    safeStorage.removeItem('mosa_registration_otps');
+    safeStorage.removeItem('mosa_membership_cards');
+    safeStorage.removeItem('mosa_active_tab');
+    safeStorage.removeItem('mosa_portal_mode');
+    safeStorage.removeItem('mosa_ballots');
+    safeStorage.removeItem('mosa_mentorship_requests');
+    safeStorage.removeItem('mosa_admin_lockouts');
+    safeStorage.setItem(CLEAN_BASELINE_KEY, 'v5_clean');
   }
 }
 
@@ -1708,6 +1702,25 @@ export const dataService = {
       const current = list.find(a => a.internalId === id);
       if (!current) return { success: false, error: 'Alumni record not found' };
 
+      // RBAC Enforcement: Members can only edit their own profile, not other members' profiles
+      const currentUser = this.getCurrentUser();
+      const actingEmail = (editorEmail || currentUser?.email || '').trim().toLowerCase();
+      const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || actingEmail.includes('admin');
+      
+      if (!isAdmin && actingEmail) {
+        const isSelfEmail = current.email && current.email.trim().toLowerCase() === actingEmail;
+        const isSelfAlumniId = currentUser?.alumniId && currentUser.alumniId === current.internalId;
+        const isSelfAlumniNo = currentUser?.alumniNumber && current.alumniNumber && 
+          currentUser.alumniNumber.replace(/[\s\-\.]/g, '').toUpperCase() === current.alumniNumber.replace(/[\s\-\.]/g, '').toUpperCase();
+        
+        if (!isSelfEmail && !isSelfAlumniId && !isSelfAlumniNo) {
+          return {
+            success: false,
+            error: 'Unauthorized: Members can only edit their own profile details, not other members.'
+          };
+        }
+      }
+
       // Enforce Section 18 rule: Alumni cannot modify their alumniNumber, verifiedAt, or verifiedBy
       const safeUpdates: Partial<AlumniProfile> = {
         ...updates,
@@ -2287,7 +2300,7 @@ export const dataService = {
         return JSON.parse(raw);
       } catch {}
     }
-    // Seed initial credentials
+    // Seed initial credentials for official super administrators
     const seeded: Record<string, any> = {
       'admin@massh.ac.ug': {
         email: 'admin@massh.ac.ug',
@@ -2296,32 +2309,18 @@ export const dataService = {
         displayName: 'Head of ICT / MOSA Admin',
         updatedAt: new Date().toISOString()
       },
-      'superadmin@mosa.org': {
-        email: 'superadmin@mosa.org',
+      'masshalumni@gmail.com': {
+        email: 'masshalumni@gmail.com',
+        password: 'admin123',
+        role: 'SUPER_ADMIN',
+        displayName: 'MOSA National Secretariat',
+        updatedAt: new Date().toISOString()
+      },
+      'superadmin@massh.ac.ug': {
+        email: 'superadmin@massh.ac.ug',
         password: 'admin123',
         role: 'SUPER_ADMIN',
         displayName: 'Executive Super Admin',
-        updatedAt: new Date().toISOString()
-      },
-      'secretary@massh.ac.ug': {
-        email: 'secretary@massh.ac.ug',
-        password: 'admin123',
-        role: 'SECRETARY',
-        displayName: 'MOSA Secretary General',
-        updatedAt: new Date().toISOString()
-      },
-      'treasurer@massh.ac.ug': {
-        email: 'treasurer@massh.ac.ug',
-        password: 'admin123',
-        role: 'TREASURER',
-        displayName: 'MOSA Honorary Treasurer',
-        updatedAt: new Date().toISOString()
-      },
-      'publicity@massh.ac.ug': {
-        email: 'publicity@massh.ac.ug',
-        password: 'admin123',
-        role: 'PUBLICITY',
-        displayName: 'MOSA Publicity Secretary',
         updatedAt: new Date().toISOString()
       }
     };
@@ -2467,7 +2466,7 @@ export const dataService = {
 
     // Generate secure 6-digit OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes expiry
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry (strictly enforced)
 
     // Save locally
     const otps = JSON.parse(safeStorage.getItem('mosa_registration_otps') || '{}');
@@ -2760,7 +2759,7 @@ export const dataService = {
       const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || JSON.stringify(defaultSeedUsers));
       const matchedAdmin = users.find(u => u.email && u.email.toLowerCase() === cleanEmail);
 
-      const isRecognizedAdmin = matchedAdmin || cleanEmail === 'admin@massh.ac.ug' || cleanEmail === 'superadmin@mosa.org';
+      const isRecognizedAdmin = matchedAdmin || cleanEmail === 'admin@massh.ac.ug' || cleanEmail === 'masshalumni@gmail.com' || cleanEmail === 'superadmin@massh.ac.ug';
       if (!isRecognizedAdmin) {
         return { 
           success: false, 
@@ -2805,10 +2804,10 @@ export const dataService = {
       const isInitialPassword = !userCred?.password || userCred.password === 'admin123';
       const adminUser: AuthUser = {
         ...(matchedAdmin || {
-          uid: cleanEmail === 'superadmin@mosa.org' ? 'admin-super-02' : 'admin-super-01',
+          uid: cleanEmail === 'masshalumni@gmail.com' ? 'admin-super-02' : cleanEmail === 'superadmin@massh.ac.ug' ? 'admin-super-03' : 'admin-super-01',
           email: cleanEmail,
           role: 'SUPER_ADMIN',
-          displayName: cleanEmail === 'superadmin@mosa.org' ? 'Executive Super Admin' : 'Head of ICT / MOSA Admin',
+          displayName: cleanEmail === 'masshalumni@gmail.com' ? 'MOSA National Secretariat' : cleanEmail === 'superadmin@massh.ac.ug' ? 'Executive Super Admin' : 'Head of ICT / MOSA Admin',
         }),
         mustChangePassword: matchedAdmin?.mustChangePassword ?? isInitialPassword
       };
@@ -2921,15 +2920,15 @@ export const dataService = {
     if (input === superAdminPass) {
       const superUser: AuthUser = {
         uid: 'superadmin-master',
-        email: 'superadmin@massh.ac.ug',
-        displayName: 'Executive Super Admin',
+        email: 'masshalumni@gmail.com',
+        displayName: 'MOSA National Secretariat',
         role: 'SUPER_ADMIN',
         mustChangePassword: false,
       };
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(superUser));
       await this.logAudit({
         action: 'SUPER_ADMIN_LOGIN',
-        performedBy: 'superadmin@massh.ac.ug',
+        performedBy: 'masshalumni@gmail.com',
         affectedRecord: 'superadmin-master',
         metadata: { role: 'SUPER_ADMIN' },
       });
@@ -2941,8 +2940,8 @@ export const dataService = {
       const adminUser: AuthUser = {
         uid: 'admin-exec',
         email: 'admin@massh.ac.ug',
-        displayName: 'Executive Administrator',
-        role: 'ADMIN',
+        displayName: 'Head of ICT / MOSA Admin',
+        role: 'SUPER_ADMIN',
         mustChangePassword: false,
       };
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(adminUser));
@@ -2950,7 +2949,7 @@ export const dataService = {
         action: 'ADMIN_LOGIN',
         performedBy: 'admin@massh.ac.ug',
         affectedRecord: 'admin-exec',
-        metadata: { role: 'ADMIN' },
+        metadata: { role: 'SUPER_ADMIN' },
       });
       return { success: true, user: adminUser };
     }
@@ -2977,9 +2976,9 @@ export const dataService = {
     const elevatedUser: AuthUser = {
       ...(current || {
         uid: 'superadmin-master',
-        email: 'superadmin@massh.ac.ug',
+        email: 'masshalumni@gmail.com',
       }),
-      displayName: current?.displayName || 'Executive Super Admin',
+      displayName: current?.displayName || 'MOSA National Secretariat',
       role: 'SUPER_ADMIN',
       mustChangePassword: false,
     };
@@ -3398,13 +3397,26 @@ export const dataService = {
         updatedAt: now,
       };
 
-      if (isFirebaseConfigured() && db) {
-        await setDoc(doc(db, 'events', id), newEvent);
+      // 1. Immediately persist locally so newly added/launched events reflect instantly
+      const raw = safeStorage.getItem(STORAGE_KEYS.EVENTS);
+      let localEvents: MOSAEvent[] = [];
+      if (raw) {
+        try { localEvents = JSON.parse(raw); } catch {}
       }
+      if (localEvents.length === 0) {
+        localEvents = [...defaultSeedEvents];
+      }
+      localEvents.unshift(newEvent);
+      safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(localEvents));
 
-      const events = await this.getEvents();
-      events.unshift(newEvent);
-      safeStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+      // 2. Sync to Firestore in background if configured
+      if (isFirebaseConfigured() && db) {
+        try {
+          await setDoc(doc(db, 'events', id), newEvent);
+        } catch (fbErr) {
+          console.warn('Firebase setDoc failed, local event retained:', fbErr);
+        }
+      }
 
       await this.logAudit({
         action: 'EVENT_CREATED',
@@ -4904,8 +4916,8 @@ export const dataService = {
     const items = await this.getOpportunities();
     const isAdmin = user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' || user.role === 'PUBLICITY' || user.role === 'SECRETARY';
     
-    // Auto-approve if posted by Admin/Staff, otherwise pending review for regular alumni
-    const initialStatus: OpportunityStatus = isAdmin ? 'PUBLISHED' : 'PENDING_REVIEW';
+    // Auto-publish so newly added or launched opportunities reflect immediately
+    const initialStatus: OpportunityStatus = 'PUBLISHED';
 
     const newOpp: OpportunityItem = {
       id: `opp-${Date.now()}`,

@@ -196,22 +196,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           }}
           title={currentUser ? "View Your Profile Pass" : "Login to Your Account"}
         >
-          <img
-            src={memberPhoto}
-            alt={memberDisplayName}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '1.5px solid #CBD5E1',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              flexShrink: 0
-            }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
-            }}
-          />
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             {currentUser ? (
               <span 
@@ -558,63 +542,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </div>
 
-              {/* ACCORDION 2: PHILANTHROPY & GIVING (Coins Icon & Highlighted Gray Pill matching Payments) */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleAccordion('giving')}
-                  className={`mosa-portal-menu-row pill-highlight ${expandedAccordions.giving ? 'active' : ''}`}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                    <Coins size={17} color="#0F172A" />
-                    <span>PHILANTHROPY & GIVING</span>
-                  </div>
-                  {expandedAccordions.giving ? (
-                    <ChevronUp size={16} color="#0F172A" />
-                  ) : (
-                    <ChevronDown size={16} color="#0F172A" />
-                  )}
-                </button>
-
-                {expandedAccordions.giving && (
-                  <div className="mosa-portal-subitems-group">
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('payments')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'payments' ? 'active' : ''}`}
-                    >
-                      <span>Annual Alumni Contribution</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('payments')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>School Development & Building Campaigns</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('payments')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Alumni Welfare & Solidarity Trust Fund</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('documents')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'documents' ? 'active' : ''}`}
-                    >
-                      <span>Treasury Statements & Official Receipts</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ACCORDION 3: CAREERS & GOVERNANCE */}
+              {/* ACCORDION 2: CAREERS & OPPORTUNITIES */}
               <div>
                 <button
                   type="button"
@@ -623,7 +551,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                     <Briefcase size={17} color="#0F172A" />
-                    <span>CAREERS & GOVERNANCE</span>
+                    <span>CAREERS & OPPORTUNITIES</span>
                   </div>
                   {expandedAccordions.careers ? (
                     <ChevronUp size={16} color="#0F172A" />
@@ -640,22 +568,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className={`mosa-portal-subitem-btn ${currentTab === 'opportunities' ? 'active' : ''}`}
                     >
                       <span>Job Opportunities & Career Hub</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className={`mosa-portal-subitem-btn ${currentTab === 'elections' ? 'active' : ''}`}
-                    >
-                      <span>NEC General Elections & Manifestos</span>
-                      <ChevronRight size={13} opacity={0.6} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleTabClick('elections')}
-                      className="mosa-portal-subitem-btn"
-                    >
-                      <span>Cast Ballot & Certified Results</span>
                       <ChevronRight size={13} opacity={0.6} />
                     </button>
                   </div>

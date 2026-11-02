@@ -58,14 +58,14 @@ export async function runVerificationTests(): Promise<{ passed: boolean; report:
 
     const creds = dataService.getUserCredentials();
     assert(!!creds['admin@massh.ac.ug'], 'Head of ICT Super Admin (admin@massh.ac.ug) exists in credentials');
-    assert(!!creds['superadmin@mosa.org'], 'Executive Super Admin (superadmin@mosa.org) exists in credentials');
+    assert(!!creds['masshalumni@gmail.com'], 'MOSA National Secretariat Super Admin (masshalumni@gmail.com) exists in credentials');
     assert(!creds['muhammad.z@alumni.massh.ac.ug'], 'Demo user muhammad.z@alumni.massh.ac.ug is permanently removed');
 
     const adminLogin = await dataService.login('admin@massh.ac.ug', 'admin123', 'admin');
     assert(adminLogin.success && adminLogin.user?.role === 'SUPER_ADMIN', 'Head of ICT can authenticate offline with role SUPER_ADMIN');
 
-    const superAdminLogin = await dataService.login('superadmin@mosa.org', 'admin123', 'admin');
-    assert(superAdminLogin.success && superAdminLogin.user?.role === 'SUPER_ADMIN', 'Executive Super Admin can authenticate offline with role SUPER_ADMIN');
+    const superAdminLogin = await dataService.login('masshalumni@gmail.com', 'admin123', 'admin');
+    assert(superAdminLogin.success && superAdminLogin.user?.role === 'SUPER_ADMIN', 'National Secretariat can authenticate offline with role SUPER_ADMIN');
 
     report.push('\n=== 3. VERIFYING REGISTRATION & SEQUENTIAL ALLOCATION (MA. 0001) ===');
 
