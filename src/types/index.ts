@@ -313,6 +313,8 @@ export interface MeetingAttendanceRecord {
   alumniId?: string;
   alumniNumber?: string;
   chapterId?: string;
+  email?: string;
+  userId?: string;
   // Guest / non-alumnus details
   category?: string;
   organisation?: string;

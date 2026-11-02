@@ -136,12 +136,12 @@ export const ChaptersMap: React.FC<Props> = ({
       }}>
         {/* Map Canvas */}
         <div style={{
-          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 50%, #18533B 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 50%, #22C55E 100%)',
           borderRadius: '16px',
           padding: '1.5rem',
           position: 'relative',
           minHeight: '440px',
-          boxShadow: '0 8px 24px rgba(10,39,27,0.25)',
+          boxShadow: '0 8px 24px rgba(22, 163, 74,0.25)',
           border: '1px solid rgba(198,138,36,0.3)',
           overflow: 'hidden'
         }}>

@@ -49,6 +49,7 @@ import {
   BookOpen,
   ShieldAlert,
   Crown,
+  Bell,
   Mail
 } from 'lucide-react';
 import { 
@@ -78,6 +79,7 @@ import { LeadershipOfficesManager } from './LeadershipOfficesManager';
 import { MemberDataExportManager } from './MemberDataExportManager';
 import { SecretariatManager } from './SecretariatManager';
 import { EmailManager } from './EmailManager';
+import { NotificationsModal } from './NotificationsModal';
 
 const DEFAULT_MODULES_BY_ROLE: Record<string, PermissionModule[]> = {
   SUPER_ADMIN: ['REGISTRY', 'FINANCE', 'ATTENDANCE', 'EVENTS', 'COMMUNICATIONS', 'CHAPTERS', 'DOCUMENTS', 'USERS', 'REPORTS', 'SETTINGS', 'AUDIT', 'OPPORTUNITIES', 'ELECTIONS'],
@@ -258,6 +260,28 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [superAdminError, setSuperAdminError] = useState('');
   const [superAdminSuccess, setSuperAdminSuccess] = useState('');
   const [isElevating, setIsElevating] = useState(false);
+
+  // Admin Live Notifications State
+  const [adminUnreadCount, setAdminUnreadCount] = useState<number>(0);
+  const [showAdminNotifsModal, setShowAdminNotifsModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const refreshAdminNotifs = async () => {
+      try {
+        const notifs = await dataService.getUserNotifications(activeUser || currentUser);
+        setAdminUnreadCount(notifs.filter(n => !n.isRead).length);
+      } catch (e) {}
+    };
+    refreshAdminNotifs();
+    window.addEventListener('mosa-notifications-updated', refreshAdminNotifs);
+    window.addEventListener('storage', refreshAdminNotifs);
+    const interval = setInterval(refreshAdminNotifs, 4000);
+    return () => {
+      window.removeEventListener('mosa-notifications-updated', refreshAdminNotifs);
+      window.removeEventListener('storage', refreshAdminNotifs);
+      clearInterval(interval);
+    };
+  }, [activeUser, currentUser]);
 
   useEffect(() => {
     setActiveUser(currentUser);
@@ -792,14 +816,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       {/* Top Administrative Header Bar */}
       <header 
         style={{
-          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 60%, #18533B 100%)',
+          background: 'linear-gradient(135deg, #16A34A 0%, #15803D 60%, #166534 100%)',
           color: '#FFFFFF',
           borderBottom: '3px solid #C68A24',
           padding: '1.25rem 1.5rem',
           position: 'sticky',
           top: 0,
           zIndex: 90,
-          boxShadow: '0 4px 20px rgba(10, 39, 27, 0.25)',
+          boxShadow: '0 4px 20px rgba(22, 163, 74, 0.25)',
         }}
       >
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -840,7 +864,55 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {/* Admin Alerts Bell with Live Counter */}
+            <button
+              type="button"
+              id="btn-admin-notifications"
+              onClick={() => setShowAdminNotifsModal(true)}
+              style={{
+                position: 'relative',
+                background: 'rgba(255, 255, 255, 0.12)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                color: '#FFFFFF',
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              title={adminUnreadCount > 0 ? `${adminUnreadCount} Unread Admin Alerts` : 'Admin Alerts & Notifications'}
+            >
+              <Bell size={19} color="#FFFFFF" />
+              {adminUnreadCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '-3px',
+                    right: '-3px',
+                    background: '#EF4444',
+                    color: '#FFFFFF',
+                    fontSize: '0.62rem',
+                    fontWeight: 800,
+                    minWidth: '17px',
+                    height: '17px',
+                    padding: '0 3px',
+                    borderRadius: '999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1.5px solid #16A34A',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  {adminUnreadCount > 9 ? '9+' : adminUnreadCount}
+                </span>
+              )}
+            </button>
+
             {/* Super Admin Status or Unlock Button */}
             {isSuperAdmin ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -895,7 +967,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 }}
                 style={{
                   background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                  color: '#0A271B',
+                  color: '#15803D',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '0.45rem 0.95rem',
@@ -910,7 +982,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                 }}
                 title="Authenticate with Super Admin password to unlock overall system control"
               >
-                <Crown size={15} color="#0A271B" />
+                <Crown size={15} color="#15803D" />
                 <span>Sign In as Super Admin</span>
               </button>
             )}
@@ -1378,11 +1450,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
             {/* Header Greeting Banner */}
             <div style={{
-              background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)',
+              background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
               borderRadius: '16px',
               padding: '1.75rem 2rem',
               color: '#FFFFFF',
-              boxShadow: '0 8px 24px rgba(10, 39, 27, 0.25)',
+              boxShadow: '0 8px 24px rgba(22, 163, 74, 0.25)',
               border: '1px solid rgba(251, 191, 36, 0.2)',
               display: 'flex',
               justifyContent: 'space-between',
@@ -1410,7 +1482,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                   onClick={() => { setActiveSection('registry'); setRegistrySubTab('applications'); }}
                   style={{
                     background: '#FBBF24',
-                    color: '#0A271B',
+                    color: '#15803D',
                     border: 'none',
                     borderRadius: '8px',
                     padding: '0.65rem 1.1rem',
@@ -1796,7 +1868,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
               }}
               style={{
                 background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                color: '#0A271B',
+                color: '#15803D',
                 border: 'none',
                 borderRadius: '10px',
                 padding: '0.85rem 1.85rem',
@@ -2008,7 +2080,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     type="submit"
                     style={{
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#0A271B',
+                      color: '#15803D',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.75rem',
@@ -2869,7 +2941,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     }}
                     style={{
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#0A271B',
+                      color: '#15803D',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '0.5rem 1rem',
@@ -4187,7 +4259,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             left: 0, 
             right: 0, 
             bottom: 0, 
-            background: 'rgba(10, 39, 27, 0.75)', 
+            background: 'rgba(22, 163, 74, 0.75)', 
             backdropFilter: 'blur(5px)',
             display: 'flex', 
             alignItems: 'center', 
@@ -4210,7 +4282,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             {/* Modal Header */}
             <div 
               style={{ 
-                background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)', 
+                background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)', 
                 borderBottom: '3px solid #D97706', 
                 padding: '1.5rem', 
                 color: '#FFFFFF',
@@ -4231,7 +4303,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
                     }}
                   >
-                    <Crown size={22} color="#0A271B" />
+                    <Crown size={22} color="#15803D" />
                   </div>
                   <div>
                     <div style={{ fontSize: '0.7rem', color: '#FCD34D', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
@@ -4386,7 +4458,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       padding: '0.75rem 1.4rem',
                       borderRadius: '8px',
                       background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-                      color: '#0A271B',
+                      color: '#15803D',
                       border: 'none',
                       fontWeight: 800,
                       fontSize: '0.88rem',
@@ -4405,6 +4477,34 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Admin Alerts & Notifications Center Modal */}
+      {showAdminNotifsModal && (
+        <NotificationsModal
+          isOpen={showAdminNotifsModal}
+          onClose={() => setShowAdminNotifsModal(false)}
+          currentUser={activeUser || currentUser}
+          onNavigateTab={(tab: any) => {
+            setShowAdminNotifsModal(false);
+            const tabStr = String(tab || '').toUpperCase();
+            if (tabStr.includes('REGISTRY') || tabStr.includes('DIRECTORY') || tabStr.includes('ADMIN')) {
+              setActiveModule('REGISTRY');
+            } else if (tabStr.includes('ATTENDANCE')) {
+              setActiveModule('ATTENDANCE');
+            } else if (tabStr.includes('FINANCE') || tabStr.includes('PAYMENT')) {
+              setActiveModule('FINANCE');
+            } else if (tabStr.includes('EVENT')) {
+              setActiveModule('EVENTS');
+            } else if (tabStr.includes('COMMUNICATION')) {
+              setActiveModule('COMMUNICATIONS');
+            } else if (tabStr.includes('OPPORTUNIT')) {
+              setActiveModule('OPPORTUNITIES');
+            } else if (tabStr.includes('ELECTION')) {
+              setActiveModule('ELECTIONS');
+            }
+          }}
+        />
       )}
     </div>
   );

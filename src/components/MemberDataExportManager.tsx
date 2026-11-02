@@ -150,7 +150,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
       {/* Filters Card */}
       <div
         style={{
-          background: 'rgba(10, 39, 27, 0.7)',
+          background: 'rgba(22, 163, 74, 0.7)',
           border: '1.5px solid rgba(255, 255, 255, 0.12)',
           borderRadius: '14px',
           padding: '1.5rem',
@@ -183,10 +183,10 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
                 boxSizing: 'border-box',
               }}
             >
-              <option value="ALL" style={{ background: '#0A271B' }}>All Records (Eligible & Pending)</option>
-              <option value="VERIFIED" style={{ background: '#0A271B' }}>Verified Alumni Members Only</option>
-              <option value="PENDING" style={{ background: '#0A271B' }}>Pending Verification Queue</option>
-              <option value="UNREGISTERED" style={{ background: '#0A271B' }}>Unregistered User Accounts</option>
+              <option value="ALL" style={{ background: '#15803D' }}>All Records (Eligible & Pending)</option>
+              <option value="VERIFIED" style={{ background: '#15803D' }}>Verified Alumni Members Only</option>
+              <option value="PENDING" style={{ background: '#15803D' }}>Pending Verification Queue</option>
+              <option value="UNREGISTERED" style={{ background: '#15803D' }}>Unregistered User Accounts</option>
             </select>
           </div>
 
@@ -209,9 +209,9 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
                 boxSizing: 'border-box',
               }}
             >
-              <option value="ALL" style={{ background: '#0A271B' }}>All Cohorts (1997–2026)</option>
+              <option value="ALL" style={{ background: '#15803D' }}>All Cohorts (1997–2026)</option>
               {availableYears.map(yr => (
-                <option key={yr} value={yr} style={{ background: '#0A271B' }}>
+                <option key={yr} value={yr} style={{ background: '#15803D' }}>
                   Class of {yr}
                 </option>
               ))}
@@ -237,9 +237,9 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
                 boxSizing: 'border-box',
               }}
             >
-              <option value="ALL" style={{ background: '#0A271B' }}>All Leaders & Members</option>
+              <option value="ALL" style={{ background: '#15803D' }}>All Leaders & Members</option>
               {offices.map(o => (
-                <option key={o.id} value={o.id} style={{ background: '#0A271B' }}>
+                <option key={o.id} value={o.id} style={{ background: '#15803D' }}>
                   {o.title}
                 </option>
               ))}
@@ -290,7 +290,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 1: Excel (.xlsx) */}
         <div
           style={{
-            background: 'rgba(10, 39, 27, 0.7)',
+            background: 'rgba(22, 163, 74, 0.7)',
             border: '1.5px solid rgba(5, 150, 105, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',
@@ -347,7 +347,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 2: CSV (.csv) */}
         <div
           style={{
-            background: 'rgba(10, 39, 27, 0.7)',
+            background: 'rgba(22, 163, 74, 0.7)',
             border: '1.5px solid rgba(217, 119, 6, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',
@@ -378,7 +378,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
             disabled={exportingFormat !== null || previewCount === 0}
             style={{
               background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
-              color: '#05160F',
+              color: '#166534',
               border: 'none',
               padding: '0.7rem 1.25rem',
               borderRadius: '8px',
@@ -404,7 +404,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 3: Executive PDF (.pdf) */}
         <div
           style={{
-            background: 'rgba(10, 39, 27, 0.7)',
+            background: 'rgba(22, 163, 74, 0.7)',
             border: '1.5px solid rgba(236, 72, 153, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',

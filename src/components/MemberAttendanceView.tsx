@@ -112,6 +112,24 @@ export const MemberAttendanceView: React.FC<Props> = ({
       return;
     }
 
+    const cleanAssistedName = colleagueName.trim().toLowerCase();
+    const cleanAssistedNum = colleagueMANumber.trim().toUpperCase();
+    const cleanAssistedPhone = colleaguePhone.replace(/[\s\-\(\)]/g, '').toLowerCase();
+
+    const existingAssisted = allAttendance.find(r =>
+      r.meetingId === meetingId &&
+      r.status !== 'REMOVED' &&
+      (
+        (cleanAssistedNum && r.alumniNumber && r.alumniNumber.toUpperCase().trim() === cleanAssistedNum) ||
+        (cleanAssistedName && r.fullName && r.fullName.toLowerCase().trim() === cleanAssistedName) ||
+        (cleanAssistedPhone && r.phone && r.phone.replace(/[\s\-\(\)]/g, '').toLowerCase() === cleanAssistedPhone)
+      )
+    );
+    if (existingAssisted) {
+      flashNotice(meetingId, `"${colleagueName.trim()}" is already registered on the attendance list for this meeting.`, true);
+      return;
+    }
+
     setAssistedLoading(true);
     try {
       await governanceService.assistedMemberRegister(
@@ -140,6 +158,22 @@ export const MemberAttendanceView: React.FC<Props> = ({
     e.preventDefault();
     if (!quickName.trim()) {
       flashNotice(meetingId, 'Full name is required.', true);
+      return;
+    }
+
+    const cleanQuickName = quickName.trim().toLowerCase();
+    const cleanQuickPhone = quickContact.replace(/[\s\-\(\)]/g, '').toLowerCase();
+    const existingGuest = allAttendance.find(r =>
+      r.meetingId === meetingId &&
+      r.status !== 'REMOVED' &&
+      (
+        (cleanQuickName && r.fullName && r.fullName.toLowerCase().trim() === cleanQuickName) ||
+        (cleanQuickPhone && r.phone && r.phone.replace(/[\s\-\(\)]/g, '').toLowerCase() === cleanQuickPhone)
+      )
+    );
+    if (existingGuest) {
+      flashNotice(meetingId, `"${quickName.trim()}" is already registered on the attendance list for this meeting.`, true);
+      setQuickLoading(false);
       return;
     }
 
@@ -177,15 +211,25 @@ export const MemberAttendanceView: React.FC<Props> = ({
     }
   };
 
-  // Find user's attendance record for a meeting
+  // Find user's attendance record for a meeting (multi-factor match)
   const getUserRecord = (meetingId: string): MeetingAttendanceRecord | undefined => {
     if (!currentUser) return undefined;
+    const userEmail = currentUser.email?.toLowerCase().trim();
+    const userName = currentUser.displayName?.toLowerCase().trim();
+    const userAlumniNo = currentUser.alumniNumber?.toUpperCase().trim();
+    const userAlumniId = currentUser.alumniId;
+    const userUid = currentUser.uid;
+
     return allAttendance.find(r => 
       r.meetingId === meetingId && 
       r.status !== 'REMOVED' && 
-      ((currentUser.alumniId && r.alumniId === currentUser.alumniId) ||
-       (currentUser.email && r.phone?.toLowerCase() === currentUser.email.toLowerCase()) ||
-       (currentUser.alumniNumber && r.alumniNumber && r.alumniNumber.toUpperCase() === currentUser.alumniNumber.toUpperCase()))
+      (
+        (userAlumniId && r.alumniId === userAlumniId) ||
+        (userUid && (r.userId === userUid || r.alumniId === userUid)) ||
+        (userAlumniNo && r.alumniNumber && r.alumniNumber.toUpperCase().trim() === userAlumniNo) ||
+        (userEmail && r.email && r.email.toLowerCase().trim() === userEmail) ||
+        (userName && r.fullName && r.fullName.toLowerCase().trim() === userName)
+      )
     );
   };
 
@@ -198,12 +242,12 @@ export const MemberAttendanceView: React.FC<Props> = ({
       <div 
         className="mosa-card" 
         style={{ 
-          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)', 
+          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)', 
           color: '#FFFFFF', 
           padding: '2rem 1.5rem', 
           borderRadius: '14px',
           borderLeft: '5px solid #C68A24',
-          boxShadow: '0 8px 24px -6px rgba(10,39,27,0.3)',
+          boxShadow: '0 8px 24px -6px rgba(22, 163, 74,0.3)',
           marginBottom: '2rem'
         }}
       >

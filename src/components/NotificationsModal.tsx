@@ -43,14 +43,9 @@ export const NotificationsModal: React.FC<Props> = ({
   const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
 
   const loadNotifications = async () => {
-    if (!isRegistered || !alumniId) {
-      setNotifications([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     try {
-      const list = await dataService.getAlumniNotifications(alumniId);
+      const list = await dataService.getUserNotifications(currentUser);
       setNotifications(list);
     } catch (e) {
       console.error(e);
@@ -61,7 +56,14 @@ export const NotificationsModal: React.FC<Props> = ({
 
   useEffect(() => {
     loadNotifications();
-  }, [alumniId, isRegistered]);
+    const onUpdated = () => loadNotifications();
+    window.addEventListener('mosa-notifications-updated', onUpdated);
+    window.addEventListener('storage', onUpdated);
+    return () => {
+      window.removeEventListener('mosa-notifications-updated', onUpdated);
+      window.removeEventListener('storage', onUpdated);
+    };
+  }, [currentUser]);
 
   const handleNotificationClick = async (notif: AlumniNotification) => {
     await dataService.markNotificationAsRead(notif.id);
@@ -73,7 +75,7 @@ export const NotificationsModal: React.FC<Props> = ({
   };
 
   const handleMarkAllRead = async () => {
-    await dataService.markAllNotificationsAsRead(alumniId);
+    await dataService.markAllNotificationsAsRead(currentUser);
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
   };
 
@@ -212,7 +214,7 @@ export const NotificationsModal: React.FC<Props> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.45rem',
-                background: '#113D2B',
+                background: '#16A34A',
                 color: '#FFFFFF',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '8px',

@@ -498,14 +498,26 @@ export const governanceService = {
     }
 
     const all = this.getAllAttendance();
-    const dup = all.find(r =>
-      r.meetingId === meetingId &&
-      r.status !== 'REMOVED' &&
-      ((resolvedAlumniId && r.alumniId === resolvedAlumniId) ||
-       (user.email && r.phone?.toLowerCase() === user.email.toLowerCase()) ||
-       (resolvedAlumniNumber && r.alumniNumber && r.alumniNumber.toUpperCase() === resolvedAlumniNumber.toUpperCase()))
-    );
-    if (dup) throw new Error('You have already registered attendance for this meeting.');
+    const cleanUserEmail = user.email?.trim().toLowerCase();
+    const cleanUserName = user.displayName?.trim().toLowerCase();
+    const cleanAlumniNo = (resolvedAlumniNumber || user.alumniNumber)?.trim().toUpperCase();
+    const cleanAlumniId = resolvedAlumniId || user.alumniId;
+    const cleanUid = user.uid;
+
+    const dup = all.find(r => {
+      if (r.meetingId !== meetingId || r.status === 'REMOVED') return false;
+      if (cleanAlumniId && r.alumniId === cleanAlumniId) return true;
+      if (cleanUid && (r.userId === cleanUid || r.alumniId === cleanUid)) return true;
+      if (cleanAlumniNo && r.alumniNumber && r.alumniNumber.toUpperCase().trim() === cleanAlumniNo) return true;
+      if (cleanUserEmail && r.email && r.email.toLowerCase().trim() === cleanUserEmail) return true;
+      if (cleanUserName && r.fullName && r.fullName.toLowerCase().trim() === cleanUserName) return true;
+      return false;
+    });
+
+    if (dup) {
+      throw new Error(`You have already registered attendance for this meeting (recorded as ${dup.fullName}).`);
+    }
+
     const active = all.filter(r => r.meetingId === meetingId && r.status !== 'REMOVED').length;
     if (meeting!.maxAttendance && active >= meeting!.maxAttendance) throw new Error('This meeting has reached maximum attendance.');
 
@@ -519,6 +531,8 @@ export const governanceService = {
       fullName: profile ? `${profile.firstName} ${profile.lastName}` : (resolvedFullName || user.displayName),
       alumniId: resolvedAlumniId || user.alumniId || user.uid,
       alumniNumber: profile?.alumniNumber || resolvedAlumniNumber || user.alumniNumber,
+      email: cleanUserEmail,
+      userId: user.uid,
       registeredAt: now,
       isLate: this.isLate(meeting!, now),
     };
@@ -582,8 +596,21 @@ export const governanceService = {
     const meeting = this.getMeeting(meetingId);
     this.assertWritable(meeting, true);
     const all = this.getAllAttendance();
-    const existing = all.find(r => r.meetingId === meetingId && r.alumniId === alumnus.internalId);
-    if (existing && existing.status !== 'REMOVED') throw new Error(`${alumnus.firstName} ${alumnus.lastName} is already on the attendance list.`);
+    const cleanAlumniNo = alumnus.alumniNumber?.toUpperCase().trim();
+    const cleanAlumniEmail = alumnus.email?.toLowerCase().trim();
+    const cleanAlumniName = `${alumnus.firstName} ${alumnus.lastName}`.toLowerCase().trim();
+
+    const existing = all.find(r => 
+      r.meetingId === meetingId && 
+      r.status !== 'REMOVED' && 
+      (
+        r.alumniId === alumnus.internalId ||
+        (cleanAlumniNo && r.alumniNumber && r.alumniNumber.toUpperCase().trim() === cleanAlumniNo) ||
+        (cleanAlumniEmail && r.email && r.email.toLowerCase().trim() === cleanAlumniEmail) ||
+        (cleanAlumniName && r.fullName && r.fullName.toLowerCase().trim() === cleanAlumniName)
+      )
+    );
+    if (existing) throw new Error(`${alumnus.firstName} ${alumnus.lastName} is already on the attendance list.`);
     const now = new Date().toISOString();
     const rec: MeetingAttendanceRecord = {
       id: uid('att'),
@@ -594,6 +621,7 @@ export const governanceService = {
       fullName: `${alumnus.firstName} ${alumnus.lastName}`,
       alumniId: alumnus.internalId,
       alumniNumber: alumnus.alumniNumber,
+      email: cleanAlumniEmail,
       registeredAt: now,
       addedBy: actor.email,
       verifiedBy: actor.email,
@@ -620,6 +648,22 @@ export const governanceService = {
     const meeting = this.getMeeting(meetingId);
     this.assertWritable(meeting, true);
     if (!guest.fullName.trim()) throw new Error('Name is required.');
+
+    const all = this.getAllAttendance();
+    const cleanGuestName = guest.fullName.trim().toLowerCase();
+    const cleanGuestPhone = guest.phone ? guest.phone.replace(/[\s\-\(\)]/g, '').toLowerCase() : undefined;
+
+    const dup = all.find(r => {
+      if (r.meetingId !== meetingId || r.status === 'REMOVED') return false;
+      if (cleanGuestName && r.fullName && r.fullName.toLowerCase().trim() === cleanGuestName) return true;
+      if (cleanGuestPhone && r.phone && r.phone.replace(/[\s\-\(\)]/g, '').toLowerCase() === cleanGuestPhone) return true;
+      return false;
+    });
+
+    if (dup) {
+      throw new Error(`"${guest.fullName.trim()}" is already registered on the attendance list for this meeting.`);
+    }
+
     const now = new Date().toISOString();
 
     let attendeeType = guest.attendeeType;
@@ -672,7 +716,6 @@ export const governanceService = {
       verifiedAt: now,
       isLate: this.isLate(meeting!, now),
     };
-    const all = this.getAllAttendance();
     all.push(rec);
     this.saveAttendance(all);
     await dataService.logAudit({ action: 'ATTENDANCE_GUEST_ADDED', performedBy: actor.email, affectedRecord: rec.id, metadata: { meetingId, name: rec.fullName, type: attendeeType } });
@@ -808,10 +851,20 @@ export const governanceService = {
   // ------------------------------------------
   async notifyAllMembers(title: string, message: string) {
     try {
+      // 1. Broadcast notification to 'all' so every active user & visitor bell reflects it
+      await dataService.sendNotification({
+        alumniId: 'all',
+        title,
+        message,
+        type: 'ATTENDANCE_OPEN',
+        linkTab: 'attendance',
+      });
+
+      // 2. Also send dedicated notification to each registered alumnus
       const alumni = await dataService.getAlumniList();
       for (const a of alumni) {
         if (a.membershipStatus === 'ACTIVE' || a.membershipStatus === 'APPROVED') {
-          await dataService.sendNotification({ alumniId: a.internalId, title, message, type: 'EVENT_INVITE', linkTab: 'events' });
+          await dataService.sendNotification({ alumniId: a.internalId, title, message, type: 'EVENT_INVITE', linkTab: 'attendance' });
         }
       }
     } catch (e) {

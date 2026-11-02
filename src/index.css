@@ -1,12 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary-navy: #113D2B; /* MASSH Prestige Forest Green */
-  --primary-navy-dark: #0A271B; /* Deep Pine Green */
-  --primary-navy-light: #18533B; /* Vibrant Forest Green */
-  --primary-green: #113D2B;
-  --primary-green-dark: #0A271B;
-  --primary-green-light: #18533B;
+  --primary-navy: #16A34A; /* MASSH Prestige Light Green */
+  --primary-navy-dark: #15803D; /* Radiant Emerald Green */
+  --primary-navy-light: #22C55E; /* Vibrant Fresh Light Green */
+  --primary-green: #16A34A;
+  --primary-green-dark: #15803D;
+  --primary-green-light: #22C55E;
   --cream-bg: #F8F6F0; /* Warm Rich Cream */
   --cream-surface: #FCFBF7;
   --cream-border: #E5DFD1;
@@ -14,16 +14,16 @@
   --gold-accent: #C68A24;
   --gold-light: #EAB308;
   --gold-soft: #FEF3C7;
-  --emerald-accent: #16A34A;
+  --emerald-accent: #22C55E;
   --emerald-soft: #DCFCE7;
   --slate-50: #F8F6F0; /* Cream Base */
   --slate-100: #F2EFE6; /* Warm Cream Surface */
   --slate-200: #E5DFD1; /* Cream Border */
   --slate-300: #D3CAB8;
-  --slate-600: #4B6354;
-  --slate-700: #33483D;
-  --slate-800: #1B3528;
-  --slate-900: #0B2419;
+  --slate-600: #16A34A;
+  --slate-700: #15803D;
+  --slate-800: #166534;
+  --slate-900: #14532D;
   
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Cinzel', serif;
@@ -34,10 +34,10 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   
-  --shadow-sm: 0 1px 3px rgba(10, 39, 27, 0.06);
-  --shadow-md: 0 4px 12px rgba(10, 39, 27, 0.08);
-  --shadow-lg: 0 10px 25px rgba(10, 39, 27, 0.12);
-  --shadow-xl: 0 20px 35px rgba(10, 39, 27, 0.18);
+  --shadow-sm: 0 1px 3px rgba(22, 163, 74, 0.08);
+  --shadow-md: 0 4px 12px rgba(22, 163, 74, 0.12);
+  --shadow-lg: 0 10px 25px rgba(22, 163, 74, 0.16);
+  --shadow-xl: 0 20px 35px rgba(22, 163, 74, 0.22);
   --shadow-gold: 0 4px 14px rgba(198, 138, 36, 0.25);
 }
 
@@ -111,6 +111,14 @@ h1, h2, h3, h4, h5, h6 {
   top: 0;
   z-index: 100;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  will-change: transform, opacity;
+}
+
+.mosa-header.header-hidden {
+  transform: translateY(-100%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .mosa-nav-container {
@@ -133,13 +141,13 @@ h1, h2, h3, h4, h5, h6 {
 .massh-crest {
   width: 50px;
   height: 50px;
-  background: radial-gradient(circle, #2E5E28 0%, #113D2B 100%);
+  background: radial-gradient(circle, #22C55E 0%, #16A34A 100%);
   border: 2px solid #F3EFE6;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(10, 39, 27, 0.35);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
   font-family: var(--font-serif);
   font-weight: 800;
   color: #FAF6ED;
@@ -369,7 +377,7 @@ h1, h2, h3, h4, h5, h6 {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 39, 27, 0.72);
+  background: rgba(22, 163, 74, 0.72);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -679,7 +687,7 @@ img, video, canvas, svg, iframe {
     right: 0 !important;
     height: calc(60px + env(safe-area-inset-bottom, 0px)) !important;
     padding-bottom: max(env(safe-area-inset-bottom, 0px), 4px) !important;
-    background: #0A271B !important;
+    background: #16A34A !important;
     border-top: 1.5px solid rgba(198, 138, 36, 0.45) !important;
     box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.45) !important;
     z-index: 1000 !important;
@@ -689,11 +697,11 @@ img, video, canvas, svg, iframe {
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
-    justify-content: flex-start !important;
+    justify-content: space-around !important;
     align-items: center !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-    gap: 0.35rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    gap: 0.5rem !important;
     backdrop-filter: blur(14px) !important;
   }
 
@@ -708,14 +716,15 @@ img, video, canvas, svg, iframe {
     justify-content: center !important;
     background: transparent !important;
     border: none !important;
-    color: #94A3B8 !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    gap: 2px !important;
+    color: #F0FDF4 !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    gap: 3px !important;
     cursor: pointer !important;
-    flex: 0 0 auto !important;
-    min-width: 60px !important;
-    padding: 6px 6px !important;
+    flex: 1 1 0 !important;
+    max-width: 95px !important;
+    min-width: 64px !important;
+    padding: 6px 4px !important;
     transition: all 0.18s ease !important;
     border-radius: 8px !important;
     min-height: 48px !important;
@@ -724,16 +733,16 @@ img, video, canvas, svg, iframe {
 
   .mobile-bottom-nav-item:active {
     transform: scale(0.95);
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
   }
 
   .mobile-bottom-nav-item.active {
-    color: #FBBF24 !important;
-    background: rgba(251, 191, 36, 0.12) !important;
+    color: #FEF08A !important;
+    background: rgba(254, 240, 138, 0.22) !important;
   }
 
   .mobile-bottom-nav-item.active svg {
-    color: #FBBF24 !important;
+    color: #FEF08A !important;
     transform: translateY(-1px);
   }
 
@@ -923,7 +932,7 @@ img, video, canvas, svg, iframe {
   .modal-overlay {
     padding: 0 !important;
     align-items: flex-end !important;
-    background: rgba(10, 39, 27, 0.82) !important;
+    background: rgba(22, 163, 74, 0.82) !important;
     backdrop-filter: blur(4px) !important;
   }
 
@@ -995,11 +1004,11 @@ html, body, #root {
 .mosa-card {
   background: #FFFFFF;
   border: 1px solid var(--cream-border) !important;
-  box-shadow: 0 4px 14px rgba(10, 39, 27, 0.05);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.05);
 }
 
 .mosa-card:hover {
-  box-shadow: 0 8px 24px rgba(10, 39, 27, 0.08);
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.08);
   border-color: #D3CAB8 !important;
 }
 
@@ -1019,12 +1028,12 @@ html, body, #root {
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 6px rgba(10, 39, 27, 0.25);
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-green-light) 0%, var(--primary-green) 100%) !important;
-  box-shadow: 0 4px 12px rgba(10, 39, 27, 0.3);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
 /* Table styling */

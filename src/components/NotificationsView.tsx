@@ -42,15 +42,9 @@ export const NotificationsView: React.FC<Props> = ({
   const isRegistered = isRegisteredAlumni(currentUser);
 
   const loadNotifications = async () => {
-    if (!isRegistered) {
-      setNotifications([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     try {
-      const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
-      const list = await dataService.getAlumniNotifications(alumniId);
+      const list = await dataService.getUserNotifications(currentUser);
       setNotifications(list);
     } catch (e) {
       console.error('Failed to load notifications:', e);
@@ -61,12 +55,17 @@ export const NotificationsView: React.FC<Props> = ({
 
   useEffect(() => {
     loadNotifications();
+    const onUpdated = () => loadNotifications();
+    window.addEventListener('mosa-notifications-updated', onUpdated);
+    window.addEventListener('storage', onUpdated);
+    return () => {
+      window.removeEventListener('mosa-notifications-updated', onUpdated);
+      window.removeEventListener('storage', onUpdated);
+    };
   }, [currentUser, isRegistered]);
 
   const handleMarkAllRead = async () => {
-    if (!isRegistered) return;
-    const alumniId = currentUser?.alumniId || currentUser?.alumniNumber || currentUser?.uid || '';
-    await dataService.markAllNotificationsAsRead(alumniId);
+    await dataService.markAllNotificationsAsRead(currentUser);
     await loadNotifications();
     if (onRefreshNotifs) onRefreshNotifs();
   };
@@ -146,166 +145,18 @@ export const NotificationsView: React.FC<Props> = ({
     return true;
   });
 
-  if (!isRegistered) {
-    return (
-      <div style={{ maxWidth: '880px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem' }}>
-        {/* Top Header Card */}
-        <div 
-          style={{ 
-            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)', 
-            borderRadius: '16px', 
-            padding: '1.75rem 1.5rem', 
-            color: '#FFFFFF',
-            marginBottom: '1.5rem',
-            boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.25)',
-            border: '1.5px solid rgba(198, 138, 36, 0.3)',
-          }}
-        >
-          {onBack && (
-            <button
-              onClick={onBack}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                background: 'rgba(255, 255, 255, 0.12)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                color: '#F8FAFC',
-                borderRadius: '8px',
-                padding: '0.45rem 0.9rem',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginBottom: '1.25rem',
-              }}
-            >
-              <ArrowLeft size={16} />
-              <span>Back to Dashboard</span>
-            </button>
-          )}
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div 
-              style={{ 
-                width: '46px', 
-                height: '46px', 
-                borderRadius: '12px', 
-                background: 'rgba(217, 119, 6, 0.25)', 
-                border: '1.5px solid #D97706',
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                color: '#FDE68A'
-              }}
-            >
-              <Bell size={24} />
-            </div>
-            <div>
-              <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, letterSpacing: '-0.01em' }}>
-                Notification Center
-              </h1>
-              <p style={{ margin: '0.2rem 0 0 0', color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.86rem' }}>
-                Official Mandela Old Students Association Announcements & Community Alerts
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Protection / Gated Card */}
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: '16px',
-            border: '1px solid #E2E8F0',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
-            padding: '3rem 1.75rem',
-            textAlign: 'center'
-          }}
-        >
-          <div
-            style={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              background: '#FEF3C7',
-              border: '2px solid #F59E0B',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 1.25rem auto',
-              color: '#B45309'
-            }}
-          >
-            <Bell size={30} />
-          </div>
-
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.65rem' }}>
-            Alumni Registration Required to Receive Notifications
-          </h2>
-
-          <p style={{ color: '#475569', fontSize: '0.92rem', lineHeight: 1.6, maxWidth: '520px', margin: '0 auto 1.5rem auto' }}>
-            Association circulars, official notices, meeting attendance roll calls, donation updates, and convention announcements are delivered strictly to verified registered alumni members.
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center' }}>
-            <button
-              onClick={() => onOpenRegister ? onOpenRegister() : onNavigate('home')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                background: 'linear-gradient(135deg, #113D2B 0%, #15803D 100%)',
-                color: '#FFFFFF',
-                padding: '0.85rem 1.75rem',
-                borderRadius: '10px',
-                fontWeight: 800,
-                fontSize: '0.92rem',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(21, 128, 61, 0.25)',
-                width: '100%',
-                maxWidth: '320px'
-              }}
-            >
-              <CheckCircle2 size={18} />
-              <span>Register as Alumnus</span>
-            </button>
-
-            {onBack && (
-              <button
-                onClick={onBack}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#64748B',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  padding: '0.4rem 0.8rem',
-                }}
-              >
-                Return to Dashboard
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={{ maxWidth: '880px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem' }}>
       
       {/* Top Header Card */}
       <div 
         style={{ 
-          background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)', 
+          background: 'linear-gradient(135deg, #16A34A 0%, #15803D 65%, #166534 100%)', 
           borderRadius: '16px', 
           padding: '1.75rem 1.5rem', 
           color: '#FFFFFF',
           marginBottom: '1.5rem',
-          boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.25)',
+          boxShadow: '0 10px 25px -5px rgba(22, 163, 74, 0.25)',
           border: '1.5px solid rgba(198, 138, 36, 0.3)',
         }}
       >
@@ -378,6 +229,55 @@ export const NotificationsView: React.FC<Props> = ({
           )}
         </div>
       </div>
+
+      {/* Guest Notice (If not logged in or unregistered) */}
+      {!isRegistered && (
+        <div
+          style={{
+            background: '#FEF3C7',
+            border: '1px solid #F59E0B',
+            borderRadius: '12px',
+            padding: '0.85rem 1.15rem',
+            marginBottom: '1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <ShieldCheck size={22} color="#B45309" />
+            <div>
+              <div style={{ fontWeight: 700, color: '#92400E', fontSize: '0.88rem' }}>
+                Association Community Circulars
+              </div>
+              <div style={{ color: '#B45309', fontSize: '0.78rem' }}>
+                You are viewing official broadcast alerts. Register as an alumnus to receive personalized digital ID cards, voting, and dues notifications.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => onOpenRegister ? onOpenRegister() : onNavigate('home')}
+            style={{
+              background: '#16A34A',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '0.45rem 0.9rem',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+            }}
+          >
+            <CheckCircle2 size={15} />
+            <span>Register as Alumnus</span>
+          </button>
+        </div>
+      )}
 
       {/* Filter Tabs */}
       <div 

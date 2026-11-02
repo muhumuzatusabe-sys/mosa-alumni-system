@@ -146,12 +146,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div
           className="member-identity-card"
           style={{
-            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 65%, #18533B 100%)',
-            borderRadius: '14px',
-            padding: '1.15rem 1.35rem',
+            background: 'linear-gradient(135deg, #16A34A 0%, #15803D 65%, #166534 100%)',
+            borderRadius: '16px',
+            padding: '1.25rem 1.4rem',
             color: '#FFFFFF',
-            boxShadow: '0 6px 18px rgba(10, 39, 27, 0.16)',
-            border: '1.5px solid rgba(198, 138, 36, 0.35)',
+            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.22)',
+            border: '1.5px solid #F59E0B',
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'wrap',
@@ -168,14 +168,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
                 <span
                   style={{
-                    fontSize: '0.66rem',
+                    fontSize: '0.68rem',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    color: '#FCD34D',
+                    letterSpacing: '0.08em',
+                    color: '#FEF08A',
                     fontWeight: 800,
                   }}
                 >
-                  MASSH Alumni Photo
+                  MASSH ALUMNI PORTAL
                 </span>
 
                 {memberProfile.photoUrl ? (
@@ -215,9 +215,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Member Details Hierarchy */}
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
-                  MASSH ALUMNI PORTAL
-                </div>
 
                 <h2
                   style={{
@@ -287,14 +284,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
                 <span
                   style={{
-                    fontSize: '0.66rem',
+                    fontSize: '0.68rem',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    color: '#FCD34D',
+                    letterSpacing: '0.08em',
+                    color: '#FEF08A',
                     fontWeight: 800,
                   }}
                 >
-                  Alumni Membership
+                  MASSH ALUMNI PORTAL
                 </span>
 
                 {userPhoto ? (
@@ -331,9 +328,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
 
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
-                  MASSH ALUMNI PORTAL
-                </div>
 
                 <h2
                   style={{
@@ -397,14 +391,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
                 <span
                   style={{
-                    fontSize: '0.66rem',
+                    fontSize: '0.68rem',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    color: '#FCD34D',
+                    letterSpacing: '0.08em',
+                    color: '#FEF08A',
                     fontWeight: 800,
                   }}
                 >
-                  Alumni Membership
+                  MASSH ALUMNI PORTAL
                 </span>
 
                 {userPhoto ? (
@@ -412,44 +406,40 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     src={userPhoto}
                     alt={currentUser?.displayName || 'MASSH Member'}
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '62px',
+                      height: '62px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '2px solid #FBBF24',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                      border: '2.5px solid #FDE68A',
+                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3)',
                     }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '62px',
+                      height: '62px',
                       borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      color: '#CBD5E1',
+                      background: 'rgba(255, 255, 255, 0.12)',
+                      color: '#FEF08A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      border: '1.5px solid rgba(255, 255, 255, 0.2)',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                      border: '2px solid rgba(254, 240, 138, 0.4)',
+                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
                     }}
                   >
-                    <GraduationCap size={24} color="#94A3B8" />
+                    <GraduationCap size={26} color="#FEF08A" />
                   </div>
                 )}
               </div>
 
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.07em', color: '#CBD5E1', fontWeight: 600 }}>
-                  MASSH ALUMNI PORTAL
-                </div>
-
                 <h2
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.3rem',
                     color: '#FFFFFF',
-                    margin: '0.15rem 0 0.35rem 0',
+                    margin: '0.1rem 0 0.45rem 0',
                     fontWeight: 800,
                     letterSpacing: '-0.01em',
                   }}
@@ -461,13 +451,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <span
                     style={{
                       fontFamily: 'monospace',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       fontSize: '0.8rem',
-                      color: '#CBD5E1',
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      padding: '0.2rem 0.55rem',
+                      color: '#FEF08A',
+                      background: 'rgba(255, 255, 255, 0.12)',
+                      padding: '0.25rem 0.6rem',
                       borderRadius: '6px',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      border: '1px solid rgba(254, 240, 138, 0.35)',
                     }}
                   >
                     No alumni number allocated
@@ -477,39 +467,39 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     style={{
                       fontSize: '0.74rem',
                       fontWeight: 700,
-                      color: '#E2E8F0',
-                      background: 'rgba(100, 116, 139, 0.3)',
-                      padding: '0.2rem 0.6rem',
+                      color: '#FEE2E2',
+                      background: 'rgba(239, 68, 68, 0.25)',
+                      padding: '0.25rem 0.65rem',
                       borderRadius: '999px',
-                      border: '1px solid rgba(148, 163, 184, 0.35)',
+                      border: '1px solid rgba(248, 113, 113, 0.4)',
                     }}
                   >
                     Not yet registered
                   </span>
 
-                  {/* Subtle Register as Alumnus Action (Section 5) */}
+                  {/* Register as Alumnus Action */}
                   <button
                     id="btn-home-pass-register"
                     onClick={onOpenRegister}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '0.35rem',
-                      background: 'linear-gradient(135deg, #C68A24 0%, #9A6814 100%)',
+                      gap: '0.4rem',
+                      background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '8px',
-                      padding: '0.35rem 0.75rem',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
+                      padding: '0.4rem 0.85rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 800,
                       cursor: 'pointer',
-                      boxShadow: '0 2px 6px rgba(198, 138, 36, 0.3)',
+                      boxShadow: '0 2px 8px rgba(217, 119, 6, 0.35)',
                       transition: 'transform 0.15s ease',
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                   >
-                    <UserPlus size={13} />
+                    <UserPlus size={14} />
                     <span>Register</span>
                   </button>
                 </div>
@@ -549,7 +539,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -573,7 +563,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -597,7 +587,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#E8F5E9', color: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -621,7 +611,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(10, 39, 27, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -648,7 +638,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               borderRadius: '14px',
               background: '#FFFFFF',
               border: '1px solid #E5DFD1',
-              boxShadow: '0 3px 10px rgba(10, 39, 27, 0.04)',
+              boxShadow: '0 3px 10px rgba(22, 163, 74, 0.04)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -683,12 +673,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Total Contributions Snippet */}
               <div 
                 style={{ 
-                  background: 'linear-gradient(135deg, #113D2B 0%, #18533B 100%)', 
+                  background: 'linear-gradient(135deg, #16A34A 0%, #22C55E 100%)', 
                   borderRadius: '10px', 
                   padding: '0.9rem 1rem', 
                   color: '#FFFFFF',
                   marginBottom: '0.85rem',
-                  boxShadow: '0 4px 12px rgba(10, 39, 27, 0.15)',
+                  boxShadow: '0 4px 12px rgba(22, 163, 74, 0.15)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -797,7 +787,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               borderRadius: '14px',
               background: '#FFFFFF',
               border: '1px solid #E5DFD1',
-              boxShadow: '0 3px 10px rgba(10, 39, 27, 0.04)',
+              boxShadow: '0 3px 10px rgba(22, 163, 74, 0.04)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -861,7 +851,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.4rem',
-                      background: '#113D2B',
+                      background: '#16A34A',
                       color: '#FFFFFF',
                       fontSize: '0.78rem',
                       fontWeight: 700,
@@ -928,7 +918,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                                 width: '34px',
                                 height: '34px',
                                 borderRadius: '50%',
-                                background: '#113D2B',
+                                background: '#16A34A',
                                 color: '#FDE68A',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -981,7 +971,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 width: '100%',
                 padding: '0.65rem 0.85rem',
                 borderRadius: '8px',
-                background: '#113D2B',
+                background: '#16A34A',
                 color: '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '0.82rem',
@@ -991,7 +981,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.4rem',
-                boxShadow: '0 2px 6px rgba(10, 39, 27, 0.25)',
+                boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)',
               }}
             >
               {isRegistered ? (

@@ -1,15 +1,10 @@
 import React from 'react';
 import { 
   Home,
-  Users, 
-  Coins, 
-  ClipboardCheck, 
-  Sliders,
-  LogOut,
-  LogIn
+  Bell,
+  Menu
 } from 'lucide-react';
 import { AuthUser } from '../types';
-import { isStaffRole } from '../services/governanceService';
 
 interface Props {
   currentTab: string;
@@ -28,17 +23,9 @@ interface Props {
 export const MobileBottomNav: React.FC<Props> = ({
   currentTab,
   setCurrentTab,
-  currentUser,
-  onOpenVerify,
   onOpenNotifications,
   unreadNotificationsCount = 0,
-  onOpenAdmin,
-  onSwitchToAdmin,
-  onLogout,
-  onOpenAuth,
 }) => {
-  const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
-
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
       {/* 1. Home */}
@@ -48,89 +35,64 @@ export const MobileBottomNav: React.FC<Props> = ({
         onClick={() => setCurrentTab('home')}
         title="Home Dashboard"
       >
-        <Home size={19} />
+        <Home size={20} />
         <span>Home</span>
       </button>
 
-      {/* 2. Registry */}
+      {/* 2. Alerts / Notifications with Live Badge */}
       <button
         type="button"
-        className={`mobile-bottom-nav-item ${currentTab === 'directory' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('directory')}
-        title="Alumni Directory"
-      >
-        <Users size={19} />
-        <span>Registry</span>
-      </button>
-
-      {/* 3. Attendance (Replacing My Pass) */}
-      <button
-        type="button"
-        className={`mobile-bottom-nav-item ${currentTab === 'attendance' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('attendance')}
-        title="Meeting Attendance & Roll Call"
-      >
-        <ClipboardCheck size={19} />
-        <span>Attendance</span>
-      </button>
-
-      {/* 4. Giving / Payments */}
-      <button
-        type="button"
-        className={`mobile-bottom-nav-item ${currentTab === 'payments' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('payments')}
-        title="Donations & Giving"
-      >
-        <Coins size={19} />
-        <span>Giving</span>
-      </button>
-
-      {/* 5. Admin Panel (Direct Staff switch or Admin Gate) */}
-      <button
-        type="button"
-        className="mobile-bottom-nav-item"
+        className={`mobile-bottom-nav-item ${currentTab === 'notifications' ? 'active' : ''}`}
         onClick={() => {
-          if (isStaff && onSwitchToAdmin) {
-            onSwitchToAdmin();
-          } else if (onOpenAdmin) {
-            onOpenAdmin();
-          } else if (onOpenAuth) {
-            onOpenAuth();
+          if (onOpenNotifications) {
+            onOpenNotifications();
+          } else {
+            setCurrentTab('notifications');
           }
         }}
-        style={{ color: '#FBBF24' }}
-        title="Administration Panel"
+        style={{ position: 'relative' }}
+        title="Alerts & Notifications"
       >
-        <Sliders size={19} color="#FBBF24" />
-        <span style={{ color: '#FDE68A', fontWeight: 700 }}>Admin</span>
+        <div style={{ position: 'relative', display: 'inline-flex' }}>
+          <Bell size={19} />
+          {unreadNotificationsCount > 0 && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-8px',
+                background: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '0.58rem',
+                fontWeight: 800,
+                minWidth: '15px',
+                height: '15px',
+                padding: '0 2px',
+                borderRadius: '999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid #16A34A',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+              }}
+            >
+              {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+            </span>
+          )}
+        </div>
+        <span>Alerts</span>
       </button>
 
-      {/* 8. Logout / Login */}
-      {currentUser ? (
-        <button
-          type="button"
-          className="mobile-bottom-nav-item"
-          onClick={onLogout}
-          style={{ color: '#FDA4AF' }}
-          title="Sign Out"
-        >
-          <LogOut size={19} color="#FDA4AF" />
-          <span style={{ color: '#FECDD3' }}>Logout</span>
-        </button>
-      ) : (
-        <button
-          type="button"
-          className="mobile-bottom-nav-item"
-          onClick={onOpenAuth}
-          style={{ color: '#86EFAC' }}
-          title="Sign In"
-        >
-          <LogIn size={19} color="#86EFAC" />
-          <span style={{ color: '#BBF7D0' }}>Login</span>
-        </button>
-      )}
+      {/* 3. More (Shifted institutional menu, account logout & admin panel) */}
+      <button
+        type="button"
+        className={`mobile-bottom-nav-item ${currentTab === 'more' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('more')}
+        title="More Services & Menu"
+      >
+        <Menu size={20} />
+        <span>More</span>
+      </button>
     </nav>
   );
 };
-
-

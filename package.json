@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node ./scripts/copy-assets.js",
-    "build": "node ./scripts/copy-assets.js && node ./scripts/run-build.js",
+    "prebuild": "node ./scripts/apply-light-green.js && node ./scripts/copy-assets.js",
+    "build": "node ./scripts/apply-light-green.js && node ./scripts/copy-assets.js && node ./scripts/run-build.js",
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy": "npm run build && firebase deploy",

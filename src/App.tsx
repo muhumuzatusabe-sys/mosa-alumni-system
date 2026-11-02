@@ -23,6 +23,7 @@ import { NotificationsModal } from './components/NotificationsModal';
 import { NotificationsView } from './components/NotificationsView';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { MOSAWelcomeView } from './components/MOSAWelcomeView';
+import { MoreMenuView } from './components/MoreMenuView';
 import { SuperAdminPasswordChangeModal } from './components/SuperAdminPasswordChangeModal';
 import { dataService } from './services/dataService';
 import { isStaffRole, isRegisteredAlumni } from './services/governanceService';
@@ -30,7 +31,7 @@ import { MemberAttendanceView } from './components/MemberAttendanceView';
 import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
-import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2, Music } from 'lucide-react';
+import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2 } from 'lucide-react';
 import { MosaLogo } from './components/MosaLogo';
 
 const getInitialTab = (): string => {
@@ -166,15 +167,11 @@ export const App: React.FC = () => {
       const modules = await dataService.getModuleSettings();
       setModuleSettings(modules);
 
-      if (user && isRegisteredAlumni(user)) {
-        const alumniId = user.alumniId || user.alumniNumber || user.uid;
-        const notifs = await dataService.getAlumniNotifications(alumniId);
-        setUnreadNotifsCount(notifs.filter(n => !n.isRead).length);
-      } else {
-        setUnreadNotifsCount(0);
-      }
+      // Multi-factor unread notification count matching active session or broadcasts
+      const notifs = await dataService.getUserNotifications(user);
+      setUnreadNotifsCount(notifs.filter(n => !n.isRead).length);
     } catch (e) {
-      console.error(e);
+      console.error('Failed to compute unread notifications count:', e);
       setUnreadNotifsCount(0);
     }
   };
@@ -189,6 +186,14 @@ export const App: React.FC = () => {
     };
     initApp();
 
+    // Live reactive listener: updates notification badge instantly across all components & tabs
+    const onNotifsUpdated = () => {
+      refreshUserData();
+    };
+    window.addEventListener('mosa-notifications-updated', onNotifsUpdated);
+    window.addEventListener('storage', onNotifsUpdated);
+    const notifPoll = setInterval(onNotifsUpdated, 4000);
+
     // Request notification permissions for installed PWA / system app alerts strictly for registered alumni
     const user = dataService.getCurrentUser();
     if (user && isRegisteredAlumni(user)) {
@@ -198,6 +203,12 @@ export const App: React.FC = () => {
         } catch (e) {}
       }
     }
+
+    return () => {
+      window.removeEventListener('mosa-notifications-updated', onNotifsUpdated);
+      window.removeEventListener('storage', onNotifsUpdated);
+      clearInterval(notifPoll);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -238,7 +249,7 @@ export const App: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(ellipse at top, #113D2B 0%, #0A271B 65%, #05160F 100%)',
+          background: 'radial-gradient(ellipse at top, #16A34A 0%, #15803D 65%, #166534 100%)',
           color: '#FFFFFF',
           padding: '1.5rem',
         }}
@@ -446,7 +457,7 @@ export const App: React.FC = () => {
               top: 0, 
               zIndex: 90,
               padding: '0.65rem 1.25rem',
-              boxShadow: '0 2px 4px rgba(10, 39, 27, 0.04)'
+              boxShadow: '0 2px 4px rgba(22, 163, 74, 0.04)'
             }}
           >
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center' }}>
@@ -457,7 +468,7 @@ export const App: React.FC = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  background: '#113D2B',
+                  background: '#16A34A',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '8px',
@@ -498,6 +509,21 @@ export const App: React.FC = () => {
             onOpenVerify={() => setIsVerifyOpen(true)}
             onGoToPortal={() => handleNavigate('home')}
             onGoToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : handleAdminGateClick}
+          />
+        )}
+
+        {/* 0.6. MORE SERVICES & INSTITUTIONAL MENU (Shifted Full Page View) */}
+        {currentTab === 'more' && (
+          <MoreMenuView
+            currentUser={currentUser}
+            moduleSettings={moduleSettings}
+            onNavigateTab={handleNavigate}
+            onOpenRegister={() => setIsRegisterOpen(true)}
+            onOpenVerify={() => setIsVerifyOpen(true)}
+            onOpenAuth={() => openAuth('alumni')}
+            onLogout={handleLogout}
+            onOpenAdmin={handleAdminGateClick}
+            onSwitchToAdmin={currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role)) ? () => setPortalMode('admin') : handleAdminGateClick}
           />
         )}
 
@@ -633,145 +659,6 @@ export const App: React.FC = () => {
           />
         )}
       </main>
-
-      {/* Member Portal Footer */}
-      <footer style={{ background: '#0A271B', color: '#CBD5CD', padding: '2.5rem 1.25rem', borderTop: '2px solid #C68A24', fontSize: '0.85rem' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <div>
-            <div style={{ color: '#FDE68A', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 800 }}>
-              MASSH ALUMNI PORTAL
-            </div>
-            <div style={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em', marginTop: '0.15rem' }}>
-              Mandela Secondary School Hoima (MASSH)
-            </div>
-            <div style={{ color: '#CBD5CD', fontSize: '0.82rem', marginTop: '0.2rem', fontWeight: 600 }}>
-              Mandela Old Students Association (MOSA) • Founded 1997
-            </div>
-            <div style={{ color: '#8BA193', fontSize: '0.78rem', marginTop: '0.35rem', fontStyle: 'italic' }}>
-              "Caring to Achieve"
-            </div>
-          </div>
-
-          {/* Association Handles & Official Secretariat Contacts */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.65rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              {/* X / Twitter */}
-              <a
-                href="https://x.com/Masshalumni"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Follow MOSA on X (@Masshalumni)"
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 900,
-                }}
-              >
-                𝕏
-              </a>
-
-              {/* LinkedIn */}
-              <a
-                href="https://linkedin.com/company/mosa-massh"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Connect with MOSA on LinkedIn"
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#60A5FA',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                }}
-              >
-                in
-              </a>
-
-              {/* TikTok */}
-              <a
-                href="https://tiktok.com/@mosa_massh"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Follow MOSA on TikTok"
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#F43F5E',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                }}
-              >
-                <Music size={13} />
-              </a>
-
-              {/* Gmail / Email */}
-              <a
-                href="mailto:masshalumni@gmail.com"
-                title="Email MOSA Secretariat (masshalumni@gmail.com)"
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#F87171',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                }}
-              >
-                @
-              </a>
-            </div>
-
-            <div style={{ color: '#94A3B8', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <span>Tel: +256 772 411921, +256 706599793, +256 773432413</span>
-              <span>•</span>
-              <a 
-                href="mailto:masshalumni@gmail.com" 
-                style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
-              >
-                masshalumni@gmail.com
-              </a>
-              <span>•</span>
-              <a 
-                href="https://mtech-46634.web.app" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}
-              >
-                mtech-46634.web.app
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* Mobile Bottom Navigation - Static Fixed Bar with Scrollable Side-by-Side Icons */}
       <MobileBottomNav

@@ -91,7 +91,7 @@ export const EmailManager: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #113D2B 0%, #064E3B 100%)',
+        background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
         color: '#FFFFFF',
         padding: '1.5rem',
         borderRadius: '14px',
@@ -134,7 +134,7 @@ export const EmailManager: React.FC = () => {
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'config' ? '#FCD34D' : 'rgba(255,255,255,0.15)',
-              color: activeTab === 'config' ? '#064E3B' : '#FFFFFF',
+              color: activeTab === 'config' ? '#15803D' : '#FFFFFF',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
@@ -159,7 +159,7 @@ export const EmailManager: React.FC = () => {
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'logs' ? '#FCD34D' : 'rgba(255,255,255,0.15)',
-              color: activeTab === 'logs' ? '#064E3B' : '#FFFFFF',
+              color: activeTab === 'logs' ? '#15803D' : '#FFFFFF',
               fontWeight: 700,
               fontSize: '0.85rem',
               cursor: 'pointer',
@@ -454,7 +454,7 @@ export const EmailManager: React.FC = () => {
               <button
                 type="submit"
                 style={{
-                  background: '#113D2B',
+                  background: '#16A34A',
                   color: '#FFFFFF',
                   padding: '0.85rem 1.5rem',
                   borderRadius: '8px',

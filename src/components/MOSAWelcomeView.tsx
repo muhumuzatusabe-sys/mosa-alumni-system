@@ -133,7 +133,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
         flexDirection: 'column', 
         justifyContent: 'space-between',
         background: '#ECFDF5', 
-        color: '#064E3B', 
+        color: '#15803D', 
         fontFamily: "'Outfit', 'Inter', system-ui, -apple-system, sans-serif",
         overflow: 'hidden',
         position: 'relative',
@@ -241,7 +241,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
             <div style={{ fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#B45309', fontWeight: 800 }}>
               Mandela Secondary School Hoima
             </div>
-            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#064E3B', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#15803D', lineHeight: 1.1 }}>
               MOSA — Alumni Association
             </div>
           </div>
@@ -320,7 +320,7 @@ export const MOSAWelcomeView: React.FC<MOSAWelcomeViewProps> = ({
               fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)',
               fontWeight: 900,
               lineHeight: 1.15,
-              color: '#064E3B',
+              color: '#15803D',
               letterSpacing: '-0.025em',
               margin: '0 0 0.5rem 0',
             }}

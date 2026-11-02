@@ -452,12 +452,17 @@ const CreateMeetingDialog: React.FC<{ currentUser: AuthUser; onClose: () => void
 const AddAttendeeDialog: React.FC<{ meeting: Meeting; currentUser: AuthUser; onClose: () => void; onDone: (msg: string) => void }> = ({ meeting, currentUser, onClose, onDone }) => {
   const [mode, setMode] = useState<'REGISTRY' | 'GUEST'>('REGISTRY');
   const [alumni, setAlumni] = useState<AlumniProfile[]>([]);
+  const [existingRecords, setExistingRecords] = useState<MeetingAttendanceRecord[]>([]);
   const [q, setQ] = useState('');
   const [err, setErr] = useState('');
   const [g, setG] = useState({ fullName: '', attendeeType: 'GUEST' as AttendeeType, organisation: '', position: '', phone: '', relationship: '' });
   const [createProfile, setCreateProfile] = useState(false);
 
-  useEffect(() => { dataService.getAlumniList().then(setAlumni); }, []);
+  useEffect(() => { 
+    dataService.getAlumniList().then(setAlumni); 
+    const allAtt = governanceService.getAllAttendance().filter(r => r.meetingId === meeting.id && r.status !== 'REMOVED');
+    setExistingRecords(allAtt);
+  }, [meeting.id]);
 
   const results = q.trim().length < 2 ? [] : alumni.filter(a =>
     `${a.firstName} ${a.middleName || ''} ${a.lastName} ${a.alumniNumber} ${a.nickname || ''}`.toLowerCase().includes(q.toLowerCase())
@@ -497,15 +502,27 @@ const AddAttendeeDialog: React.FC<{ meeting: Meeting; currentUser: AuthUser; onC
             <>
               <input className="form-input" autoFocus placeholder="Type a name or MA number, e.g. MA. 0248" value={q} onChange={e => setQ(e.target.value)} />
               <div style={{ marginTop: '0.5rem', border: results.length ? '1px solid #E2E8F0' : 'none', borderRadius: '8px', overflow: 'hidden' }}>
-                {results.map(a => (
-                  <div key={a.internalId} style={rowStyle}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600 }}>{a.firstName} {a.lastName}</div>
-                      <div style={{ fontSize: '0.76rem', color: '#64748B' }}>{a.alumniNumber} | {a.membershipStatus}</div>
+                {results.map(a => {
+                  const isAlreadyAdded = existingRecords.some(r => 
+                    r.alumniId === a.internalId || 
+                    (r.alumniNumber && a.alumniNumber && r.alumniNumber.toUpperCase().trim() === a.alumniNumber.toUpperCase().trim()) ||
+                    (r.email && a.email && r.email.toLowerCase().trim() === a.email.toLowerCase().trim()) ||
+                    (r.fullName && r.fullName.toLowerCase().trim() === `${a.firstName} ${a.lastName}`.toLowerCase().trim())
+                  );
+                  return (
+                    <div key={a.internalId} style={rowStyle}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600 }}>{a.firstName} {a.lastName}</div>
+                        <div style={{ fontSize: '0.76rem', color: '#64748B' }}>{a.alumniNumber} | {a.membershipStatus}</div>
+                      </div>
+                      {isAlreadyAdded ? (
+                        <button disabled className="btn btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.8rem', opacity: 0.6, cursor: 'not-allowed' }}>Already Added</button>
+                      ) : (
+                        <button className="btn btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.8rem' }} onClick={() => addMember(a)}>Add</button>
+                      )}
                     </div>
-                    <button className="btn btn-secondary" style={{ padding: '0.3rem 0.7rem', fontSize: '0.8rem' }} onClick={() => addMember(a)}>Add</button>
-                  </div>
-                ))}
+                  );
+                })}
                 {q.trim().length >= 2 && results.length === 0 && (
                   <p style={{ fontSize: '0.85rem', color: '#64748B', padding: '0.75rem 0' }}>No registry match. Use "Guest / Non-Alumnus" to record this person.</p>
                 )}

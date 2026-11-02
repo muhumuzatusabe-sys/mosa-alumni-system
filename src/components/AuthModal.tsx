@@ -296,7 +296,7 @@ export const AuthModal: React.FC<Props> = ({
           width: '100%',
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 20px 40px -15px rgba(10, 39, 27, 0.25)',
+          boxShadow: '0 20px 40px -15px rgba(22, 163, 74, 0.25)',
           border: '1px solid #E5DFD1',
           background: '#FFFFFF'
         }}
@@ -304,7 +304,7 @@ export const AuthModal: React.FC<Props> = ({
         {/* Modal Top Bar */}
         <div 
           style={{ 
-            background: 'linear-gradient(135deg, #113D2B 0%, #0A271B 100%)', 
+            background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)', 
             padding: '1.25rem 1.5rem',
             color: '#FFFFFF',
             position: 'relative'
@@ -387,7 +387,7 @@ export const AuthModal: React.FC<Props> = ({
                   borderRadius: '8px',
                   border: 'none',
                   background: portal === 'alumni' ? '#FFFFFF' : 'transparent',
-                  color: portal === 'alumni' ? '#113D2B' : '#E5DFD1',
+                  color: portal === 'alumni' ? '#16A34A' : '#E5DFD1',
                   fontWeight: portal === 'alumni' ? 700 : 500,
                   fontSize: '0.82rem',
                   cursor: 'pointer',
@@ -399,7 +399,7 @@ export const AuthModal: React.FC<Props> = ({
                   boxShadow: portal === 'alumni' ? '0 2px 4px rgba(0,0,0,0.15)' : 'none'
                 }}
               >
-                <UserCheck size={15} color={portal === 'alumni' ? '#113D2B' : '#E5DFD1'} />
+                <UserCheck size={15} color={portal === 'alumni' ? '#16A34A' : '#E5DFD1'} />
                 <span>Alumni Member</span>
               </button>
 
@@ -412,7 +412,7 @@ export const AuthModal: React.FC<Props> = ({
                   borderRadius: '8px',
                   border: 'none',
                   background: portal === 'admin' ? '#FFFFFF' : 'transparent',
-                  color: portal === 'admin' ? '#113D2B' : '#E5DFD1',
+                  color: portal === 'admin' ? '#16A34A' : '#E5DFD1',
                   fontWeight: portal === 'admin' ? 700 : 500,
                   fontSize: '0.82rem',
                   cursor: 'pointer',
@@ -495,7 +495,7 @@ export const AuthModal: React.FC<Props> = ({
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#113D2B' }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#16A34A' }}>
                     {alumniMode === 'signin' ? 'Sign In to Your Account' : 'Set Your Account Password'}
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#6B7280' }}>
@@ -553,7 +553,7 @@ export const AuthModal: React.FC<Props> = ({
               {alumniMode === 'signin' && (
                 <form onSubmit={handleAlumniSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A' }}>
                       Registered Email Address
                     </label>
                     <input
@@ -577,7 +577,7 @@ export const AuthModal: React.FC<Props> = ({
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.25rem' }}>
+                      <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A', marginBottom: '0.25rem' }}>
                         Password
                       </label>
                       <button
@@ -643,7 +643,7 @@ export const AuthModal: React.FC<Props> = ({
                       marginTop: '0.5rem',
                       padding: '0.85rem',
                       borderRadius: '8px',
-                      background: '#113D2B',
+                      background: '#16A34A',
                       color: '#FFFFFF',
                       fontWeight: 700,
                       fontSize: '0.92rem',
@@ -670,7 +670,7 @@ export const AuthModal: React.FC<Props> = ({
                   {pwdStep === 'details' ? (
                     <form onSubmit={handleRequestPasswordOtp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A' }}>
                       Your Registered Email Address
                     </label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -706,7 +706,7 @@ export const AuthModal: React.FC<Props> = ({
                           borderRadius: '8px',
                           background: '#FAF7EE',
                           border: '1px solid #E5DFD1',
-                          color: '#113D2B',
+                          color: '#16A34A',
                           fontWeight: 600,
                           fontSize: '0.82rem',
                           cursor: 'pointer',
@@ -736,7 +736,7 @@ export const AuthModal: React.FC<Props> = ({
                           width: '36px', 
                           height: '36px', 
                           borderRadius: '50%', 
-                          background: '#113D2B', 
+                          background: '#16A34A', 
                           color: '#FCD34D',
                           display: 'flex',
                           alignItems: 'center',
@@ -750,7 +750,7 @@ export const AuthModal: React.FC<Props> = ({
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                          <span style={{ fontWeight: 700, color: '#113D2B', fontSize: '0.88rem' }}>
+                          <span style={{ fontWeight: 700, color: '#16A34A', fontSize: '0.88rem' }}>
                             {verifiedAlumnus.firstName} {verifiedAlumnus.lastName}
                           </span>
                           <span 
@@ -775,7 +775,7 @@ export const AuthModal: React.FC<Props> = ({
                   )}
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A' }}>
                       Create New Password
                     </label>
                     <div style={{ position: 'relative' }}>
@@ -816,7 +816,7 @@ export const AuthModal: React.FC<Props> = ({
                   </div>
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B' }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A' }}>
                       Confirm Password
                     </label>
                     <div style={{ position: 'relative' }}>
@@ -864,7 +864,7 @@ export const AuthModal: React.FC<Props> = ({
                       marginTop: '0.5rem',
                       padding: '0.85rem',
                       borderRadius: '8px',
-                      background: '#113D2B',
+                      background: '#16A34A',
                       color: '#FFFFFF',
                       fontWeight: 700,
                       fontSize: '0.92rem',
@@ -910,7 +910,7 @@ export const AuthModal: React.FC<Props> = ({
                     <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
                       We sent a 6-digit confirmation code to:
                     </div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#113D2B', marginTop: '0.1rem' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#16A34A', marginTop: '0.1rem' }}>
                       {email}
                     </div>
 
@@ -943,7 +943,7 @@ export const AuthModal: React.FC<Props> = ({
                           style={{
                             width: '100%',
                             padding: '0.55rem 0.75rem',
-                            background: '#113D2B',
+                            background: '#16A34A',
                             color: '#FCD34D',
                             border: 'none',
                             borderRadius: '8px',
@@ -1002,7 +1002,7 @@ export const AuthModal: React.FC<Props> = ({
                   </div>
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#113D2B', textAlign: 'center', display: 'block' }}>
+                    <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A', textAlign: 'center', display: 'block' }}>
                       Enter 6-Digit Code
                     </label>
                     <input
@@ -1018,7 +1018,7 @@ export const AuthModal: React.FC<Props> = ({
                       style={{
                         width: '100%',
                         padding: '0.75rem',
-                        border: '2px solid #113D2B',
+                        border: '2px solid #16A34A',
                         borderRadius: '8px',
                         fontSize: '1.3rem',
                         fontWeight: 800,
@@ -1040,7 +1040,7 @@ export const AuthModal: React.FC<Props> = ({
                       marginTop: '0.25rem',
                       padding: '0.85rem',
                       borderRadius: '8px',
-                      background: '#113D2B',
+                      background: '#16A34A',
                       color: '#FFFFFF',
                       fontWeight: 700,
                       fontSize: '0.92rem',
@@ -1145,7 +1145,7 @@ export const AuthModal: React.FC<Props> = ({
 
               <form onSubmit={handleAdminSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#113D2B', display: 'block', marginBottom: '0.45rem' }}>
+                  <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#16A34A', display: 'block', marginBottom: '0.45rem' }}>
                     Admin Password
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -1233,7 +1233,7 @@ export const AuthModal: React.FC<Props> = ({
                 fontSize: '0.78rem'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#113D2B', marginBottom: '0.35rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#16A34A', marginBottom: '0.35rem' }}>
                 <MosaLogo size={16} />
                 <span>Need assistance signing into your alumni account?</span>
               </div>

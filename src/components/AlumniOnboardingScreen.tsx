@@ -32,7 +32,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         padding: '2rem 1rem',
-        background: 'radial-gradient(ellipse at top, #113D2B 0%, #0A271B 65%, #05160F 100%)',
+        background: 'radial-gradient(ellipse at top, #16A34A 0%, #15803D 65%, #166534 100%)',
         position: 'relative',
         boxSizing: 'border-box',
       }}
@@ -44,7 +44,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
           width: '550px',
           height: '550px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.12) 0%, rgba(10, 39, 27, 0) 70%)',
+          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.12) 0%, rgba(22, 163, 74, 0) 70%)',
           top: '12%',
           pointerEvents: 'none',
         }}
@@ -67,7 +67,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
         {/* Header Ribbon */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #0A271B 0%, #113D2B 100%)',
+            background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
             padding: '2.25rem 2rem 2rem 2rem',
             textAlign: 'center',
             color: '#FFFFFF',
@@ -232,7 +232,7 @@ export const AlumniOnboardingScreen: React.FC<AlumniOnboardingScreenProps> = ({
               style={{
                 width: '100%',
                 padding: '0.95rem 1.25rem',
-                background: 'linear-gradient(135deg, #113D2B 0%, #0A271B 100%)',
+                background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '12px',

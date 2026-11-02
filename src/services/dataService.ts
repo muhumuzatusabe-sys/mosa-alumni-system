@@ -1239,18 +1239,37 @@ export const dataService = {
             console.warn('Failed to dispatch auto-approval email:', mailErr);
           }
         }
-      } else if (appData.email) {
-        // Dispatch application receipt acknowledgment email
-        try {
-          const applicantName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ') || 'Applicant';
-          await emailService.sendApplicationReceivedEmail(
-            appData.email,
-            applicantName,
-            newApp.referenceId || id,
-            appData
-          );
-        } catch (mailErr) {
-          console.warn('Failed to dispatch application acknowledgment email:', mailErr);
+      } else {
+        // Administrative notification for queued review
+        await this.sendNotification({
+          alumniId: 'admin',
+          title: 'New Alumni Application Submitted',
+          message: `${appData.firstName} ${appData.lastName} has submitted an alumni membership application (Ref: ${newApp.referenceId}) for Secretariat review.`,
+          type: 'VERIFICATION',
+          linkTab: 'admin',
+        });
+
+        if (appData.email) {
+          await this.sendNotification({
+            alumniId: appData.email,
+            title: 'Application Submitted for Review',
+            message: `Your membership application (Ref: ${newApp.referenceId}) has been received and is queued for Secretariat verification.`,
+            type: 'VERIFICATION',
+            linkTab: 'home',
+          });
+
+          // Dispatch application receipt acknowledgment email
+          try {
+            const applicantName = [appData.firstName, appData.middleName, appData.lastName].filter(Boolean).join(' ') || 'Applicant';
+            await emailService.sendApplicationReceivedEmail(
+              appData.email,
+              applicantName,
+              newApp.referenceId || id,
+              appData
+            );
+          } catch (mailErr) {
+            console.warn('Failed to dispatch application acknowledgment email:', mailErr);
+          }
         }
       }
 
@@ -4414,26 +4433,60 @@ export const dataService = {
   },
 
   // NOTIFICATION CENTER
-  async getAlumniNotifications(alumniId: string): Promise<AlumniNotification[]> {
-    if (!alumniId || alumniId.trim() === '' || alumniId === 'guest') {
-      return [];
-    }
+  async getUserNotifications(user?: AuthUser | null): Promise<AlumniNotification[]> {
     const raw = safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
     let notifs: AlumniNotification[] = [];
     if (raw) {
       try { notifs = JSON.parse(raw); } catch {}
     }
-    if (notifs.length === 0) {
-      safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(defaultSeedNotifications));
-      notifs = [...defaultSeedNotifications];
+
+    if (!user) {
+      return notifs
+        .filter(n => n.alumniId === 'all')
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
-    const userNotifs = notifs.filter(n => n.alumniId === alumniId || n.alumniId === 'all');
-    if (userNotifs.length > 0) {
-      return userNotifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' || (!!user.role && user.role !== 'ALUMNI' && user.role !== 'USER');
+    const userEmail = (user.email || '').toLowerCase().trim();
+    const candidateIds = [
+      user.uid,
+      user.alumniId,
+      user.alumniNumber,
+    ].filter(Boolean) as string[];
+
+    const result = notifs.filter(n => {
+      // 1. Broadcasts to everyone
+      if (n.alumniId === 'all') return true;
+      // 2. Broadcasts to administrative staff
+      if (isAdmin && (n.alumniId === 'admin' || n.alumniId === 'all_admin' || n.alumniId === 'staff' || n.alumniId === 'all_staff')) {
+        return true;
+      }
+      // 3. Email-addressed notification
+      if (userEmail && n.alumniId?.toLowerCase().trim() === userEmail) {
+        return true;
+      }
+      // 4. Candidate ID matches (uid, internal alumniId, official alumniNumber)
+      if (candidateIds.includes(n.alumniId)) {
+        return true;
+      }
+      return false;
+    });
+
+    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+
+  async getAlumniNotifications(alumniId: string): Promise<AlumniNotification[]> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+    let notifs: AlumniNotification[] = [];
+    if (raw) {
+      try { notifs = JSON.parse(raw); } catch {}
     }
-    // If specific alumniId has no dedicated notifications, only return general broadcasts if it's a valid ID
-    const generalBroadcasts = notifs.filter(n => n.alumniId === 'all');
-    return generalBroadcasts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (!alumniId || alumniId.trim() === '' || alumniId === 'guest') {
+      return notifs.filter(n => n.alumniId === 'all').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    const cleanId = alumniId.toLowerCase().trim();
+    const userNotifs = notifs.filter(n => n.alumniId === 'all' || n.alumniId === alumniId || n.alumniId?.toLowerCase().trim() === cleanId);
+    return userNotifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   async sendNotification(notification: Omit<AlumniNotification, 'id' | 'createdAt' | 'isRead'>): Promise<AlumniNotification> {
@@ -4450,6 +4503,14 @@ export const dataService = {
     };
     notifs.unshift(newNotif);
     safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+
+    // Instantly notify active listeners across all components and windows
+    if (typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent('mosa-notifications-updated', { detail: newNotif }));
+        window.dispatchEvent(new Event('storage'));
+      } catch (evErr) {}
+    }
 
     // ==============================================================
     // TRIGGER OS / INSTALLED PWA APP DEVICE NOTIFICATION
@@ -4493,29 +4554,61 @@ export const dataService = {
     if (raw) {
       try { notifs = JSON.parse(raw); } catch {}
     }
-    if (notifs.length === 0) {
-      notifs = [...defaultSeedNotifications];
-    }
     const idx = notifs.findIndex(n => n.id === notificationId);
     if (idx !== -1) {
       notifs[idx].isRead = true;
       safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+      if (typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(new CustomEvent('mosa-notifications-updated'));
+          window.dispatchEvent(new Event('storage'));
+        } catch (evErr) {}
+      }
     }
   },
 
-  async markAllNotificationsAsRead(alumniId: string): Promise<void> {
+  async markAllNotificationsAsRead(userOrTarget?: AuthUser | string | null): Promise<void> {
     const raw = safeStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
     let notifs: AlumniNotification[] = [];
     if (raw) {
       try { notifs = JSON.parse(raw); } catch {}
     }
-    if (notifs.length === 0) {
-      notifs = [...defaultSeedNotifications];
+
+    if (!userOrTarget) {
+      notifs.forEach(n => { n.isRead = true; });
+    } else if (typeof userOrTarget === 'string') {
+      const cleanTarget = userOrTarget.toLowerCase().trim();
+      notifs.forEach(n => {
+        if (n.alumniId === 'all' || n.alumniId === userOrTarget || n.alumniId?.toLowerCase().trim() === cleanTarget) {
+          n.isRead = true;
+        }
+      });
+    } else {
+      const u = userOrTarget;
+      const isAdmin = u.role === 'ADMIN' || u.role === 'SUPER_ADMIN' || (!!u.role && u.role !== 'ALUMNI' && u.role !== 'USER');
+      const userEmail = (u.email || '').toLowerCase().trim();
+      const ids = [u.uid, u.alumniId, u.alumniNumber].filter(Boolean) as string[];
+
+      notifs.forEach(n => {
+        if (n.alumniId === 'all') {
+          n.isRead = true;
+        } else if (isAdmin && (n.alumniId === 'admin' || n.alumniId === 'all_admin' || n.alumniId === 'staff' || n.alumniId === 'all_staff')) {
+          n.isRead = true;
+        } else if (userEmail && n.alumniId?.toLowerCase().trim() === userEmail) {
+          n.isRead = true;
+        } else if (ids.includes(n.alumniId)) {
+          n.isRead = true;
+        }
+      });
     }
-    notifs.forEach(n => {
-      if (n.alumniId === alumniId) n.isRead = true;
-    });
+
     safeStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+    if (typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent('mosa-notifications-updated'));
+        window.dispatchEvent(new Event('storage'));
+      } catch (evErr) {}
+    }
   },
 
   // ==========================================
@@ -6177,10 +6270,10 @@ export const dataService = {
   <Style ss:ID="Header">
    <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
    <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#0A271B"/>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2" ss:Color="#15803D"/>
    </Borders>
    <Font ss:FontName="Calibri" ss:Size="11" ss:Color="#FFFFFF" ss:Bold="1"/>
-   <Interior ss:Color="#0A271B" ss:Pattern="Solid"/>
+   <Interior ss:Color="#15803D" ss:Pattern="Solid"/>
   </Style>
   <Style ss:ID="RowEven">
    <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
@@ -6244,7 +6337,7 @@ export const dataService = {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
     // Brand Header banner
-    doc.setFillColor(10, 39, 27); // #0A271B
+    doc.setFillColor(22, 163, 74); // #15803D
     doc.rect(0, 0, 297, 26, 'F');
 
     // Title

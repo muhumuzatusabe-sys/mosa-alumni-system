@@ -1,12 +1,16 @@
+Set-Location $PSScriptRoot
+
 Write-Host "==========================================================" -ForegroundColor Green
 Write-Host "   MOSA ALUMNI MANAGEMENT SYSTEM (MASSH Est. 1997)" -ForegroundColor Green
 Write-Host "   Automated Deployment: Firebase Hosting + GitHub" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
+Write-Host "Working Directory: $PWD" -ForegroundColor Gray
 Write-Host ""
 
 $env:NODE_OPTIONS = "--max-old-space-size=4096"
 
 Write-Host "[1/3] Building production bundle..." -ForegroundColor Cyan
+node ./scripts/apply-light-green.js
 node ./scripts/copy-assets.js
 node ./scripts/run-build.js
 $buildCode = $LASTEXITCODE
@@ -26,19 +30,31 @@ Write-Host "[OK] Production bundle compiled successfully into ./dist" -Foregroun
 Write-Host ""
 
 Write-Host "[2/3] Deploying to Firebase Hosting (mtech-46634)..." -ForegroundColor Cyan
+
+# Clear corrupted cache if present so firebase CLI runs cleanly
+if (Test-Path "$env:USERPROFILE\.cache\firebase\tools") {
+    Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\firebase\tools" -ErrorAction SilentlyContinue
+}
+
+$deployed = $false
 try {
-    firebase deploy --only hosting
-    if ($LASTEXITCODE -ne 0) {
-        throw "firebase command failed, trying npx"
-    }
+    Write-Host "Deploying via npx firebase-tools..." -ForegroundColor Yellow
+    npx --yes firebase-tools deploy --only hosting
+    if ($LASTEXITCODE -eq 0) { $deployed = $true }
 } catch {
-    npx --yes firebase deploy --only hosting
+    Write-Host "npx execution encountered error, trying global firebase..." -ForegroundColor Yellow
+}
+
+if (-not $deployed) {
+    try {
+        firebase deploy --only hosting
+    } catch {}
 }
 
 Write-Host ""
 Write-Host "[3/3] Committing & pushing to GitHub..." -ForegroundColor Cyan
 git add .
-git commit -m "feat(system): clean blank system baseline and unblocked authentication"
+git commit -m "fix(build): resolve duplicate variable declaration in governanceService and optimize portal panel"
 git push origin main
 
 Write-Host ""
