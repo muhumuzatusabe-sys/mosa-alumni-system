@@ -30,7 +30,9 @@ import {
   XCircle,
   Eye,
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  Info,
+  X
 } from 'lucide-react';
 import { PaymentModal } from './PaymentModal';
 import { ReceiptModal } from './ReceiptModal';
@@ -45,6 +47,7 @@ interface Props {
 
 export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }) => {
   const [activeTab, setActiveTab] = useState<'campaigns' | 'dues' | 'my-history' | 'treasurer-desk'>('campaigns');
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isTreasurySettingsOpen, setIsTreasurySettingsOpen] = useState(false);
   
   // Data state
@@ -223,66 +226,54 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem 1rem' }}>
       
-      {/* Hero / Executive Metrics Header */}
-      <div style={{ 
-        background: 'linear-gradient(135deg, #14532D 0%, #0A271B 60%, #14532D 100%)', 
-        borderRadius: '16px', 
-        padding: '2rem', 
-        color: '#FFFFFF',
-        marginBottom: '2rem',
-        boxShadow: '0 10px 25px -5px rgba(10, 39, 27, 0.3)'
-      }}>
+      {/* ------------------------------------------------------------- */}
+      {/* 1. COMPACT ONE-PAGE TOP BAR                                   */}
+      {/* ------------------------------------------------------------- */}
+      <div style={{ marginBottom: '1.25rem' }}>
         {onBack && (
           <button
             onClick={onBack}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.45rem',
-              padding: '0.45rem 0.85rem',
-              borderRadius: '8px',
-              background: 'rgba(255, 255, 255, 0.12)',
-              color: '#FFFFFF',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              fontSize: '0.82rem',
+              gap: '0.4rem',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '6px',
+              background: '#F1F5F9',
+              color: '#334155',
+              border: '1px solid #CBD5E1',
+              fontSize: '0.8rem',
               fontWeight: 700,
               cursor: 'pointer',
-              marginBottom: '1rem',
+              marginBottom: '0.75rem',
               transition: 'all 0.15s ease',
             }}
           >
-            <ArrowLeft size={15} />
+            <ArrowLeft size={14} />
             <span>Back to Dashboard</span>
           </button>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          flexWrap: 'wrap', 
+          gap: '0.75rem',
+          paddingBottom: '0.75rem',
+          borderBottom: '1px solid #E2E8F0'
+        }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
-              <span style={{ 
-                background: 'rgba(217, 119, 6, 0.2)', 
-                color: '#FBBF24', 
-                padding: '4px 10px', 
-                borderRadius: '9999px', 
-                fontSize: '0.75rem', 
-                fontWeight: 700,
-                border: '1px solid rgba(217, 119, 6, 0.4)'
-              }}>
-                MOSA PHILANTHROPY & GIVING
-              </span>
-              <span style={{ color: '#93C5FD', fontSize: '0.8rem' }}>Mandela Secondary School Hoima</span>
-            </div>
-
-            <h1 style={{ fontSize: '1.85rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+            <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: 0, color: '#0B203E', letterSpacing: '-0.01em' }}>
               Donations &amp; Giving
             </h1>
-            <p style={{ color: '#CBD5E1', fontSize: '0.95rem', marginTop: '0.4rem', maxWidth: '640px', lineHeight: '1.5' }}>
-              Supporting Mandela Secondary School Hoima through voluntary alumni philanthropy, school project campaigns, and transparent giving records.
-            </p>
+            <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.15rem' }}>
+              Mandela Secondary School Hoima • Voluntary Projects &amp; Philanthropy
+            </div>
           </div>
 
-          {/* Voluntary Quick Actions Header */}
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Action Buttons: Donate to Project, Giving History, Clean Simple About */}
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <button
               onClick={() => {
                 setPayDefaultCategory('PROJECT_DONATION');
@@ -291,196 +282,116 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
                 setIsPayModalOpen(true);
               }}
               className="btn btn-primary"
-              style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#059669', borderColor: '#059669' }}
+              style={{
+                padding: '0.55rem 1rem',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: '#0A271B',
+                borderColor: '#0A271B',
+                color: '#FFFFFF',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(10, 39, 27, 0.25)'
+              }}
             >
-              <HeartHandshake size={18} /> Donate to Project
+              <HeartHandshake size={16} color="#FDE68A" />
+              <span>Donate to Project</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('my-history')}
-              className="btn btn-secondary"
-              style={{ padding: '0.75rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.2)' }}
+              onClick={() => setActiveTab(activeTab === 'my-history' ? 'campaigns' : 'my-history')}
+              style={{
+                padding: '0.55rem 0.9rem',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: activeTab === 'my-history' ? '#0A271B' : '#FFFFFF',
+                color: activeTab === 'my-history' ? '#FFFFFF' : '#0F172A',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                cursor: 'pointer',
+              }}
             >
-              <Receipt size={18} /> Giving History
+              <Receipt size={15} color={activeTab === 'my-history' ? '#FDE68A' : '#475569'} />
+              <span>{activeTab === 'my-history' ? 'View Projects' : 'Giving History'}</span>
+            </button>
+
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              style={{
+                padding: '0.55rem 0.85rem',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: '#F8FAFC',
+                color: '#0A271B',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                cursor: 'pointer',
+              }}
+              title="About Voluntary Philanthropy & Impact"
+            >
+              <Info size={15} color="#14532D" />
+              <span>About</span>
             </button>
 
             {isAdmin && (
-              <button
-                onClick={() => { setCampaignToEdit(null); setIsCampaignModalOpen(true); }}
-                className="btn btn-secondary"
-                style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)' }}
-              >
-                <Plus size={16} /> New Campaign
-              </button>
+              <>
+                <button
+                  onClick={() => { setCampaignToEdit(null); setIsCampaignModalOpen(true); }}
+                  style={{
+                    padding: '0.55rem 0.85rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    background: '#F1F5F9',
+                    color: '#334155',
+                    border: '1px solid #CBD5E1',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={15} />
+                  <span>New Project</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab(activeTab === 'treasurer-desk' ? 'campaigns' : 'treasurer-desk')}
+                  style={{
+                    padding: '0.55rem 0.85rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    background: activeTab === 'treasurer-desk' ? '#0A271B' : '#FEF3C7',
+                    color: activeTab === 'treasurer-desk' ? '#FFFFFF' : '#92400E',
+                    border: '1px solid #FDE68A',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ShieldCheck size={15} />
+                  <span>Desk</span>
+                  {financialStats?.pendingCount > 0 && (
+                    <span style={{ background: '#EF4444', color: '#FFFFFF', fontSize: '0.65rem', padding: '1px 5px', borderRadius: '999px', fontWeight: 800 }}>
+                      {financialStats.pendingCount}
+                    </span>
+                  )}
+                </button>
+              </>
             )}
           </div>
         </div>
-
-        {/* 4 Financial Stat Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem' }}>
-          <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-            <div style={{ color: '#93C5FD', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Coins size={16} /> Total Funds Verified
-            </div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: '0.25rem', color: '#34D399' }}>
-              {financialStats ? formatUGX(financialStats.totalVerifiedAmount) : '...'}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#CBD5E1', marginTop: '4px' }}>
-              {financialStats?.verifiedCount || 0} verified official receipts issued
-            </div>
-          </div>
-
-          <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-            <div style={{ color: '#93C5FD', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <TrendingUp size={16} /> Active School Projects
-            </div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: '0.25rem', color: '#FBBF24' }}>
-              {campaigns.filter(c => c.status === 'ACTIVE').length} Projects
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#CBD5E1', marginTop: '4px' }}>
-              Science labs, student bursary &amp; sports pavilion
-            </div>
-          </div>
-
-          <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-            <div style={{ color: '#93C5FD', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Award size={16} /> My Giving Record
-            </div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, marginTop: '0.4rem', color: '#34D399', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CheckCircle size={20} />
-              {currentUser?.alumniNumber ? (myTotalContributions > 0 ? `UGX ${myTotalContributions.toLocaleString()}` : 'Registered Member') : 'Sign In to Check'}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#CBD5E1', marginTop: '4px' }}>
-              {currentUser?.alumniNumber ? `${currentUser.alumniNumber} • Voluntary giving records` : 'Alumni portal authentication required'}
-            </div>
-          </div>
-
-          {isAdmin && (
-            <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.12)' }}>
-              <div style={{ color: '#FCA5A5', fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Clock size={16} /> Pending Verifications
-              </div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, marginTop: '0.25rem', color: '#F87171' }}>
-                {financialStats?.pendingCount || 0} Awaiting
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#CBD5E1', marginTop: '4px' }}>
-                Reconcile with MoMo/Bank statements
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Navigation Sub-Tabs */}
-      <div 
-        className="horizontal-scroll-touch"
-        style={{ 
-          display: 'flex', 
-          gap: '0.5rem', 
-          borderBottom: '1px solid #E2E8F0', 
-          marginBottom: '1.75rem',
-          overflowX: 'auto',
-          paddingBottom: '2px',
-          WebkitOverflowScrolling: 'touch'
-        }}
-      >
-        <button
-          onClick={() => setActiveTab('campaigns')}
-          style={{
-            padding: '0.75rem 1.25rem',
-            border: 'none',
-            background: 'none',
-            borderBottom: activeTab === 'campaigns' ? '3px solid #0B203E' : '3px solid transparent',
-            color: activeTab === 'campaigns' ? '#0B203E' : '#64748B',
-            fontWeight: activeTab === 'campaigns' ? 700 : 500,
-            cursor: 'pointer',
-            fontSize: '0.95rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap'
-          }}
-        >
-          <HeartHandshake size={18} /> Projects ({campaigns.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab('dues')}
-          style={{
-            padding: '0.75rem 1.25rem',
-            border: 'none',
-            background: 'none',
-            borderBottom: activeTab === 'dues' ? '3px solid #0B203E' : '3px solid transparent',
-            color: activeTab === 'dues' ? '#0B203E' : '#64748B',
-            fontWeight: activeTab === 'dues' ? 700 : 500,
-            cursor: 'pointer',
-            fontSize: '0.95rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap'
-          }}
-        >
-          <Award size={18} /> Annual Contribution
-        </button>
-
-        {currentUser && (
-          <button
-            onClick={() => setActiveTab('my-history')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: 'none',
-              borderBottom: activeTab === 'my-history' ? '3px solid #0B203E' : '3px solid transparent',
-              color: activeTab === 'my-history' ? '#0B203E' : '#64748B',
-              fontWeight: activeTab === 'my-history' ? 700 : 500,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              flexShrink: 0,
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <Receipt size={18} /> Giving History ({myPayments.length})
-          </button>
-        )}
-
-        {isAdmin && (
-          <button
-            onClick={() => setActiveTab('treasurer-desk')}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: 'none',
-              borderBottom: activeTab === 'treasurer-desk' ? '3px solid #0B203E' : '3px solid transparent',
-              color: activeTab === 'treasurer-desk' ? '#0B203E' : '#64748B',
-              fontWeight: activeTab === 'treasurer-desk' ? 700 : 500,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <ShieldCheck size={18} /> Treasurer Verification Desk
-            {financialStats?.pendingCount > 0 && (
-              <span style={{ 
-                background: '#EF4444', 
-                color: '#FFFFFF', 
-                fontSize: '0.7rem', 
-                padding: '1px 6px', 
-                borderRadius: '9999px', 
-                fontWeight: 700 
-              }}>
-                {financialStats.pendingCount}
-              </span>
-            )}
-          </button>
-        )}
       </div>
 
       {/* ============================================================== */}
@@ -515,42 +426,51 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
                     className="mosa-card" 
                     style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}
                   >
-                  <div style={{ position: 'relative', height: '180px', background: '#0B203E', overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', height: '140px', background: '#0B203E', overflow: 'hidden' }}>
                     <img 
                       src={camp.coverImage || 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80'} 
                       alt={camp.title}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
-                    <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(11, 32, 62, 0.85)', backdropFilter: 'blur(4px)', color: '#FFFFFF', padding: '3px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(11, 32, 62, 0.88)', backdropFilter: 'blur(4px)', color: '#FFFFFF', padding: '2px 8px', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700 }}>
                       {camp.category}
                     </div>
                   </div>
 
-                  <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                    <h3 style={{ fontSize: '1.2rem', color: '#0B203E', fontWeight: 700, margin: '0 0 0.5rem 0' }}>
+                  <div style={{ padding: '1.15rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <h3 style={{ fontSize: '1.1rem', color: '#0B203E', fontWeight: 700, margin: '0 0 0.35rem 0' }}>
                       {camp.title}
                     </h3>
-                    <p style={{ color: '#64748B', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '1.25rem', flex: 1 }}>
+                    <p style={{ 
+                      color: '#64748B', 
+                      fontSize: '0.82rem', 
+                      lineHeight: '1.4', 
+                      marginBottom: '0.85rem', 
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>
                       {camp.description}
                     </p>
 
                     {/* Progress Bar */}
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '4px' }}>
-                        <span style={{ fontWeight: 700, color: '#059669' }}>{formatUGX(camp.raisedAmount)}</span>
+                    <div style={{ marginBottom: '0.85rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '4px' }}>
+                        <span style={{ fontWeight: 700, color: '#0A271B' }}>{formatUGX(camp.raisedAmount)}</span>
                         <span style={{ color: '#64748B' }}>Goal: {formatUGX(camp.targetAmount)}</span>
                       </div>
-                      <div style={{ height: '8px', background: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ height: '7px', background: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
                         <div style={{ 
                           width: `${pct}%`, 
                           height: '100%', 
-                          background: 'linear-gradient(90deg, #10B981, #059669)', 
+                          background: 'linear-gradient(90deg, #14532D, #0A271B)', 
                           borderRadius: '4px' 
                         }} />
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748B', marginTop: '4px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>
                         <span>{pct}% Funded</span>
-                        <span>{camp.donorCount} Generous Donors</span>
+                        <span>{camp.donorCount} Donors</span>
                       </div>
                     </div>
 
@@ -559,9 +479,9 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
                       <button
                         onClick={() => handleOpenDonateForCampaign(camp.id)}
                         className="btn btn-primary"
-                        style={{ flex: 1, padding: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                        style={{ flex: 1, padding: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: '#0A271B', borderColor: '#0A271B', color: '#FFFFFF', borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem' }}
                       >
-                        <HeartHandshake size={16} /> Donate to This Project
+                        <HeartHandshake size={15} color="#FDE68A" /> Donate to This Project
                       </button>
 
                       {isAdmin && (
@@ -1088,6 +1008,142 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* CLEAN SIMPLE ABOUT MODAL (EXTRA INFORMATION & POLICY DETAILS)   */}
+      {/* ============================================================== */}
+      {isAboutOpen && (
+        <div 
+          className="modal-backdrop"
+          onClick={() => setIsAboutOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1200,
+            padding: '1rem',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <div 
+            className="modal-content"
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '560px',
+              width: '100%',
+              padding: '1.5rem',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              border: '1.5px solid #E2E8F0',
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid #F1F5F9' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#DCFCE7', color: '#0A271B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <HeartHandshake size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', color: '#0B203E', margin: 0, fontWeight: 800 }}>
+                    About Donations &amp; Giving
+                  </h3>
+                  <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                    Mandela Secondary School Hoima • Founded 1997
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsAboutOpen(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#64748B',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Description Body */}
+            <div style={{ fontSize: '0.88rem', color: '#334155', lineHeight: 1.6, display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <p style={{ margin: 0 }}>
+                <strong>MOSA Philanthropy &amp; Giving</strong> is the official channel through which alumni, well-wishers, and partners voluntarily support the development of Mandela Secondary School Hoima.
+              </p>
+
+              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', color: '#64748B', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.25rem' }}>
+                  Verified Transparency Standard
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#0F172A' }}>
+                  Every contribution is reconciled by the MOSA Treasury with official Mobile Money &amp; Bank statements. Once verified, a signed digital receipt and permanent audit record are issued.
+                </div>
+              </div>
+
+              {/* Verified Metrics Snapshot */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem' }}>
+                <div style={{ background: '#ECFDF5', borderRadius: '8px', padding: '0.75rem', border: '1px solid #A7F3D0' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#047857', fontWeight: 600 }}>Total Verified Funds</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#065F46', marginTop: '2px' }}>
+                    {financialStats ? formatUGX(financialStats.totalVerifiedAmount) : 'UGX 0'}
+                  </div>
+                </div>
+
+                <div style={{ background: '#FEF3C7', borderRadius: '8px', padding: '0.75rem', border: '1px solid #FDE68A' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#92400E', fontWeight: 600 }}>Verified Receipts Issued</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#78350F', marginTop: '2px' }}>
+                    {financialStats?.verifiedCount || 0} Receipts
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: '0.85rem', color: '#475569' }}>
+                <strong>Project Allocation Areas:</strong>
+                <ul style={{ paddingLeft: '1.25rem', marginTop: '0.35rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <li>Science and computer laboratory equipment upgrades</li>
+                  <li>Academic scholarships and underprivileged student bursaries</li>
+                  <li>Sports pavilion and co-curricular facility development</li>
+                  <li>Alumni mentorship and career development programs</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ marginTop: '1.25rem', paddingTop: '0.75rem', borderTop: '1px solid #F1F5F9', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setIsAboutOpen(false)}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  borderRadius: '8px',
+                  background: '#0A271B',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
