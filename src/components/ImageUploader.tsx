@@ -223,7 +223,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           </div>
 
           <div style={{ flex: 1, minWidth: '180px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#16A34A', fontSize: '0.8rem', fontWeight: 700 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#166534', fontSize: '0.8rem', fontWeight: 700 }}>
               <CheckCircle2 size={15} />
               <span>Image Attached & Ready</span>
             </div>

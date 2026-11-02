@@ -225,12 +225,12 @@ export const PaymentsHub: React.FC<Props> = ({ currentUser, onOpenAuth, onBack }
       
       {/* Hero / Executive Metrics Header */}
       <div style={{ 
-        background: 'linear-gradient(135deg, #15803D 0%, #16A34A 60%, #22C55E 100%)', 
+        background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)', 
         borderRadius: '16px', 
         padding: '2rem', 
         color: '#FFFFFF',
         marginBottom: '2rem',
-        boxShadow: '0 10px 25px -5px rgba(22, 163, 74, 0.3)'
+        boxShadow: '0 10px 25px -5px rgba(22, 101, 52, 0.3)'
       }}>
         {onBack && (
           <button

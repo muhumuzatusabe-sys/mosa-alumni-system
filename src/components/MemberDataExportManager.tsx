@@ -150,7 +150,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
       {/* Filters Card */}
       <div
         style={{
-          background: 'rgba(22, 163, 74, 0.7)',
+          background: 'rgba(22, 101, 52, 0.7)',
           border: '1.5px solid rgba(255, 255, 255, 0.12)',
           borderRadius: '14px',
           padding: '1.5rem',
@@ -290,7 +290,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 1: Excel (.xlsx) */}
         <div
           style={{
-            background: 'rgba(22, 163, 74, 0.7)',
+            background: 'rgba(22, 101, 52, 0.7)',
             border: '1.5px solid rgba(5, 150, 105, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',
@@ -347,7 +347,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 2: CSV (.csv) */}
         <div
           style={{
-            background: 'rgba(22, 163, 74, 0.7)',
+            background: 'rgba(22, 101, 52, 0.7)',
             border: '1.5px solid rgba(217, 119, 6, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',
@@ -404,7 +404,7 @@ export const MemberDataExportManager: React.FC<MemberDataExportManagerProps> = (
         {/* Card 3: Executive PDF (.pdf) */}
         <div
           style={{
-            background: 'rgba(22, 163, 74, 0.7)',
+            background: 'rgba(22, 101, 52, 0.7)',
             border: '1.5px solid rgba(236, 72, 153, 0.4)',
             borderRadius: '14px',
             padding: '1.5rem',

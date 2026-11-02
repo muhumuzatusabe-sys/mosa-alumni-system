@@ -6337,7 +6337,7 @@ export const dataService = {
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
     // Brand Header banner
-    doc.setFillColor(22, 163, 74); // #15803D
+    doc.setFillColor(22, 101, 52); // #15803D
     doc.rect(0, 0, 297, 26, 'F');
 
     // Title

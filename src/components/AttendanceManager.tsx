@@ -233,7 +233,7 @@ export const AttendanceManager: React.FC<Props> = ({ currentUser }) => {
         {meeting.attendanceState === 'OPEN' && (
           <div style={{ marginTop: '0.85rem', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '8px', padding: '0.65rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.82rem', color: '#166534' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16A34A', display: 'inline-block', boxShadow: '0 0 8px #16A34A' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#166534', display: 'inline-block', boxShadow: '0 0 8px #166534' }} />
               <strong>Live Member Roll Call Active:</strong> Members can check in from their mobile phones or computers on the Attendance page.
             </div>
             <span style={{ fontSize: '0.75rem', color: '#15803D' }}>Real-time synchronization enabled</span>

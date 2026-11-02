@@ -3,22 +3,12 @@ import {
   Users, 
   Award, 
   Coins, 
-  Bell, 
-  CheckCircle2, 
-  ArrowRight, 
-  ChevronRight, 
-  MapPin, 
   HeartHandshake, 
-  TrendingUp,
   Receipt,
-  QrCode,
   ClipboardCheck,
-  ShieldCheck,
-  Menu,
   Clock,
   UserPlus,
-  GraduationCap,
-  Lock
+  GraduationCap
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -28,7 +18,6 @@ import {
   PaymentTransaction 
 } from '../types';
 import { dataService } from '../services/dataService';
-import { isRegisteredAlumni } from '../services/governanceService';
 
 interface HomeViewProps {
   currentUser: AuthUser | null;
@@ -53,10 +42,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [userApplication, setUserApplication] = useState<AlumniApplication | null>(null);
   const [memberPayments, setMemberPayments] = useState<PaymentTransaction[]>([]);
   const [activeCampaigns, setActiveCampaigns] = useState<DonationCampaign[]>([]);
-  const [compactAlumni, setCompactAlumni] = useState<AlumniProfile[]>([]);
-  const [totalAlumniCount, setTotalAlumniCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const isRegistered = isRegisteredAlumni(currentUser);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -72,10 +58,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           dataService.getPayments(),
         ]);
 
-        const isRegistered = isRegisteredAlumni(currentUser);
         setActiveCampaigns(campaignsList.slice(0, 2));
-        setCompactAlumni(isRegistered ? alumniList.slice(0, 3) : []);
-        setTotalAlumniCount(alumniList.length);
 
         // Resolve current member profile
         let userProfile: AlumniProfile | null = null;
@@ -142,15 +125,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 1. COMPACT MEMBER IDENTITY & DIGITAL ALUMNI PASS               */}
       {/* ============================================================== */}
-      <section style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '100%' }}>
+      <section style={{ marginBottom: '0.75rem', width: '100%', maxWidth: '100%' }}>
         <div
           className="member-identity-card"
           style={{
-            background: 'linear-gradient(135deg, #16A34A 0%, #15803D 65%, #166534 100%)',
+            background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #14532D 100%)',
             borderRadius: '16px',
             padding: '1.25rem 1.4rem',
             color: '#FFFFFF',
-            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.22)',
+            boxShadow: '0 8px 24px rgba(22, 101, 52, 0.22)',
             border: '1.5px solid #F59E0B',
             display: 'flex',
             alignItems: 'center',
@@ -183,29 +166,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     src={memberProfile.photoUrl}
                     alt={memberProfile.firstName || 'MASSH Alumnus'}
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '2px solid #FBBF24',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                      border: '3.5px solid #FDE68A',
+                      boxShadow: '0 4px 18px rgba(0, 0, 0, 0.4)',
                     }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       background: 'linear-gradient(135deg, #D97706, #B45309)',
                       color: '#FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '1.25rem',
+                      fontSize: '1.9rem',
                       fontWeight: 800,
-                      border: '2px solid #FDE68A',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.35)',
+                      border: '3.5px solid #FDE68A',
+                      boxShadow: '0 4px 18px rgba(0, 0, 0, 0.4)',
                     }}
                   >
                     {`${memberProfile.firstName?.[0] || 'M'}${memberProfile.lastName?.[0] || 'A'}`}
@@ -218,9 +201,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 <h2
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.35rem',
                     color: '#FFFFFF',
-                    margin: '0.15rem 0 0.35rem 0',
+                    margin: '0.15rem 0 0.45rem 0',
                     fontWeight: 800,
                     letterSpacing: '-0.01em',
                     whiteSpace: 'nowrap',
@@ -236,45 +219,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     style={{
                       fontFamily: 'monospace',
                       fontWeight: 800,
-                      fontSize: '0.82rem',
-                      color: '#FDE68A',
-                      background: 'rgba(217, 119, 6, 0.25)',
-                      padding: '0.2rem 0.55rem',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(245, 158, 11, 0.4)',
+                      fontSize: '0.88rem',
+                      color: '#FEF08A',
+                      background: 'rgba(255, 255, 255, 0.15)',
+                      padding: '0.25rem 0.65rem',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(254, 240, 138, 0.4)',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.35rem',
                     }}
                   >
-                    <Award size={13} color="#FBBF24" />
+                    <Award size={14} color="#FBBF24" />
                     <span>{memberProfile.alumniNumber}</span>
                   </span>
-
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      color: '#D1FAE5',
-                      background: 'rgba(5, 150, 105, 0.3)',
-                      padding: '0.2rem 0.6rem',
-                      borderRadius: '999px',
-                      border: '1px solid rgba(16, 185, 129, 0.45)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                    }}
-                  >
-                    <CheckCircle2 size={12} color="#34D399" />
-                    <span>Verified Member</span>
-                  </span>
-
-                  {memberProfile.city && (
-                    <span style={{ fontSize: '0.75rem', color: '#94A3B8', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <MapPin size={12} color="#FBBF24" />
-                      <span>{`${memberProfile.city} Chapter`}</span>
-                    </span>
-                  )}
                 </div>
               </div>
             </>
@@ -299,30 +257,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     src={userPhoto}
                     alt={userApplication?.firstName || currentUser?.displayName || 'MASSH Member'}
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '2px dashed #FBBF24',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
+                      border: '3.5px dashed #FDE68A',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.35)',
                     }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: '58px',
-                      height: '58px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       background: 'rgba(245, 158, 11, 0.2)',
                       color: '#FCD34D',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      border: '2px dashed #FBBF24',
-                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.25)',
+                      border: '3.5px dashed #FDE68A',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <Clock size={24} />
+                    <Clock size={36} />
                   </div>
                 )}
               </div>
@@ -406,30 +364,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     src={userPhoto}
                     alt={currentUser?.displayName || 'MASSH Member'}
                     style={{
-                      width: '62px',
-                      height: '62px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       objectFit: 'cover',
-                      border: '2.5px solid #FDE68A',
-                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.3)',
+                      border: '3.5px solid #FDE68A',
+                      boxShadow: '0 4px 18px rgba(0, 0, 0, 0.4)',
                     }}
                   />
                 ) : (
                   <div
                     style={{
-                      width: '62px',
-                      height: '62px',
+                      width: '92px',
+                      height: '92px',
                       borderRadius: '50%',
                       background: 'rgba(255, 255, 255, 0.12)',
                       color: '#FEF08A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      border: '2px solid rgba(254, 240, 138, 0.4)',
-                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)',
+                      border: '3.5px solid rgba(254, 240, 138, 0.5)',
+                      boxShadow: '0 4px 18px rgba(0, 0, 0, 0.3)',
                     }}
                   >
-                    <GraduationCap size={26} color="#FEF08A" />
+                    <GraduationCap size={36} color="#FEF08A" />
                   </div>
                 )}
               </div>
@@ -512,12 +470,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ============================================================== */}
       {/* 2. COMPACT QUICK ACTIONS                                       */}
       {/* ============================================================== */}
-      <section style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '100%' }}>
+      <section style={{ marginBottom: '0.75rem', width: '100%', maxWidth: '100%' }}>
         <div
           className="quick-actions-grid"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '0.65rem',
             width: '100%',
             maxWidth: '100%',
@@ -539,7 +497,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -563,10 +521,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Coins size={16} />
             </div>
             <span>Donations</span>
@@ -587,7 +545,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#E8F5E9', color: '#2E7D32', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -611,7 +569,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               fontSize: '0.85rem',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.03)',
+              boxShadow: '0 1px 4px rgba(22, 101, 52, 0.03)',
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -623,381 +581,150 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* ============================================================== */}
-      {/* 3. PRIMARY ONE-PAGE GRID: DONATIONS & GIVING + REGISTRY        */}
+      {/* 3. PRIMARY ONE-PAGE SECTION: DONATIONS & GIVING (TERMINATING AT GIVING HISTORY) */}
       {/* ============================================================== */}
       <section style={{ width: '100%', maxWidth: '100%' }}>
-        <div className="home-primary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
-          
-          {/* ------------------------------------------------------------ */}
-          {/* SECTION A: DONATIONS & GIVING (VOLUNTARY, COMPACT)           */}
-          {/* ------------------------------------------------------------ */}
-          <div
-            className="mosa-card home-card"
-            style={{
-              padding: '1.25rem',
-              borderRadius: '14px',
-              background: '#FFFFFF',
-              border: '1px solid #E5DFD1',
-              boxShadow: '0 3px 10px rgba(22, 163, 74, 0.04)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              width: '100%',
-              maxWidth: '100%',
-              boxSizing: 'border-box',
-              overflow: 'hidden',
+        <div
+          className="mosa-card home-card"
+          style={{
+            padding: '1.15rem 1.25rem',
+            borderRadius: '14px',
+            background: '#FFFFFF',
+            border: '1px solid #E5DFD1',
+            boxShadow: '0 3px 10px rgba(22, 101, 52, 0.05)',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+              <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Coins size={18} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>
+                  Donations &amp; Giving
+                </h3>
+                <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
+                  Voluntary alumni philanthropy &amp; projects
+                </div>
+              </div>
+            </div>
+            
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803D', background: '#DCFCE7', padding: '0.2rem 0.55rem', borderRadius: '999px', border: '1px solid #BBF7D0' }}>
+              Contributions
+            </span>
+          </div>
+
+          {/* Total Contributions Snippet */}
+          <div 
+            style={{ 
+              background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #14532D 100%)', 
+              borderRadius: '10px', 
+              padding: '0.85rem 1rem', 
+              color: '#FFFFFF',
+              marginBottom: '0.85rem',
+              boxShadow: '0 4px 12px rgba(22, 101, 52, 0.16)',
             }}
           >
-            <div>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Coins size={18} />
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>
-                      Donations &amp; Giving
-                    </h3>
-                    <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
-                      Voluntary alumni philanthropy &amp; projects
-                    </div>
-                  </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: '#D1FAE5', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+                  Verified Contributions to Date
                 </div>
-                
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803D', background: '#DCFCE7', padding: '0.15rem 0.5rem', borderRadius: '999px' }}>
-                  Contributions
-                </span>
-              </div>
-
-              {/* Total Contributions Snippet */}
-              <div 
-                style={{ 
-                  background: 'linear-gradient(135deg, #16A34A 0%, #22C55E 100%)', 
-                  borderRadius: '10px', 
-                  padding: '0.9rem 1rem', 
-                  color: '#FFFFFF',
-                  marginBottom: '0.85rem',
-                  boxShadow: '0 4px 12px rgba(22, 163, 74, 0.15)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '0.68rem', color: '#D1FAE5', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-                      Verified Contributions to Date
-                    </div>
-                    <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FDE68A', margin: '0.1rem 0' }}>
-                      UGX {totalVerifiedGiving.toLocaleString()}
-                    </div>
-                  </div>
-
-                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D1FAE5', background: 'rgba(22, 163, 74, 0.35)', padding: '0.2rem 0.55rem', borderRadius: '6px' }}>
-                    {totalVerifiedGiving > 0 ? 'Active Contributor' : 'Verified Member'}
-                  </span>
+                <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#FDE68A', margin: '0.1rem 0' }}>
+                  UGX {totalVerifiedGiving.toLocaleString()}
                 </div>
               </div>
 
-              {/* Active Project Progress */}
-              {featuredCampaign ? (
-                <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E5DFD1', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0B271C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {featuredCampaign.title}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#C68A24', flexShrink: 0 }}>
-                      {campaignPercent}%
-                    </span>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div style={{ width: '100%', height: '6px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
-                    <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #16A34A, #C68A24)', borderRadius: '999px' }} />
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.25rem' }}>
-                    <span>Raised: UGX {featuredCampaign.raisedAmount.toLocaleString()}</span>
-                    <span>Goal: UGX {featuredCampaign.targetAmount.toLocaleString()}</span>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.85rem', border: '1px solid #E5DFD1', marginBottom: '1rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.2rem' }}>
-                    No Active Campaigns
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
-                    School development and project campaigns will appear here.
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="home-giving-actions" style={{ display: 'flex', gap: '0.55rem' }}>
-              <button
-                onClick={() => onNavigate('payments')}
-                style={{
-                  flex: 1,
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '8px',
-                  background: 'linear-gradient(135deg, #059669, #047857)',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.82rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.4rem',
-                }}
-              >
-                <HeartHandshake size={15} />
-                <span>Donate to Project</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('payments')}
-                style={{
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '8px',
-                  background: '#F1F5F9',
-                  color: '#0B203E',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  border: '1px solid #CBD5E1',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.3rem',
-                }}
-              >
-                <Receipt size={14} />
-                <span>Giving History</span>
-              </button>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#D1FAE5', background: 'rgba(255, 255, 255, 0.18)', padding: '0.25rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.25)' }}>
+                {totalVerifiedGiving > 0 ? 'Active Contributor' : 'Alumni Contributor'}
+              </span>
             </div>
           </div>
 
-          {/* ------------------------------------------------------------ */}
-          {/* SECTION B: COMPACT ALUMNI REGISTRY PREVIEW                   */}
-          {/* ------------------------------------------------------------ */}
-          <div
-            className="mosa-card home-card"
-            style={{
-              padding: '1.25rem',
-              borderRadius: '14px',
-              background: '#FFFFFF',
-              border: '1px solid #E5DFD1',
-              boxShadow: '0 3px 10px rgba(22, 163, 74, 0.04)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              width: '100%',
-              maxWidth: '100%',
-              boxSizing: 'border-box',
-              overflow: 'hidden',
-            }}
-          >
-            <div>
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', paddingBottom: '0.5rem', borderBottom: '1px solid #F2EFE6' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Users size={18} />
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>
-                      Alumni Registry
-                    </h3>
-                    <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
-                      {totalAlumniCount > 0 ? `${totalAlumniCount.toLocaleString()} verified scholars recorded` : 'No alumni registered yet'}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onNavigate('directory')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#C68A24',
-                    fontWeight: 700,
-                    fontSize: '0.78rem',
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                  }}
-                >
-                  <span>Directory</span>
-                  <ChevronRight size={14} />
-                </button>
+          {/* Active Project Progress */}
+          {featuredCampaign ? (
+            <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.75rem 0.9rem', border: '1px solid #E5DFD1', marginBottom: '0.9rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0B271C', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {featuredCampaign.title}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#C68A24', flexShrink: 0 }}>
+                  {campaignPercent}%
+                </span>
               </div>
-
-              {/* Compact 3-Member Preview / Registration Requirement Barrier */}
-              {!isRegistered ? (
-                <div style={{ textAlign: 'center', padding: '1.25rem 0.75rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8', marginBottom: '0.85rem' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.45rem auto' }}>
-                    <Lock size={18} />
-                  </div>
-                  <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#0B271C', marginBottom: '0.2rem' }}>
-                    Member Registry Protected
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#4B6354', lineHeight: 1.45, marginBottom: '0.75rem', maxWidth: '300px', margin: '0 auto 0.75rem auto' }}>
-                    Access to the alumni directory and member records is exclusively available to registered MASSH alumni.
-                  </div>
-                  <button
-                    onClick={onOpenRegister}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      background: '#16A34A',
-                      color: '#FFFFFF',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      padding: '0.45rem 0.9rem',
-                      borderRadius: '6px',
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <UserPlus size={14} />
-                    <span>Register as Alumnus</span>
-                  </button>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.85rem' }}>
-                  {compactAlumni.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '1.5rem 0.5rem', background: '#FAF7EE', borderRadius: '8px', border: '1px dashed #D3CAB8' }}>
-                      <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.25rem' }}>
-                        No alumni registered yet
-                      </div>
-                      <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                        Be the first Mandelian scholar to complete registration.
-                      </div>
-                    </div>
-                  ) : (
-                    compactAlumni.map((alumnus, idx) => {
-                      const fullName = `${alumnus.firstName} ${alumnus.lastName}`;
-                      const occupation = alumnus.occupation || 'Mandela Secondary School Alumnus';
-                      const alumniNo = alumnus.alumniNumber || `MA. 000${idx + 1}`;
-
-                      return (
-                        <div
-                          key={alumnus.internalId}
-                          onClick={() => onSelectAlumni ? onSelectAlumni(alumnus) : onNavigate('directory')}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.65rem',
-                            padding: '0.55rem 0.6rem',
-                            borderRadius: '8px',
-                            background: '#FAF7EE',
-                            border: '1px solid #E5DFD1',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease',
-                          }}
-                          title={`Tap to view full profile of ${fullName}`}
-                        >
-                          {alumnus.photoUrl ? (
-                            <img
-                              src={alumnus.photoUrl}
-                              alt={fullName}
-                              style={{
-                                width: '34px',
-                                height: '34px',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                border: '1.5px solid #D3CAB8',
-                                flexShrink: 0,
-                              }}
-                            />
-                          ) : (
-                            <div
-                              style={{
-                                width: '34px',
-                                height: '34px',
-                                borderRadius: '50%',
-                                background: '#16A34A',
-                                color: '#FDE68A',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 700,
-                                fontSize: '0.75rem',
-                                flexShrink: 0,
-                              }}
-                            >
-                              {alumnus.firstName[0]}{alumnus.lastName[0]}
-                            </div>
-                          )}
-
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 700, color: '#0B271C', fontSize: '0.84rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {fullName}
-                            </div>
-                            <div style={{ color: '#4B6354', fontSize: '0.72rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {occupation}
-                            </div>
-                          </div>
-
-                          <span
-                            style={{
-                              fontFamily: 'monospace',
-                              fontWeight: 800,
-                              fontSize: '0.75rem',
-                              color: '#B45309',
-                              background: '#FFFBEB',
-                              padding: '0.15rem 0.45rem',
-                              borderRadius: '5px',
-                              border: '1px solid #FDE68A',
-                              flexShrink: 0,
-                            }}
-                          >
-                            {alumniNo}
-                          </span>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              )}
+              
+              {/* Progress Bar */}
+              <div style={{ width: '100%', height: '7px', background: '#E5DFD1', borderRadius: '999px', overflow: 'hidden' }}>
+                <div style={{ width: `${campaignPercent}%`, height: '100%', background: 'linear-gradient(90deg, #15803D, #C68A24)', borderRadius: '999px' }} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#4B6354', marginTop: '0.3rem' }}>
+                <span>Raised: UGX {featuredCampaign.raisedAmount.toLocaleString()}</span>
+                <span>Goal: UGX {featuredCampaign.targetAmount.toLocaleString()}</span>
+              </div>
             </div>
+          ) : (
+            <div style={{ background: '#FAF7EE', borderRadius: '10px', padding: '0.85rem', border: '1px solid #E5DFD1', marginBottom: '0.9rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0B271C', marginBottom: '0.15rem' }}>
+                No Active Campaigns
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#4B6354' }}>
+                School development and project campaigns will appear here.
+              </div>
+            </div>
+          )}
 
-            {/* Bottom Registry Action */}
+          {/* Action Buttons: Donate to Project & Giving History (Final Element on Homepage) */}
+          <div className="home-giving-actions" style={{ display: 'flex', gap: '0.6rem' }}>
             <button
-              onClick={() => onNavigate('directory')}
+              onClick={() => onNavigate('payments')}
               style={{
-                width: '100%',
-                padding: '0.65rem 0.85rem',
+                flex: 1,
+                padding: '0.7rem 0.9rem',
                 borderRadius: '8px',
-                background: '#16A34A',
+                background: 'linear-gradient(135deg, #15803D, #166534)',
                 color: '#FFFFFF',
                 fontWeight: 700,
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem',
-                boxShadow: '0 2px 6px rgba(22, 163, 74, 0.25)',
+                gap: '0.45rem',
+                boxShadow: '0 2px 6px rgba(22, 101, 52, 0.25)',
               }}
             >
-              {isRegistered ? (
-                <>
-                  <span>Explore Complete Registry</span>
-                  <ArrowRight size={14} color="#FDE68A" />
-                </>
-              ) : (
-                <>
-                  <Lock size={14} color="#FDE68A" />
-                  <span>Alumni Registry (Registration Required)</span>
-                </>
-              )}
+              <HeartHandshake size={16} />
+              <span>Donate to Project</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('payments')}
+              style={{
+                flex: 1,
+                padding: '0.7rem 0.9rem',
+                borderRadius: '8px',
+                background: '#F8FAFC',
+                color: '#0F172A',
+                fontWeight: 600,
+                fontSize: '0.84rem',
+                border: '1px solid #CBD5E1',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              <Receipt size={15} color="#475569" />
+              <span>Giving History</span>
             </button>
           </div>
-
         </div>
       </section>
 

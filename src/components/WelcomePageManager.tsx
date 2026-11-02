@@ -427,7 +427,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
       )}
 
       {/* Main Settings Form */}
-      <div style={{ background: 'rgba(22, 163, 74, 0.7)', border: '1.5px solid rgba(255, 255, 255, 0.12)', borderRadius: '14px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ background: 'rgba(22, 101, 52, 0.7)', border: '1.5px solid rgba(255, 255, 255, 0.12)', borderRadius: '14px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         
         {/* Row 1: Slogan & Main Heading */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
@@ -1172,7 +1172,7 @@ export const WelcomePageManager: React.FC<WelcomePageManagerProps> = ({
             </div>
 
             {/* Render hero preview */}
-            <div style={{ background: 'radial-gradient(ellipse at top, #16A34A 0%, #15803D 65%, #166534 100%)', padding: '2rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.12)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'center' }}>
+            <div style={{ background: 'radial-gradient(ellipse at top, #166534 0%, #15803D 65%, #166534 100%)', padding: '2rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.12)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'center' }}>
               <div>
                 <div style={{ display: 'inline-flex', background: 'rgba(236, 72, 153, 0.2)', border: '1px solid rgba(244, 63, 94, 0.4)', padding: '0.25rem 0.75rem', borderRadius: '999px', color: '#FDA4AF', fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
                   {slogan}

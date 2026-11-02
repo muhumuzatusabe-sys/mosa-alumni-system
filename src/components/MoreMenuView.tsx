@@ -127,11 +127,11 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
       {/* 1. INSTITUTIONAL PAGE HEADER */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
           borderRadius: '16px',
           padding: '1.5rem',
           color: '#FFFFFF',
-          boxShadow: '0 8px 24px rgba(22, 163, 74, 0.25)',
+          boxShadow: '0 8px 24px rgba(22, 101, 52, 0.25)',
           marginBottom: '1.5rem',
           display: 'flex',
           alignItems: 'center',
@@ -165,7 +165,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
           borderRadius: '14px',
           border: '1.5px solid #86EFAC',
           padding: '1.25rem',
-          boxShadow: '0 4px 16px rgba(22, 163, 74, 0.08)',
+          boxShadow: '0 4px 16px rgba(22, 101, 52, 0.08)',
           marginBottom: '1.5rem'
         }}
       >
@@ -180,7 +180,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   height: '54px',
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  border: '2px solid #16A34A',
+                  border: '2px solid #166534',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}
                 onError={(e) => {
@@ -199,7 +199,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.25rem' }}>
-                  <Award size={14} color="#16A34A" />
+                  <Award size={14} color="#166534" />
                   <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#15803D' }}>
                     ALUMNI NO.: {memberNumber}
                   </span>
@@ -215,7 +215,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 alignItems: 'center',
                 gap: '0.45rem',
                 background: '#ECFDF5',
-                border: '1.5px solid #16A34A',
+                border: '1.5px solid #166534',
                 color: '#15803D',
                 fontWeight: 700,
                 fontSize: '0.85rem',
@@ -247,7 +247,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.4rem',
-                  background: '#16A34A',
+                  background: '#166534',
                   color: '#FFFFFF',
                   fontWeight: 700,
                   fontSize: '0.82rem',
@@ -268,7 +268,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   alignItems: 'center',
                   gap: '0.4rem',
                   background: '#F0FDF4',
-                  color: '#16A34A',
+                  color: '#166534',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   padding: '0.5rem 0.9rem',
@@ -307,7 +307,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: '#DCFCE7', padding: '0.45rem', borderRadius: '8px', color: '#16A34A' }}>
+              <div style={{ background: '#DCFCE7', padding: '0.45rem', borderRadius: '8px', color: '#166534' }}>
                 <Edit3 size={18} />
               </div>
               <div>
@@ -319,7 +319,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 </div>
               </div>
             </div>
-            {expandedSections.registry ? <ChevronUp size={18} color="#16A34A" /> : <ChevronDown size={18} color="#16A34A" />}
+            {expandedSections.registry ? <ChevronUp size={18} color="#166534" /> : <ChevronDown size={18} color="#166534" />}
           </button>
 
           {expandedSections.registry && (
@@ -330,7 +330,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Sparkles size={16} color="#16A34A" />
+                  <Sparkles size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>MOSA Dashboard & Overview</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Primary association hub and active summary</div>
@@ -345,7 +345,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <GraduationCap size={16} color="#16A34A" />
+                  <GraduationCap size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Welcome & Association Orientation</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Introduction to Mandela Secondary School alumni body</div>
@@ -360,7 +360,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Users size={16} color="#16A34A" />
+                  <Users size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                       <span>Alumni Directory & Member Search</span>
@@ -382,7 +382,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Award size={16} color="#16A34A" />
+                  <Award size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Membership Categories & Rights</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Ordinary, Associate, Life & Honorary membership guide</div>
@@ -574,7 +574,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <CheckCircle2 size={16} color="#16A34A" />
+                  <CheckCircle2 size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Roll Call & Assembly Sign-In</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Self check-in for physical & online alumni reunions</div>
@@ -688,7 +688,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <GraduationCap size={16} color="#16A34A" />
+                  <GraduationCap size={16} color="#166534" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>About Mandela SS & MOSA History</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Founded in 1997, motto "Caring to Achieve" & executive committee</div>
@@ -790,7 +790,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               gap: '0.65rem',
               padding: '0.85rem 1.25rem',
               background: '#F0FDF4',
-              color: '#16A34A',
+              color: '#166534',
               border: '1.5px solid #86EFAC',
               borderRadius: '12px',
               fontSize: '0.92rem',
@@ -799,7 +799,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               transition: 'all 0.2s ease'
             }}
           >
-            <LogIn size={18} color="#16A34A" />
+            <LogIn size={18} color="#166534" />
             <span>Sign In to Your Account</span>
           </button>
         )}

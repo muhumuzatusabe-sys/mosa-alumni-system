@@ -15,6 +15,12 @@ node ./scripts/copy-assets.js
 node ./scripts/run-build.js
 $buildCode = $LASTEXITCODE
 
+if ($buildCode -ne 0 -or -not (Test-Path "dist\assets")) {
+    Write-Host "Attempting fallback: npx vite build..." -ForegroundColor Yellow
+    npx vite build
+    $buildCode = $LASTEXITCODE
+}
+
 Write-Host ""
 Write-Host "--- BUILD STAGES LOG (Exit code: $buildCode) ---" -ForegroundColor Yellow
 if (Test-Path "build_stages.txt") {
@@ -54,7 +60,7 @@ if (-not $deployed) {
 Write-Host ""
 Write-Host "[3/3] Committing & pushing to GitHub..." -ForegroundColor Cyan
 git add .
-git commit -m "fix(build): resolve duplicate variable declaration in governanceService and optimize portal panel"
+git commit -m "feat(ui): limit homepage content up to giving history and optimize layout fit"
 git push origin main
 
 Write-Host ""

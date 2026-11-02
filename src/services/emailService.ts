@@ -139,7 +139,7 @@ export const dispatchEmail = async (params: {
 
   console.info(
     `%c[MOSA EMAIL SERVICE] Initiating dispatch [${params.category}] to ${cleanEmail}`,
-    'background: #16A34A; color: #FCD34D; font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: bold;'
+    'background: #166534; color: #FCD34D; font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: bold;'
   );
 
   // 1. Try Official Gmail SMTP dispatch via secure cloud relay
@@ -482,7 +482,7 @@ const buildEmailTemplate = (contentHtml: string): string => {
     <body style="margin: 0; padding: 20px 10px; background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <div style="max-width: 600px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06);">
         <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, #16A34A 0%, #15803D 100%); padding: 24px; text-align: center; color: #FFFFFF;">
+        <div style="background: linear-gradient(135deg, #166534 0%, #15803D 100%); padding: 24px; text-align: center; color: #FFFFFF;">
           <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #FCD34D; font-weight: 700; margin-bottom: 4px;">
             Mandela Old Students Association
           </div>
@@ -591,7 +591,7 @@ export const sendApplicationReceivedEmail = async (
       <div style="font-size: 12px; color: #065F46; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
         Application Reference Number
       </div>
-      <div style="font-size: 24px; font-weight: 800; font-family: monospace; color: #16A34A; margin-top: 6px;">
+      <div style="font-size: 24px; font-weight: 800; font-family: monospace; color: #166534; margin-top: 6px;">
         ${referenceId}
       </div>
       <div style="font-size: 12px; color: #475569; margin-top: 6px;">
@@ -620,7 +620,7 @@ export const sendApplicationReceivedEmail = async (
     </p>
 
     <div style="margin-top: 24px; text-align: center;">
-      <a href="https://mtech-46634.web.app" style="display: inline-block; background: #16A34A; color: #FFFFFF; font-weight: 700; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 8px;">
+      <a href="https://mtech-46634.web.app" style="display: inline-block; background: #166534; color: #FFFFFF; font-weight: 700; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 8px;">
         Open MOSA Alumni Portal
       </a>
     </div>
@@ -658,7 +658,7 @@ export const sendMembershipApprovalEmail = async (
       We are delighted to welcome you to the official alumni register of the <strong>Mandela Old Students Association (MOSA)</strong>! Your membership has been officially approved.
     </p>
 
-    <div style="background: linear-gradient(135deg, #15803D 0%, #16A34A 100%); border: 2px solid #D97706; border-radius: 14px; padding: 22px; margin: 24px 0; text-align: center; color: #FFFFFF;">
+    <div style="background: linear-gradient(135deg, #15803D 0%, #166534 100%); border: 2px solid #D97706; border-radius: 14px; padding: 22px; margin: 24px 0; text-align: center; color: #FFFFFF;">
       <div style="font-size: 12px; color: #FCD34D; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
         Permanent MOSA Membership Number
       </div>

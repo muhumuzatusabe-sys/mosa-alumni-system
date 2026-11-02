@@ -452,7 +452,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
       >
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 60%, #22C55E 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
           color: '#ffffff',
           padding: '1.25rem 1.75rem',
           borderBottom: '3px solid #C68A24',
@@ -667,12 +667,12 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
               <div style={{
                 maxWidth: '480px',
                 margin: '0 auto 1.75rem auto',
-                background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
+                background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
                 color: '#FFFFFF',
                 borderRadius: '16px',
                 padding: '1.5rem',
                 textAlign: 'center',
-                boxShadow: '0 12px 24px -6px rgba(22, 163, 74, 0.35)',
+                boxShadow: '0 12px 24px -6px rgba(22, 101, 52, 0.35)',
                 border: '1.5px solid #C68A24'
               }}>
                 {successInfo.alumniNumber ? (
@@ -863,7 +863,7 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
                         height: '42px',
                         borderRadius: '50%',
                         background: '#DCFCE7',
-                        color: '#16A34A',
+                        color: '#166534',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

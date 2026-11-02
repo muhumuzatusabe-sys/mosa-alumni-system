@@ -816,14 +816,14 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       {/* Top Administrative Header Bar */}
       <header 
         style={{
-          background: 'linear-gradient(135deg, #16A34A 0%, #15803D 60%, #166534 100%)',
+          background: 'linear-gradient(135deg, #166534 0%, #15803D 60%, #166534 100%)',
           color: '#FFFFFF',
           borderBottom: '3px solid #C68A24',
           padding: '1.25rem 1.5rem',
           position: 'sticky',
           top: 0,
           zIndex: 90,
-          boxShadow: '0 4px 20px rgba(22, 163, 74, 0.25)',
+          boxShadow: '0 4px 20px rgba(22, 101, 52, 0.25)',
         }}
       >
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -904,7 +904,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1.5px solid #16A34A',
+                    border: '1.5px solid #166534',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
                   }}
                 >
@@ -1450,11 +1450,11 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
             {/* Header Greeting Banner */}
             <div style={{
-              background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
+              background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
               borderRadius: '16px',
               padding: '1.75rem 2rem',
               color: '#FFFFFF',
-              boxShadow: '0 8px 24px rgba(22, 163, 74, 0.25)',
+              boxShadow: '0 8px 24px rgba(22, 101, 52, 0.25)',
               border: '1px solid rgba(251, 191, 36, 0.2)',
               display: 'flex',
               justifyContent: 'space-between',
@@ -2610,7 +2610,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
                       <div style={{ flexShrink: 0 }}>
                         {isEnabled ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#16A34A', fontWeight: 700, fontSize: '0.85rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#166534', fontWeight: 700, fontSize: '0.85rem' }}>
                             <ToggleRight size={28} />
                             <span>ON</span>
                           </div>
@@ -2839,7 +2839,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       </div>
                       <div style={{ flexShrink: 0 }}>
                         {strat.value ? (
-                          <ToggleRight size={26} color="#16A34A" />
+                          <ToggleRight size={26} color="#166534" />
                         ) : (
                           <ToggleLeft size={26} color="#94A3B8" />
                         )}
@@ -3121,7 +3121,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                                   style={{
                                     background: 'none',
                                     border: '1px solid #CBD5E1',
-                                    color: account.active !== false ? '#DC2626' : '#16A34A',
+                                    color: account.active !== false ? '#DC2626' : '#166534',
                                     borderRadius: '6px',
                                     padding: '0.35rem 0.65rem',
                                     cursor: 'pointer',
@@ -4259,7 +4259,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             left: 0, 
             right: 0, 
             bottom: 0, 
-            background: 'rgba(22, 163, 74, 0.75)', 
+            background: 'rgba(22, 101, 52, 0.75)', 
             backdropFilter: 'blur(5px)',
             display: 'flex', 
             alignItems: 'center', 
@@ -4282,7 +4282,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
             {/* Modal Header */}
             <div 
               style={{ 
-                background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)', 
+                background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)', 
                 borderBottom: '3px solid #D97706', 
                 padding: '1.5rem', 
                 color: '#FFFFFF',

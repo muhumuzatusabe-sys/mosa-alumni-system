@@ -251,7 +251,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
         justifyContent: 'center',
         alignItems: 'center',
         padding: '1.5rem 1rem',
-        background: 'radial-gradient(ellipse at top, #16A34A 0%, #15803D 60%, #166534 100%)',
+        background: 'radial-gradient(ellipse at top, #166534 0%, #15803D 60%, #166534 100%)',
         position: 'relative',
         boxSizing: 'border-box',
       }}
@@ -263,7 +263,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.08) 0%, rgba(22, 163, 74, 0) 70%)',
+          background: 'radial-gradient(circle, rgba(198, 138, 36, 0.08) 0%, rgba(22, 101, 52, 0) 70%)',
           top: '10%',
           pointerEvents: 'none',
         }}
@@ -287,7 +287,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
         {/* Card Header Branding */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
+            background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
             padding: '2rem 1.75rem 1.75rem 1.75rem',
             textAlign: 'center',
             color: '#FFFFFF',
@@ -525,7 +525,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#16A34A')}
+                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                     </div>
@@ -571,7 +571,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#16A34A')}
+                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                       <button
@@ -632,7 +632,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           boxSizing: 'border-box',
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={(e) => (e.target.style.borderColor = '#16A34A')}
+                        onFocus={(e) => (e.target.style.borderColor = '#166534')}
                         onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                       />
                       <button
@@ -663,7 +663,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.85rem',
-                      background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                      background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '10px',
@@ -740,7 +740,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     <div style={{ fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
                       We sent a 6-digit confirmation code to:
                     </div>
-                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#16A34A', marginTop: '0.15rem' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#166534', marginTop: '0.15rem' }}>
                       {email}
                     </div>
 
@@ -773,7 +773,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                           style={{
                             width: '100%',
                             padding: '0.55rem 0.75rem',
-                            background: '#16A34A',
+                            background: '#166534',
                             color: '#FCD34D',
                             border: 'none',
                             borderRadius: '8px',
@@ -859,7 +859,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       style={{
                         width: '100%',
                         padding: '0.85rem',
-                        border: '2px solid #16A34A',
+                        border: '2px solid #166534',
                         borderRadius: '10px',
                         fontSize: '1.4rem',
                         fontWeight: 800,
@@ -880,7 +880,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                     style={{
                       width: '100%',
                       padding: '0.85rem',
-                      background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                      background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: '10px',
@@ -991,7 +991,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       outline: 'none',
                       boxSizing: 'border-box',
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#16A34A')}
+                    onFocus={(e) => (e.target.style.borderColor = '#166534')}
                     onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                   />
                 </div>
@@ -1047,7 +1047,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                       outline: 'none',
                       boxSizing: 'border-box',
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = '#16A34A')}
+                    onFocus={(e) => (e.target.style.borderColor = '#166534')}
                     onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                   />
                   <button
@@ -1079,7 +1079,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                   width: '100%',
                   marginTop: '0.75rem',
                   padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                  background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',
@@ -1186,7 +1186,7 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
                 style={{
                   width: '100%',
                   padding: '0.85rem',
-                  background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                  background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',

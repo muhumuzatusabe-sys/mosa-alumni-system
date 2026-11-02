@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthUser, ModuleSettings, AlumniProfile } from '../types';
 import { isStaffRole } from '../services/governanceService';
 import { dataService } from '../services/dataService';
@@ -91,35 +91,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => { isMounted = false; };
   }, [currentUser]);
 
-  // Scroll detection: disappear when one scrolls down, reappear at top or when scrolling up
-  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-  const prevScrollY = useRef(0);
-
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.pageYOffset || document.documentElement.scrollTop;
-          
-          // If scrolled down past 35px and continuing downward -> disappear!
-          if (currentY > 35 && currentY > prevScrollY.current + 5) {
-            setIsHeaderHidden(true);
-          } else if (currentY < prevScrollY.current - 10 || currentY <= 15) {
-            // Scrolling upward or back at the very top -> reappear
-            setIsHeaderHidden(false);
-          }
-          prevScrollY.current = Math.max(0, currentY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const handleTabClick = (tabKey: string) => {
     setCurrentTab(tabKey);
   };
@@ -148,52 +119,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
 
   return (
-    <header 
-      className={`mosa-header ${isHeaderHidden ? 'header-hidden' : ''}`} 
-      style={{ 
-        position: 'sticky', 
-        top: 0, 
-        zIndex: 1100,
-        transform: isHeaderHidden ? 'translateY(-100%)' : 'translateY(0)',
-        opacity: isHeaderHidden ? 0 : 1,
-        pointerEvents: isHeaderHidden ? 'none' : 'auto',
-        transition: 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease',
-      }}
-    >
+    <header className="mosa-header" style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
       <div className="mosa-nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', padding: '0.65rem 1.25rem' }}>
-        {/* Left: [MENU] Toggle Button matching screenshot format + Official School Crest */}
+        {/* Left: Official School Crest linking to Home */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
-          <button
-            onClick={() => handleTabClick(currentTab === 'more' ? 'home' : 'more')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.45rem 0.8rem',
-              borderRadius: '7px',
-              fontWeight: 700,
-              fontSize: '0.82rem',
-              letterSpacing: '0.04em',
-              color: currentTab === 'more' ? '#FFFFFF' : '#15803D',
-              background: currentTab === 'more' ? '#16A34A' : '#FFFFFF',
-              border: '1.5px solid #16A34A',
-              boxShadow: '0 1px 4px rgba(22, 163, 74, 0.15)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            aria-expanded={currentTab === 'more'}
-            aria-label="Navigation Menu"
-          >
-            <Menu size={16} color={currentTab === 'more' ? '#FFFFFF' : '#15803D'} strokeWidth={2.5} />
-            <span style={{ fontWeight: 800 }}>MENU</span>
-          </button>
-
           <div
             onClick={() => handleTabClick('home')}
             style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '0.4rem' }}
             title="Mandela Secondary School Hoima"
           >
-            <MosaLogo size={32} />
+            <MosaLogo size={36} />
           </div>
         </div>
 
@@ -286,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1.5px solid #16A34A',
+                  border: '1.5px solid #166534',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
                 }}
               >

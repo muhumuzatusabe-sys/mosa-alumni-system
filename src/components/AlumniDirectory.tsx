@@ -108,13 +108,13 @@ export const AlumniDirectory: React.FC<Props> = ({
         {/* Registry Heading with Back button */}
         <div 
           style={{
-            background: 'linear-gradient(135deg, #15803D 0%, #16A34A 65%, #22C55E 100%)',
+            background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #15803D 100%)',
             borderRadius: '16px',
             padding: '1.75rem 2rem',
             color: '#ffffff',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 8px 20px rgba(22, 163, 74, 0.16)',
+            boxShadow: '0 8px 20px rgba(22, 101, 52, 0.16)',
             border: '1.5px solid rgba(198, 138, 36, 0.35)',
             display: 'flex',
             flexWrap: 'wrap',
@@ -232,7 +232,7 @@ export const AlumniDirectory: React.FC<Props> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.5rem',
-                background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+                background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
                 color: '#FFFFFF',
                 padding: '0.85rem 1.75rem',
                 borderRadius: '10px',
@@ -280,25 +280,25 @@ export const AlumniDirectory: React.FC<Props> = ({
             }}
           >
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <CheckCircle2 size={16} color="#166534" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div style={{ fontSize: '0.82rem', color: '#475569' }}>
                 <strong>Classmate Search:</strong> Reconnect with former classmates from O-Level & A-Level cohorts.
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <CheckCircle2 size={16} color="#166534" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div style={{ fontSize: '0.82rem', color: '#475569' }}>
                 <strong>Verified MA Number:</strong> Receive your permanent sequential alumni number.
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <CheckCircle2 size={16} color="#166534" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div style={{ fontSize: '0.82rem', color: '#475569' }}>
                 <strong>Official Pass:</strong> Unlock your official green digital alumni pass.
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-              <CheckCircle2 size={16} color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <CheckCircle2 size={16} color="#166534" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div style={{ fontSize: '0.82rem', color: '#475569' }}>
                 <strong>Notifications & Alerts:</strong> Receive community announcements, giving drives & events.
               </div>
@@ -315,13 +315,13 @@ export const AlumniDirectory: React.FC<Props> = ({
       {/* 4.1 Registry Heading */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 65%, #22C55E 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 65%, #15803D 100%)',
           borderRadius: '16px',
           padding: '1.75rem 2rem',
           color: '#ffffff',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 20px rgba(22, 163, 74, 0.16)',
+          boxShadow: '0 8px 20px rgba(22, 101, 52, 0.16)',
           border: '1.5px solid rgba(198, 138, 36, 0.35)',
           display: 'flex',
           flexWrap: 'wrap',
@@ -514,8 +514,8 @@ export const AlumniDirectory: React.FC<Props> = ({
                     fontSize: '0.8rem',
                     fontWeight: 600,
                     cursor: 'pointer',
-                    border: levelFilter === item.id ? '1px solid #16A34A' : '1px solid #E5DFD1',
-                    background: levelFilter === item.id ? '#16A34A' : '#FFFFFF',
+                    border: levelFilter === item.id ? '1px solid #166534' : '1px solid #E5DFD1',
+                    background: levelFilter === item.id ? '#166534' : '#FFFFFF',
                     color: levelFilter === item.id ? '#FFFFFF' : '#4B6354',
                   }}
                 >
@@ -641,7 +641,7 @@ export const AlumniDirectory: React.FC<Props> = ({
                       width: '46px', 
                       height: '46px', 
                       borderRadius: '50%', 
-                      background: 'linear-gradient(135deg, #0B203E 0%, #16A34A 100%)', 
+                      background: 'linear-gradient(135deg, #0B203E 0%, #166534 100%)', 
                       color: '#FDE68A', 
                       display: 'flex', 
                       alignItems: 'center', 

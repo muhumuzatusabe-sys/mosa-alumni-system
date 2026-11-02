@@ -126,7 +126,7 @@ export const PublicVerifyAlumniModal: React.FC<Props> = ({
       >
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 60%, #22C55E 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
           color: '#ffffff',
           padding: '1.25rem 1.5rem',
           borderBottom: '3px solid #C68A24',

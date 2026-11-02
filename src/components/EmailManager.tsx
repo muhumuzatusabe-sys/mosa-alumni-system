@@ -91,7 +91,7 @@ export const EmailManager: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)',
+        background: 'linear-gradient(135deg, #166534 0%, #15803D 100%)',
         color: '#FFFFFF',
         padding: '1.5rem',
         borderRadius: '14px',
@@ -454,7 +454,7 @@ export const EmailManager: React.FC = () => {
               <button
                 type="submit"
                 style={{
-                  background: '#16A34A',
+                  background: '#166534',
                   color: '#FFFFFF',
                   padding: '0.85rem 1.5rem',
                   borderRadius: '8px',

@@ -86,7 +86,7 @@ export const TreasurySettingsModal: React.FC<Props> = ({ isOpen, onClose, onUpda
         }}
       >
         <div style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
           color: '#ffffff',
           padding: '1.25rem 1.5rem',
           borderBottom: '3px solid #C68A24',

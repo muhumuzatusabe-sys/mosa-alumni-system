@@ -130,7 +130,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
       {secretariatContacts.length > 0 && (
         <div style={{ marginBottom: '3rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} />
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#166534', display: 'inline-block' }} />
             <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0B203E', margin: 0 }}>
               MOSA National Secretariat Officials &amp; Direct WhatsApp Desk
             </h2>
@@ -196,14 +196,14 @@ export const ContactView: React.FC<ContactViewProps> = ({ currentUser, onBack })
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.45rem',
-                      background: '#16A34A',
+                      background: '#166534',
                       color: '#FFFFFF',
                       padding: '0.55rem 1rem',
                       borderRadius: '8px',
                       fontWeight: 700,
                       fontSize: '0.84rem',
                       textDecoration: 'none',
-                      boxShadow: '0 2px 8px rgba(22, 163, 74, 0.25)',
+                      boxShadow: '0 2px 8px rgba(22, 101, 52, 0.25)',
                     }}
                   >
                     <MessageSquare size={16} />

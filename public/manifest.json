@@ -24,7 +24,7 @@
   ],
   "start_url": "/",
   "background_color": "#FFFFFF",
-  "theme_color": "#16A34A",
+  "theme_color": "#166534",
   "display": "standalone",
   "orientation": "portrait-primary",
   "categories": ["education", "community", "social"]

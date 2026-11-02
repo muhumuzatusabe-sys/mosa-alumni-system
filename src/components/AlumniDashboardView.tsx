@@ -170,11 +170,11 @@ export const AlumniDashboardView: React.FC<Props> = ({ currentUser, onOpenEditMo
       {/* 1. PERSONALIZED MEMBER PROFILE HEADER */}
       <div 
         style={{
-          background: 'linear-gradient(135deg, #15803D 0%, #16A34A 60%, #22C55E 100%)',
+          background: 'linear-gradient(135deg, #15803D 0%, #166534 60%, #15803D 100%)',
           borderRadius: '20px',
           padding: '1.75rem 2rem',
           color: '#ffffff',
-          boxShadow: '0 12px 28px rgba(22, 163, 74, 0.25)',
+          boxShadow: '0 12px 28px rgba(22, 101, 52, 0.25)',
           border: '1px solid rgba(198, 138, 36, 0.3)',
           position: 'relative',
           overflow: 'hidden'

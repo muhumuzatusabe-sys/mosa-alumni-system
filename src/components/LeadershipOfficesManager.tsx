@@ -326,7 +326,7 @@ export const LeadershipOfficesManager: React.FC<LeadershipOfficesManagerProps> =
             <div
               key={office.id}
               style={{
-                background: 'rgba(22, 163, 74, 0.7)',
+                background: 'rgba(22, 101, 52, 0.7)',
                 border: '1.5px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '12px',
                 padding: '1.25rem 1.5rem',
