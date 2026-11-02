@@ -552,18 +552,28 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               justifyContent: 'center',
               gap: '0.65rem',
               padding: '0.85rem 1.25rem',
-              background: '#FEF2F2',
-              color: '#DC2626',
-              border: '1.5px solid #FCA5A5',
+              background: '#FFFFFF',
+              color: '#334155',
+              border: '1.5px solid #E2E8F0',
               borderRadius: '12px',
               fontSize: '0.92rem',
-              fontWeight: 800,
+              fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: '0 2px 6px rgba(220, 38, 38, 0.08)'
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#F8FAFC';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+              e.currentTarget.style.color = '#0F172A';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#FFFFFF';
+              e.currentTarget.style.borderColor = '#E2E8F0';
+              e.currentTarget.style.color = '#334155';
             }}
           >
-            <LogOut size={18} color="#DC2626" />
+            <LogOut size={18} color="#475569" />
             <span>Sign Out ({currentUser.email || currentUser.displayName})</span>
           </button>
         ) : (
