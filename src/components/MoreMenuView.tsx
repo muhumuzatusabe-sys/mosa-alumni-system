@@ -172,8 +172,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Award size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Membership Categories &amp; Rights</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Ordinary, Associate, Life &amp; Honorary membership guide</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Official Membership &amp; Numbering</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Ordinary, Associate, Life &amp; Honorary tiers and ID number guide</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
