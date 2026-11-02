@@ -9,7 +9,6 @@ import {
 } from '../types';
 import { dataService } from '../services/dataService';
 import { 
-  Coins, 
   TrendingUp, 
   HeartHandshake, 
   CheckCircle, 

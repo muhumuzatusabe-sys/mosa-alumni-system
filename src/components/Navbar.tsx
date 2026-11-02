@@ -10,7 +10,6 @@ import {
   LogIn, 
   Award, 
   Calendar, 
-  Coins, 
   Bell, 
   FileText, 
   Mail, 
@@ -119,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
 
   return (
-    <header className="mosa-header" style={{ position: 'sticky', top: 0, zIndex: 1100 }}>
+    <header className="mosa-header" style={{ position: 'relative', zIndex: 1100 }}>
       <div className="mosa-nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', padding: '0.65rem 1.25rem' }}>
         {/* Left: Official School Crest linking to Home */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>

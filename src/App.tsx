@@ -453,8 +453,7 @@ export const App: React.FC = () => {
             style={{ 
               background: '#FFFFFF', 
               borderBottom: '1px solid #E5DFD1', 
-              position: 'sticky', 
-              top: 0, 
+              position: 'relative', 
               zIndex: 90,
               padding: '0.65rem 1.25rem',
               boxShadow: '0 2px 4px rgba(10, 39, 27, 0.04)'

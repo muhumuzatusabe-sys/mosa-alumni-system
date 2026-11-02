@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Award, 
-  Coins, 
   HeartHandshake, 
   Receipt,
   ClipboardCheck,
   Clock,
   UserPlus,
-  GraduationCap
+  GraduationCap,
+  Building2
 } from 'lucide-react';
 import { 
   AuthUser, 
@@ -531,7 +531,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             }}
           >
             <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#DCFCE7', color: '#0A271B', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Coins size={16} />
+              <HeartHandshake size={16} />
             </div>
             <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Donations</span>
           </button>
@@ -564,7 +564,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
 
           <button
-            onClick={() => onNavigate('membership')}
+            onClick={() => onNavigate('chapters')}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -584,10 +584,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#FEF3C7', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Award size={16} />
+            <div style={{ width: '30px', height: '30px', borderRadius: '7px', background: '#F3E8FF', color: '#7E22CE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Building2 size={16} />
             </div>
-            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Membership</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Chapters</span>
           </button>
         </div>
       </section>
@@ -614,7 +614,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
               <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: '#DCFCE7', color: '#14532D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Coins size={18} />
+                <HeartHandshake size={18} />
               </div>
               <div>
                 <h3 style={{ fontSize: '1.05rem', color: '#0B271C', margin: 0, fontWeight: 800 }}>

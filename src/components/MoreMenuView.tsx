@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Users, 
   ShieldCheck, 
@@ -7,32 +7,24 @@ import {
   LogIn, 
   Award, 
   Calendar, 
-  Coins, 
-  Bell, 
+  Landmark, 
   FileText, 
   Mail, 
   ChevronRight,
   ChevronDown,
   ChevronUp,
-  Sliders, 
   Briefcase, 
   GraduationCap, 
-  Edit3, 
   Building2, 
   BookOpen, 
   Newspaper, 
   HeartHandshake, 
   Image as ImageIcon,
   CheckCircle2,
-  Sparkles,
-  ArrowRight,
-  HelpCircle,
-  ExternalLink
+  Home
 } from 'lucide-react';
-import { AuthUser, ModuleSettings, AlumniProfile } from '../types';
+import { AuthUser, ModuleSettings } from '../types';
 import { isStaffRole, isRegisteredAlumni } from '../services/governanceService';
-import { dataService } from '../services/dataService';
-import { MosaLogo } from './MosaLogo';
 
 interface MoreMenuViewProps {
   currentUser: AuthUser | null;
@@ -48,7 +40,7 @@ interface MoreMenuViewProps {
 
 export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
   currentUser,
-  moduleSettings,
+  moduleSettings: _moduleSettings,
   onNavigateTab,
   onOpenRegister,
   onOpenVerify,
@@ -57,47 +49,15 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
   onOpenAdmin,
   onSwitchToAdmin,
 }) => {
-  const [memberProfile, setMemberProfile] = useState<AlumniProfile | null>(null);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    registry: true,
-    careers: true,
-    giving: true,
-    community: true,
-    heritage: true,
-    archives: true,
-  });
+  // Accordion state: ONLY ONE major item can be expanded at a time.
+  // Initially null (all closed) so the page is never congested on load or return.
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
   const isRegistered = isRegisteredAlumni(currentUser);
 
-  useEffect(() => {
-    let isMounted = true;
-    if (currentUser) {
-      if (currentUser.alumniId) {
-        dataService.getAlumniById(currentUser.alumniId).then(profile => {
-          if (isMounted && profile) setMemberProfile(profile);
-        }).catch(() => {});
-      } else if (currentUser.email) {
-        dataService.getAlumniList().then(list => {
-          if (!isMounted) return;
-          const found = list.find(a => 
-            a.email?.toLowerCase() === currentUser.email?.toLowerCase() ||
-            (currentUser.alumniNumber && a.alumniNumber === currentUser.alumniNumber)
-          );
-          if (found) setMemberProfile(found);
-        }).catch(() => {});
-      }
-    } else {
-      setMemberProfile(null);
-    }
-    return () => { isMounted = false; };
-  }, [currentUser]);
-
   const toggleSection = (key: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    setExpandedSection(prev => (prev === key ? null : key));
   };
 
   const handleAdminClick = () => {
@@ -110,183 +70,11 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
     }
   };
 
-  const memberDisplayName = memberProfile?.fullName || 
-    (memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : currentUser?.displayName) || 
-    (currentUser?.email ? currentUser.email.split('@')[0] : 'Guest Visitor');
-
-  const memberNumber = memberProfile?.alumniNumber || 
-    currentUser?.alumniNumber || 
-    (currentUser ? 'PENDING' : 'NOT VERIFIED');
-
-  const memberPhoto = memberProfile?.photoUrl || 
-    currentUser?.photoUrl || 
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
-
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.25rem 1rem 5rem 1rem' }}>
-      {/* 1. INSTITUTIONAL PAGE HEADER */}
-      <div 
-        style={{
-          background: 'linear-gradient(135deg, #14532D 0%, #0A271B 100%)',
-          borderRadius: '16px',
-          padding: '1.5rem',
-          color: '#FFFFFF',
-          boxShadow: '0 8px 24px rgba(10, 39, 27, 0.25)',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          flexWrap: 'wrap'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ background: '#FFFFFF', padding: '0.4rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <MosaLogo size={42} />
-          </div>
-          <div>
-            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#FEF08A', fontWeight: 800 }}>
-              Mandela Secondary School Hoima (MASSH)
-            </div>
-            <h1 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>
-              MOSA Alumni Services & Menu
-            </h1>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: '#DCFCE7' }}>
-              Full institutional directory, community programs, records & administration
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. MEMBER PROFILE OR GUEST ONBOARDING CARD */}
-      <div 
-        style={{
-          background: '#FFFFFF',
-          borderRadius: '14px',
-          border: '1.5px solid #86EFAC',
-          padding: '1.25rem',
-          boxShadow: '0 4px 16px rgba(10, 39, 27, 0.08)',
-          marginBottom: '1.5rem'
-        }}
-      >
-        {currentUser ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <img 
-                src={memberPhoto} 
-                alt={memberDisplayName}
-                style={{
-                  width: '54px',
-                  height: '54px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '2px solid #0A271B',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
-                }}
-              />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A' }}>
-                    {memberDisplayName}
-                  </span>
-                  {isStaff && (
-                    <span style={{ fontSize: '0.68rem', fontWeight: 800, background: '#FEF3C7', color: '#B45309', padding: '0.15rem 0.5rem', borderRadius: '999px', border: '1px solid #FDE68A' }}>
-                      STAFF / ADMIN
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.25rem' }}>
-                  <Award size={14} color="#0A271B" />
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#14532D' }}>
-                    ALUMNI NO.: {memberNumber}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigateTab('my-profile')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                background: '#ECFDF5',
-                border: '1.5px solid #0A271B',
-                color: '#14532D',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                padding: '0.55rem 1rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span>View My Digital Pass</span>
-              <ArrowRight size={15} />
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#14532D' }}>
-                Join Mandela Old Students Association
-              </div>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: '#4B5563' }}>
-                Register your membership or sign in to access official member privileges & the directory.
-              </p>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <button
-                type="button"
-                onClick={onOpenRegister}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  background: '#0A271B',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '0.82rem',
-                  padding: '0.5rem 0.9rem',
-                  borderRadius: '8px',
-                  border: 'none',
-                  cursor: 'pointer'
-                }}
-              >
-                <UserPlus size={15} />
-                <span>Register</span>
-              </button>
-              <button
-                type="button"
-                onClick={onOpenAuth}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  background: '#F0FDF4',
-                  color: '#0A271B',
-                  fontWeight: 700,
-                  fontSize: '0.82rem',
-                  padding: '0.5rem 0.9rem',
-                  borderRadius: '8px',
-                  border: '1px solid #86EFAC',
-                  cursor: 'pointer'
-                }}
-              >
-                <LogIn size={15} />
-                <span>Sign In</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 3. STRUCTURED MENU ACCORDIONS & CATEGORIES */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      
+      {/* 1. STRUCTURED MENU ACCORDIONS & CATEGORIES */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
         {/* SECTION 1: REGISTRY & MEMBERSHIP */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
@@ -301,28 +89,28 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               padding: '1rem 1.25rem',
               background: '#F0FDF4',
               border: 'none',
-              borderBottom: expandedSections.registry ? '1.5px solid #BBF7D0' : 'none',
+              borderBottom: expandedSection === 'registry' ? '1.5px solid #BBF7D0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{ background: '#DCFCE7', padding: '0.45rem', borderRadius: '8px', color: '#0A271B' }}>
-                <Edit3 size={18} />
+                <Users size={18} />
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#14532D' }}>
-                  REGISTRY & MEMBERSHIP
+                  REGISTRY &amp; MEMBERSHIP
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#4B5563' }}>
-                  Alumni records, directory search, registration & ID verification
+                  Alumni records, directory search, registration &amp; ID verification
                 </div>
               </div>
             </div>
-            {expandedSections.registry ? <ChevronUp size={18} color="#0A271B" /> : <ChevronDown size={18} color="#0A271B" />}
+            {expandedSection === 'registry' ? <ChevronUp size={18} color="#0A271B" /> : <ChevronDown size={18} color="#0A271B" />}
           </button>
 
-          {expandedSections.registry && (
+          {expandedSection === 'registry' && (
             <div style={{ padding: '0.5rem 0' }}>
               <button
                 type="button"
@@ -330,9 +118,9 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Sparkles size={16} color="#0A271B" />
+                  <Home size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>MOSA Dashboard & Overview</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>MOSA Dashboard &amp; Overview</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Primary association hub and active summary</div>
                   </div>
                 </div>
@@ -347,7 +135,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <GraduationCap size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Welcome & Association Orientation</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Welcome &amp; Association Orientation</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Introduction to Mandela Secondary School alumni body</div>
                   </div>
                 </div>
@@ -363,7 +151,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   <Users size={16} color="#0A271B" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                      <span>Alumni Directory & Member Search</span>
+                      <span>Alumni Directory &amp; Member Search</span>
                       {!isRegistered && (
                         <span style={{ fontSize: '0.64rem', fontWeight: 800, padding: '0.1rem 0.4rem', borderRadius: '4px', background: '#FEF3C7', color: '#B45309' }}>
                           Registered Only
@@ -384,8 +172,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Award size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Membership Categories & Rights</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Ordinary, Associate, Life & Honorary membership guide</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Membership Categories &amp; Rights</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Ordinary, Associate, Life &amp; Honorary membership guide</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -437,7 +225,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               padding: '1rem 1.25rem',
               background: '#F8FAFC',
               border: 'none',
-              borderBottom: expandedSections.careers ? '1.5px solid #E2E8F0' : 'none',
+              borderBottom: expandedSection === 'careers' ? '1.5px solid #E2E8F0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
@@ -448,17 +236,17 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  CAREERS & OPPORTUNITIES
+                  CAREERS &amp; OPPORTUNITIES
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Jobs, tenders, mentorship & professional advancement
+                  Jobs, tenders, mentorship &amp; professional advancement
                 </div>
               </div>
             </div>
-            {expandedSections.careers ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+            {expandedSection === 'careers' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
           </button>
 
-          {expandedSections.careers && (
+          {expandedSection === 'careers' && (
             <div style={{ padding: '0.5rem 0' }}>
               <button
                 type="button"
@@ -468,8 +256,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Briefcase size={16} color="#4338CA" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Job Opportunities & Career Hub</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Discover open job vacancies, attachments & business tenders</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Job Opportunities &amp; Career Hub</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Discover open job vacancies, attachments &amp; business tenders</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -491,28 +279,28 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               padding: '1rem 1.25rem',
               background: '#F8FAFC',
               border: 'none',
-              borderBottom: expandedSections.giving ? '1.5px solid #E2E8F0' : 'none',
+              borderBottom: expandedSection === 'giving' ? '1.5px solid #E2E8F0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{ background: '#FEF3C7', padding: '0.45rem', borderRadius: '8px', color: '#B45309' }}>
-                <Coins size={18} />
+                <Landmark size={18} />
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  GIVING & CONTRIBUTIONS
+                  GIVING &amp; CONTRIBUTIONS
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Annual subscription, project contributions & fundraising
+                  Annual subscription, project contributions &amp; fundraising
                 </div>
               </div>
             </div>
-            {expandedSections.giving ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+            {expandedSection === 'giving' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
           </button>
 
-          {expandedSections.giving && (
+          {expandedSection === 'giving' && (
             <div style={{ padding: '0.5rem 0' }}>
               <button
                 type="button"
@@ -522,8 +310,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <HeartHandshake size={16} color="#B45309" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Association Giving & Dues</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Annual dues, school infrastructure support & donation pledges</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Association Giving &amp; Dues</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Annual dues, school infrastructure support &amp; donation pledges</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -545,7 +333,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               padding: '1rem 1.25rem',
               background: '#F8FAFC',
               border: 'none',
-              borderBottom: expandedSections.community ? '1.5px solid #E2E8F0' : 'none',
+              borderBottom: expandedSection === 'community' ? '1.5px solid #E2E8F0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
@@ -556,17 +344,17 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  COMMUNITY & PROGRAMS
+                  COMMUNITY &amp; PROGRAMS
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Assembly attendance roll call, reunions, galleries & university chapters
+                  Assembly attendance roll call, reunions, galleries &amp; university chapters
                 </div>
               </div>
             </div>
-            {expandedSections.community ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+            {expandedSection === 'community' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
           </button>
 
-          {expandedSections.community && (
+          {expandedSection === 'community' && (
             <div style={{ padding: '0.5rem 0' }}>
               <button
                 type="button"
@@ -576,8 +364,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <CheckCircle2 size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Roll Call & Assembly Sign-In</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Self check-in for physical & online alumni reunions</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Roll Call &amp; Assembly Sign-In</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Self check-in for physical &amp; online alumni reunions</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -591,7 +379,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Calendar size={16} color="#0284C7" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Alumni Events, Reunions & Dinners</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Alumni Events, Reunions &amp; Dinners</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official association calendar, dinners and sports galas</div>
                   </div>
                 </div>
@@ -606,8 +394,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <ImageIcon size={16} color="#D97706" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Heritage & Milestones Photo Gallery</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Historic campus photos, events & memorial albums</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Heritage &amp; Milestones Photo Gallery</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Historic campus photos, events &amp; memorial albums</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -621,7 +409,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Building2 size={16} color="#7C3AED" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>University & Regional Chapters</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>University &amp; Regional Chapters</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Connect with MUMASA, Kampala, Hoima and global branches</div>
                   </div>
                 </div>
@@ -644,7 +432,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               padding: '1rem 1.25rem',
               background: '#F8FAFC',
               border: 'none',
-              borderBottom: expandedSections.heritage ? '1.5px solid #E2E8F0' : 'none',
+              borderBottom: expandedSection === 'heritage' ? '1.5px solid #E2E8F0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
@@ -655,17 +443,17 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  INFORMATION & HERITAGE
+                  INFORMATION &amp; HERITAGE
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  School history, announcements, circulars & secretariat contacts
+                  School history, announcements, circulars &amp; secretariat contacts
                 </div>
               </div>
             </div>
-            {expandedSections.heritage ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+            {expandedSection === 'heritage' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
           </button>
 
-          {expandedSections.heritage && (
+          {expandedSection === 'heritage' && (
             <div style={{ padding: '0.5rem 0' }}>
               <button
                 type="button"
@@ -675,8 +463,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <Newspaper size={16} color="#0284C7" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>News, Circulars & Announcements</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official association news, executive resolutions & press releases</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>News, Circulars &amp; Announcements</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official association news, executive resolutions &amp; press releases</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -690,8 +478,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <GraduationCap size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>About Mandela SS & MOSA History</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Founded in 1997, motto "Caring to Achieve" & executive committee</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>About Mandela SS &amp; MOSA History</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Founded in 1997, motto "Caring to Achieve" &amp; executive committee</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -703,10 +491,10 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 style={itemButtonStyle}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Mail size={16} color="#EA4335" />
+                  <Mail size={16} color="#0A271B" />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Secretariat Contact & Helpdesk</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Physical address, phone lines & email support</div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Secretariat Contact &amp; Helpdesk</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Physical address, phone lines &amp; email support</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
@@ -738,7 +526,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
               </div>
               <div>
                 <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  ARCHIVES & CONSTITUTION
+                  ARCHIVES &amp; CONSTITUTION
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
                   Download official constitution, reports and governing policies
@@ -751,8 +539,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
 
       </div>
 
-      {/* 4. ACCOUNT ACTION (LOGOUT / LOGIN) AS REQUESTED */}
-      <div style={{ marginTop: '2rem' }}>
+      {/* 2. ACCOUNT ACTION (LOGOUT / LOGIN) */}
+      <div style={{ marginTop: '1.75rem' }}>
         {currentUser ? (
           <button
             type="button"
@@ -776,7 +564,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
             }}
           >
             <LogOut size={18} color="#DC2626" />
-            <span>Sign Out of Account ({currentUser.email || currentUser.displayName})</span>
+            <span>Sign Out ({currentUser.email || currentUser.displayName})</span>
           </button>
         ) : (
           <button
@@ -805,50 +593,39 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
         )}
       </div>
 
-      {/* 5. ADMIN SECTION (APPEARS THE VERY LAST AT THE BOTTOM AS REQUESTED) */}
-      <div style={{ marginTop: '1rem' }}>
-        <div
+      {/* 3. ADMIN BUTTON (Simple, sleek, just Admin) */}
+      <div style={{ marginTop: '1.25rem', textAlign: 'center' }}>
+        <button
+          type="button"
           onClick={handleAdminClick}
           style={{
-            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
-            border: '2px solid #F59E0B',
-            borderRadius: '14px',
-            padding: '1.25rem',
-            color: '#FFFFFF',
-            cursor: 'pointer',
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '1rem',
-            flexWrap: 'wrap',
-            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.2)',
-            transition: 'transform 0.15s ease'
+            gap: '0.45rem',
+            background: '#F8FAFC',
+            border: '1px solid #CBD5E1',
+            color: '#475569',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            padding: '0.5rem 1.25rem',
+            borderRadius: '8px',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = '#0A271B';
+            e.currentTarget.style.borderColor = '#0A271B';
+            e.currentTarget.style.background = '#FFFFFF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = '#475569';
+            e.currentTarget.style.borderColor = '#CBD5E1';
+            e.currentTarget.style.background = '#F8FAFC';
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ background: '#F59E0B', padding: '0.6rem', borderRadius: '10px', color: '#0F172A' }}>
-              <Sliders size={22} color="#0F172A" />
-            </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.98rem', fontWeight: 800, color: '#FDE68A', letterSpacing: '0.02em' }}>
-                  MOSA Administrative Control Panel
-                </span>
-                <span style={{ fontSize: '0.65rem', fontWeight: 800, background: '#F59E0B', color: '#0F172A', padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                  STAFF ONLY
-                </span>
-              </div>
-              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: '#94A3B8' }}>
-                Alumni approvals, verification tokens, event setup & system settings
-              </p>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#FDE68A', fontSize: '0.82rem', fontWeight: 700 }}>
-            <span>Access Admin</span>
-            <ChevronRight size={16} color="#FDE68A" />
-          </div>
-        </div>
+          <ShieldCheck size={15} />
+          <span>Admin</span>
+        </button>
       </div>
 
     </div>
