@@ -30,7 +30,7 @@ async function runEmailTests() {
   const approveEmailRes = await emailService.sendMembershipApprovalEmail(
     testEmail,
     'John Baptist Alinda',
-    'MA. 0042',
+    'MA.0042',
     'MOSA-2026-00099'
   );
   console.log('   Result:', approveEmailRes.success ? '✓ SUCCESS' : '✗ FAILED', `(Provider: ${approveEmailRes.provider})`);

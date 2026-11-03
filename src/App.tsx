@@ -31,16 +31,17 @@ import { MemberAttendanceView } from './components/MemberAttendanceView';
 import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
 import { AdminPasswordModal } from './components/AdminPasswordModal';
+import { ElectionsHub } from './components/ElectionsHub';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
-import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2 } from 'lucide-react';
+import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2, Vote } from 'lucide-react';
 import { MosaLogo } from './components/MosaLogo';
 
 const getInitialTab = (): string => {
   if (typeof window !== 'undefined') {
     const hash = window.location.hash.replace(/^#\/?/, '').trim();
-    if (hash && hash !== 'admin' && hash !== 'elections') return hash;
+    if (hash && hash !== 'admin') return hash;
     const saved = localStorage.getItem('mosa_active_tab');
-    if (saved && saved !== 'admin' && saved !== 'elections') return saved;
+    if (saved && saved !== 'admin') return saved;
   }
   return 'home';
 };
@@ -664,6 +665,15 @@ export const App: React.FC = () => {
             onOpenAuth={() => setIsAuthOpen(true)}
             onBack={handleBack}
             onNavigateTab={handleNavigate}
+          />
+        )}
+
+        {/* 11.8. ELECTIONS & LIVE VOTING (Member Voting, Candidates, Manifestos, Live Results) */}
+        {currentTab === 'elections' && (
+          <ElectionsHub
+            currentUser={currentUser}
+            onBack={handleBack}
+            onOpenAuth={() => setIsAuthOpen(true)}
           />
         )}
 

@@ -21,7 +21,10 @@ import {
   MapPin,
   Globe,
   MessageSquare,
-  ExternalLink
+  ExternalLink,
+  Vote,
+  Building2,
+  ClipboardCheck
 } from 'lucide-react';
 import { AuthUser, ModuleSettings } from '../types';
 import { isStaffRole } from '../services/governanceService';
@@ -74,6 +77,95 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
       
       {/* 1. STRUCTURED MENU ITEMS & CATEGORIES */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+
+        {/* ELECTIONS & LIVE VOTING (STANDARDIZED ACCORDION) */}
+        <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
+          <button
+            type="button"
+            onClick={() => toggleSection('elections')}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1rem 1.25rem',
+              background: '#F8FAFC',
+              border: 'none',
+              borderBottom: expandedSection === 'elections' ? '1.5px solid #E2E8F0' : 'none',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ background: '#FEF3C7', padding: '0.45rem', borderRadius: '8px', color: '#D97706' }}>
+                <Vote size={18} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
+                    ELECTIONS &amp; LIVE VOTING
+                  </span>
+                  <span style={{ fontSize: '0.62rem', background: '#DC2626', color: '#FFFFFF', fontWeight: 800, padding: '0.1rem 0.45rem', borderRadius: '999px', textTransform: 'uppercase' }}>
+                    Live
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                  Cast secret ballot, view candidate manifestos &amp; live certified results
+                </div>
+              </div>
+            </div>
+            {expandedSection === 'elections' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+          </button>
+
+          {expandedSection === 'elections' && (
+            <div style={{ padding: '0.5rem 0' }}>
+              <button
+                type="button"
+                onClick={() => onNavigateTab('elections')}
+                style={itemButtonStyle}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Vote size={16} color="#D97706" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Cast Secret Ballot (Live Voting)</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Submit your confidential, verified vote for candidate posts</div>
+                  </div>
+                </div>
+                <ChevronRight size={15} color="#94A3B8" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab('elections')}
+                style={itemButtonStyle}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <FileText size={16} color="#0284C7" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Candidate Profiles &amp; Manifestos</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Review biographies, visions and policy manifestos</div>
+                  </div>
+                </div>
+                <ChevronRight size={15} color="#94A3B8" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab('elections')}
+                style={itemButtonStyle}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Award size={16} color="#059669" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Live Certified Election Results</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Real-time verified tallies and certified outcomes</div>
+                  </div>
+                </div>
+                <ChevronRight size={15} color="#94A3B8" />
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* SECTION 1: REGISTRY & MEMBERSHIP */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
@@ -193,7 +285,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
           </button>
         </div>
 
-        {/* SECTION 3: COMMUNITY & PROGRAMS (RETAINING EVENTS & REUNIONS + HERITAGE GALLERY) */}
+        {/* SECTION 3: COMMUNITY & PROGRAMS (COMPREHENSIVE ASSOCIATION PROGRAMS) */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
           <button
             type="button"
@@ -220,7 +312,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   COMMUNITY &amp; PROGRAMS
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Alumni reunions, official events calendar &amp; campus photo gallery
+                  Alumni reunions, chapters, assemblies, events calendar &amp; campus photo gallery
                 </div>
               </div>
             </div>
@@ -238,7 +330,37 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   <Calendar size={16} color="#0284C7" />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Alumni Events, Reunions &amp; Dinners</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official association calendar, dinners and sports galas</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official association calendar, dinners, programs and sports galas</div>
+                  </div>
+                </div>
+                <ChevronRight size={15} color="#94A3B8" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab('chapters')}
+                style={itemButtonStyle}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Building2 size={16} color="#7E22CE" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Regional &amp; Diaspora Chapters</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Campus branches, district networks &amp; international alumni chapters</div>
+                  </div>
+                </div>
+                <ChevronRight size={15} color="#94A3B8" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onNavigateTab('attendance')}
+                style={itemButtonStyle}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <ClipboardCheck size={16} color="#2E7D32" />
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Meeting &amp; Assembly Attendance</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Official attendance roll-call and meeting QR badge verification</div>
                   </div>
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />

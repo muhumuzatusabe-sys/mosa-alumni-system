@@ -234,6 +234,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           {currentUser ? (
             <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.4rem' }}>
               <button
+                onClick={() => handleTabClick('elections')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  background: currentTab === 'elections' ? '#FEF3C7' : '#FFFFFF',
+                  border: '1px solid #F59E0B',
+                  color: '#92400E',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                title="MOSA Elections & Live Voting"
+              >
+                <Vote size={15} color="#D97706" />
+                <span>Elections</span>
+              </button>
+
+              <button
                 onClick={() => handleTabClick('my-profile')}
                 style={{
                   display: 'inline-flex',

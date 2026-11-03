@@ -261,7 +261,7 @@ export const EmailManager: React.FC = () => {
                     outline: 'none'
                   }}
                 >
-                  <option value="auto">Auto-Detect Relay (Recommended • Brevo → Web3Forms → FormSubmit)</option>
+                  <option value="auto">Auto-Detect Relay (Recommended • Brevo / EmailJS / Resend / Web3Forms)</option>
                   <option value="brevo">Brevo / Sendinblue (Recommended for masshalumni@gmail.com • 300 free/day)</option>
                   <option value="web3forms">Web3Forms API (Instant CORS delivery to external inboxes)</option>
                   <option value="resend">Resend REST API (Modern transactional delivery)</option>

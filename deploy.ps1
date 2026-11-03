@@ -59,8 +59,8 @@ if (-not $deployed) {
 
 Write-Host ""
 Write-Host "[3/3] Committing & pushing to GitHub..." -ForegroundColor Cyan
-git add .
-git commit -m "fix: static top header, raised MASSH panel clear of bottom ribbon, eliminate space in MA alumni numbers everywhere"
+git add -A
+git commit -m "fix: restore clean one-page Home layout with 4 core quick actions, format Elections & Live Voting as standardized accordion item in More, and enrich Community & Programs"
 git push origin main
 
 Write-Host ""
