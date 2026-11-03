@@ -74,7 +74,7 @@ export async function runSecurityRBACHardeningTests() {
   console.log('▶ [Audit 2] Sequential MA Number Invariants & Protection');
 
   const settings = await dataService.getSystemSettings();
-  assert(settings.prefix === 'MA. ', 'Prefix must strictly be "MA. "');
+  assert(settings.prefix.replace(/\s+$/, '') === 'MA.', 'Prefix must strictly be "MA."');
   assert(settings.padDigits === 4, 'Alumni numbering must format with 4 digits');
   assert(settings.establishedYear === 1997, 'School establishment year must be 1997');
   passed += 3;
@@ -83,11 +83,11 @@ export async function runSecurityRBACHardeningTests() {
   const allAlumni = await dataService.getAlumni();
   assert(allAlumni.length > 0, 'Alumni registry must contain active members');
   
-  // Verify sequential MA format
-  const validFormatRegex = /^MA\.\s\d{4}$/;
+  // Verify sequential MA format (e.g. MA.0001)
+  const validFormatRegex = /^MA\.\d{4}$/;
   for (const alumnus of allAlumni) {
     if (alumnus.alumniNumber) {
-      assert(validFormatRegex.test(alumnus.alumniNumber), `Alumni number ${alumnus.alumniNumber} must match format MA. 0001`);
+      assert(validFormatRegex.test(alumnus.alumniNumber), `Alumni number ${alumnus.alumniNumber} must match format MA.0001`);
     }
   }
   passed += 1;

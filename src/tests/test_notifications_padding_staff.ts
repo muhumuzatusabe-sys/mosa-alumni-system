@@ -25,20 +25,20 @@ console.log('--- Testing Requirement 1: Notifications & Alert Integration ---');
   console.log('--- Testing Requirement 2: MA Number Sequence Padding (1, 2, 3, 4 Digits) ---');
 
   // Verify formatting with different padding digits
-  const formatted1 = dataService.formatAlumniNumber(1, 'MA. ', 1);
-  const formatted2 = dataService.formatAlumniNumber(1, 'MA. ', 2);
-  const formatted3 = dataService.formatAlumniNumber(1, 'MA. ', 3);
-  const formatted4 = dataService.formatAlumniNumber(1, 'MA. ', 4);
+  const formatted1 = dataService.formatAlumniNumber(1, 'MA.', 1);
+  const formatted2 = dataService.formatAlumniNumber(1, 'MA.', 2);
+  const formatted3 = dataService.formatAlumniNumber(1, 'MA.', 3);
+  const formatted4 = dataService.formatAlumniNumber(1, 'MA.', 4);
 
-  assert.strictEqual(formatted1, 'MA. 1', '1 digit padding must produce MA. 1');
-  assert.strictEqual(formatted2, 'MA. 01', '2 digits padding must produce MA. 01');
-  assert.strictEqual(formatted3, 'MA. 001', '3 digits padding must produce MA. 001');
-  assert.strictEqual(formatted4, 'MA. 0001', '4 digits padding must produce MA. 0001');
+  assert.strictEqual(formatted1, 'MA.1', '1 digit padding must produce MA.1');
+  assert.strictEqual(formatted2, 'MA.01', '2 digits padding must produce MA.01');
+  assert.strictEqual(formatted3, 'MA.001', '3 digits padding must produce MA.001');
+  assert.strictEqual(formatted4, 'MA.0001', '4 digits padding must produce MA.0001');
   console.log('[PASS] formatAlumniNumber generates exact sequence for 1, 2, 3, 4 digits:');
-  console.log(`       1 digit: ${formatted1}, ${dataService.formatAlumniNumber(2, 'MA. ', 1)}, ${dataService.formatAlumniNumber(3, 'MA. ', 1)}`);
-  console.log(`       2 digits: ${formatted2}, ${dataService.formatAlumniNumber(2, 'MA. ', 2)}, ${dataService.formatAlumniNumber(3, 'MA. ', 2)}`);
-  console.log(`       3 digits: ${formatted3}, ${dataService.formatAlumniNumber(2, 'MA. ', 3)}, ${dataService.formatAlumniNumber(3, 'MA. ', 3)}`);
-  console.log(`       4 digits: ${formatted4}, ${dataService.formatAlumniNumber(2, 'MA. ', 4)}, ${dataService.formatAlumniNumber(3, 'MA. ', 4)}`);
+  console.log(`       1 digit: ${formatted1}, ${dataService.formatAlumniNumber(2, 'MA.', 1)}, ${dataService.formatAlumniNumber(3, 'MA.', 1)}`);
+  console.log(`       2 digits: ${formatted2}, ${dataService.formatAlumniNumber(2, 'MA.', 2)}, ${dataService.formatAlumniNumber(3, 'MA.', 2)}`);
+  console.log(`       3 digits: ${formatted3}, ${dataService.formatAlumniNumber(2, 'MA.', 3)}, ${dataService.formatAlumniNumber(3, 'MA.', 3)}`);
+  console.log(`       4 digits: ${formatted4}, ${dataService.formatAlumniNumber(2, 'MA.', 4)}, ${dataService.formatAlumniNumber(3, 'MA.', 4)}`);
 
   // Verify SystemSettings stores and retains padDigits configuration
   await dataService.updateSystemSettings({ prefix: 'MA. ', padDigits: 2 }, 'admin@massh.ac.ug');

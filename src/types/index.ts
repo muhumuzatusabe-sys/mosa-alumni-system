@@ -78,7 +78,7 @@ export interface PrivacySettings {
 
 export interface AlumniProfile {
   internalId: string;
-  alumniNumber: string; // e.g. "MA. 0001"
+  alumniNumber: string; // e.g. "MA.0001"
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -499,7 +499,7 @@ export interface PaymentTransaction {
   id: string;
   receiptNumber?: string; // e.g. "MOSA-RCP-2026-0001"
   alumniId: string;
-  alumniNumber: string; // e.g. "MA. 0001"
+  alumniNumber: string; // e.g. "MA.0001"
   alumniName: string;
   alumniEmail: string;
   alumniPhone?: string;

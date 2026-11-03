@@ -18,6 +18,7 @@ import {
 import QRCode from 'qrcode';
 import { MOSA_COLORS, getMosaCrestSvg, getMosaSignatureSvg, getMosaWatermarkSvg, svgToDataUrl } from '../utils/mosaCrest';
 import { MOSA_OFFICIAL_LOGO_DATA_URL } from '../utils/mosaLogoDataUrl';
+import { cleanMANumber } from '../services/dataService';
 
 interface Props {
   alumnus: AlumniProfile;
@@ -378,7 +379,7 @@ export const DigitalMembershipCard: React.FC<Props> = ({
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
               <span style={{ fontSize: 'clamp(0.45rem, 1.3vw, 0.58rem)', color: '#5A6874', fontWeight: 600 }}>MA No.</span>
               <span style={{ fontSize: 'clamp(0.55rem, 1.6vw, 0.72rem)', fontWeight: 900, color: '#0B203E', fontFamily: 'monospace' }}>
-                {snapshot.alumniNumber}
+                {cleanMANumber(snapshot.alumniNumber)}
               </span>
             </div>
           </div>

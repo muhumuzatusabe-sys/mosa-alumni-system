@@ -23,7 +23,7 @@ import {
   MembershipCardSettings,
   MembershipStatus,
 } from '../types';
-import { dataService } from './dataService';
+import { dataService, cleanMANumber } from './dataService';
 import {
   MOSA_COLORS,
   getMosaCrestSvg,
@@ -212,7 +212,7 @@ export const membershipCardService = {
       cohortYear: cohortYearNum.toString(),
       entryYear: entryYearNum.toString(),
       departureYear: departureYearNum.toString(),
-      alumniNumber: alumnus.alumniNumber || 'MA. 0000',
+      alumniNumber: cleanMANumber(alumnus.alumniNumber) || 'MA.0000',
     };
   },
 
@@ -1077,7 +1077,7 @@ export const membershipCardService = {
     doc.setTextColor(11, 32, 62);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(5.6);
-    doc.text(snapshot.alumniNumber, col2X + 8.5, currY);
+    doc.text(cleanMANumber(snapshot.alumniNumber), col2X + 8.5, currY);
     currY += 3.4;
 
     // Row: Entry year & Departure year

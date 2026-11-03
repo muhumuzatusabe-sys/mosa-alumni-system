@@ -60,7 +60,7 @@ if (-not $deployed) {
 Write-Host ""
 Write-Host "[3/3] Committing & pushing to GitHub..." -ForegroundColor Cyan
 git add .
-git commit -m "feat(elections): admin election scheduling, positions management, candidate placement by registration & MA numbers, manifestos, and live real-time results"
+git commit -m "fix: static top header, raised MASSH panel clear of bottom ribbon, eliminate space in MA alumni numbers everywhere"
 git push origin main
 
 Write-Host ""

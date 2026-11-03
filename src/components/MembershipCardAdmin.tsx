@@ -6,7 +6,7 @@ import {
   MembershipCardRecord,
   MembershipCardSettings,
 } from '../types';
-import { dataService } from '../services/dataService';
+import { dataService, cleanMANumber } from '../services/dataService';
 import { membershipCardService, DEFAULT_CARD_SETTINGS } from '../services/membershipCardService';
 import { DigitalMembershipCard } from './DigitalMembershipCard';
 import {
@@ -534,7 +534,7 @@ export const MembershipCardAdmin: React.FC<Props> = ({ currentUser }) => {
                         {/* MA Number */}
                         <td style={{ padding: '0.75rem' }}>
                           <span style={{ fontFamily: 'monospace', fontWeight: 800, color: '#0B203E', background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px' }}>
-                            {alumnus.alumniNumber}
+                            {cleanMANumber(alumnus.alumniNumber)}
                           </span>
                         </td>
 
