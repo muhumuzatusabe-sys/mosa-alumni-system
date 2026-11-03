@@ -30,7 +30,7 @@ import {
   AlumniProfile,
   ElectionStatus
 } from '../types';
-import { dataService } from '../services/dataService';
+import { dataService, cleanMANumber } from '../services/dataService';
 
 interface AdminElectionManagerProps {
   currentUser: AuthUser;
@@ -390,7 +390,7 @@ export const AdminElectionManager: React.FC<AdminElectionManagerProps> = ({ curr
   // When selecting an alumnus from search autocomplete
   const handleSelectAlumnusForCandidate = (alumnus: AlumniProfile) => {
     setCandFullName(alumnus.fullName || `${alumnus.firstName} ${alumnus.lastName}`);
-    setCandAlumniNumber(alumnus.alumniNumber || 'MA. PENDING');
+    setCandAlumniNumber(cleanMANumber(alumnus.alumniNumber) || 'MA.PENDING');
     setCandAlumniId(alumnus.id);
     setCandCohort(alumnus.cohort || alumnus.yearOfCompletion || 'Alumnus');
     setCandProfession(alumnus.profession || alumnus.careerTitle || '');
@@ -1760,7 +1760,7 @@ export const AdminElectionManager: React.FC<AdminElectionManagerProps> = ({ curr
                       type="text"
                       value={candAlumniSearch}
                       onChange={e => setCandAlumniSearch(e.target.value)}
-                      placeholder="Type name, MA number (e.g. MA. 0001), or email to auto-fill..."
+                      placeholder="Type name, MA number (e.g. MA.0001), or email to auto-fill..."
                       style={{ width: '100%', padding: '0.5rem 0.5rem 0.5rem 2.2rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem' }}
                     />
                   </div>
@@ -1786,7 +1786,7 @@ export const AdminElectionManager: React.FC<AdminElectionManagerProps> = ({ curr
                           <div>
                             <strong>{al.fullName || `${al.firstName} ${al.lastName}`}</strong>
                             <span style={{ color: '#D97706', marginLeft: '0.5rem', fontWeight: 700 }}>
-                              {al.alumniNumber}
+                              {cleanMANumber(al.alumniNumber)}
                             </span>
                           </div>
                           <span style={{ color: '#64748B', fontSize: '0.75rem' }}>
@@ -1843,7 +1843,7 @@ export const AdminElectionManager: React.FC<AdminElectionManagerProps> = ({ curr
                     required
                     value={candAlumniNumber}
                     onChange={e => setCandAlumniNumber(e.target.value)}
-                    placeholder="e.g. MA. 0001"
+                    placeholder="e.g. MA.0001"
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.88rem', fontWeight: 700, color: '#D97706' }}
                   />
                 </div>
@@ -1931,7 +1931,7 @@ export const AdminElectionManager: React.FC<AdminElectionManagerProps> = ({ curr
                     type="text"
                     value={candSeconderNumber}
                     onChange={e => setCandSeconderNumber(e.target.value)}
-                    placeholder="e.g. MA. 0089"
+                    placeholder="e.g. MA.0089"
                     style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem' }}
                   />
                 </div>

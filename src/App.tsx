@@ -445,7 +445,7 @@ export const App: React.FC = () => {
   // USER / MEMBER PORTAL ENVIRONMENT
   // ==========================================
   return (
-    <div style={{ minHeight: '100vh', width: '100%', maxWidth: '100%', overflowX: 'hidden', display: 'flex', flexDirection: 'column', background: '#F8F6F0', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', width: '100%', maxWidth: '100%', overflowX: 'clip', display: 'flex', flexDirection: 'column', background: '#F8F6F0', position: 'relative' }}>
       {/* Member Navigation Bar */}
       <Navbar
         currentTab={currentTab}

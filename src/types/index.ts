@@ -173,7 +173,7 @@ export interface AlumniApplication {
 export interface SystemSettings {
   nextAlumniNumber: number;
   nextApplicationNumber?: number;
-  prefix: string; // "MA. "
+  prefix: string; // "MA."
   padDigits: number; // 4
   systemName: string;
   schoolName: string;
@@ -403,7 +403,7 @@ export interface ChapterMember {
   id: string;
   chapterId: string;
   alumniId: string;
-  alumniNumber: string; // "MA. 0001"
+  alumniNumber: string; // "MA.0001"
   alumniName: string;
   alumniEmail: string;
   roleInChapter: 'MEMBER' | 'LEADER' | 'COORDINATOR';

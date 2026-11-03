@@ -171,7 +171,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   });
 
   // Settings Edit State
-  const [prefixInput, setPrefixInput] = useState('MA. ');
+  const [prefixInput, setPrefixInput] = useState('MA.');
   const [padDigitsInput, setPadDigitsInput] = useState(4);
   const [autoApproveInput, setAutoApproveInput] = useState(true);
   const [allowSelfAssignedInput, setAllowSelfAssignedInput] = useState(false);
@@ -344,7 +344,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
       const settings = await dataService.getSystemSettings();
       setSystemSettings(settings);
-      setPrefixInput(settings.prefix || 'MA. ');
+      setPrefixInput((settings.prefix || 'MA.').replace(/\s+$/, ''));
       setPadDigitsInput(settings.padDigits || 4);
       setAutoApproveInput(settings.autoApproveRegistrations !== false);
       setAllowSelfAssignedInput(settings.allowSelfAssignedAlumniNumber === true);
@@ -2438,7 +2438,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       style={{ width: '100%', padding: '0.75rem', fontWeight: 700, fontFamily: 'monospace' }}
                     />
                     <span style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem', display: 'block' }}>
-                      Examples: "MA. " creates <strong>MA. 0001</strong>; "MOSA-" creates <strong>MOSA-000001</strong>.
+                      Examples: "MA." creates <strong>MA.0001</strong>; "MOSA-" creates <strong>MOSA-000001</strong>.
                     </span>
                   </div>
 
@@ -2452,12 +2452,12 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
                       onChange={e => setPadDigitsInput(Number(e.target.value))}
                       style={{ width: '100%', padding: '0.75rem' }}
                     >
-                      <option value={1}>1 Digit (e.g. MA. 1, MA. 2, MA. 3)</option>
-                      <option value={2}>2 Digits (e.g. MA. 01, MA. 02, MA. 03)</option>
-                      <option value={3}>3 Digits (e.g. MA. 001, MA. 002, MA. 003)</option>
-                      <option value={4}>4 Digits (e.g. MA. 0001, MA. 0002, MA. 0003)</option>
-                      <option value={5}>5 Digits (e.g. MA. 00001)</option>
-                      <option value={6}>6 Digits (e.g. MA. 000001)</option>
+                      <option value={1}>1 Digit (e.g. MA.1, MA.2, MA.3)</option>
+                      <option value={2}>2 Digits (e.g. MA.01, MA.02, MA.03)</option>
+                      <option value={3}>3 Digits (e.g. MA.001, MA.002, MA.003)</option>
+                      <option value={4}>4 Digits (e.g. MA.0001, MA.0002, MA.0003)</option>
+                      <option value={5}>5 Digits (e.g. MA.00001)</option>
+                      <option value={6}>6 Digits (e.g. MA.000001)</option>
                     </select>
                   </div>
 

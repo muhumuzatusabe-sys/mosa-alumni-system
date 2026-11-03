@@ -30,7 +30,7 @@ import {
   BallotVote,
   AuthUser
 } from '../types';
-import { dataService } from '../services/dataService';
+import { dataService, cleanMANumber } from '../services/dataService';
 
 interface ElectionsHubProps {
   currentUser: AuthUser | null;
@@ -725,7 +725,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                                   </div>
 
                                   <div style={{ fontSize: '0.78rem', color: '#D97706', fontWeight: 700, margin: '0.1rem 0' }}>
-                                    {cand.alumniNumber} • {cand.cohort}
+                                    {cleanMANumber(cand.alumniNumber)} • {cand.cohort}
                                   </div>
 
                                   {cand.profession && (
@@ -847,7 +847,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                         {cand.fullName}
                       </h3>
                       <div style={{ fontSize: '0.8rem', color: '#D97706', fontWeight: 700 }}>
-                        {cand.alumniNumber} • {cand.cohort}
+                        {cleanMANumber(cand.alumniNumber)} • {cand.cohort}
                       </div>
                       {cand.profession && (
                         <div style={{ fontSize: '0.78rem', color: '#64748B' }}>
@@ -886,7 +886,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                   {cand.seconderName && (
                     <div style={{ fontSize: '0.75rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                       <ShieldCheck size={14} color="#047857" />
-                      Seconded by {cand.seconderName} ({cand.seconderAlumniNumber || 'Verified'})
+                      Seconded by {cand.seconderName} ({cleanMANumber(cand.seconderAlumniNumber) || 'Verified'})
                     </div>
                   )}
                 </div>
@@ -1026,7 +1026,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                               {cand.fullName}
                             </span>
                             <span style={{ fontSize: '0.75rem', color: '#D97706', fontWeight: 700 }}>
-                              ({cand.alumniNumber})
+                              ({cleanMANumber(cand.alumniNumber)})
                             </span>
                             {isWinner && (
                               <span style={{ fontSize: '0.7rem', background: '#FEF3C7', color: '#B45309', fontWeight: 800, padding: '0.1rem 0.45rem', borderRadius: '4px', border: '1px solid #FDE68A' }}>
@@ -1268,7 +1268,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                     {inspectCandidate.fullName}
                   </h3>
                   <div style={{ fontSize: '0.8rem', color: '#D97706', fontWeight: 700 }}>
-                    {inspectCandidate.alumniNumber} &bull; Cohort {inspectCandidate.cohort}
+                    {cleanMANumber(inspectCandidate.alumniNumber)} &bull; Cohort {inspectCandidate.cohort}
                   </div>
                   {inspectCandidate.profession && (
                     <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
@@ -1298,7 +1298,7 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
             {inspectCandidate.seconderName && (
               <div style={{ fontSize: '0.8rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem' }}>
                 <ShieldCheck size={16} color="#047857" />
-                Officially Seconded by: <strong>{inspectCandidate.seconderName}</strong> ({inspectCandidate.seconderAlumniNumber || 'Verified Member'})
+                Officially Seconded by: <strong>{inspectCandidate.seconderName}</strong> ({cleanMANumber(inspectCandidate.seconderAlumniNumber) || 'Verified Member'})
               </div>
             )}
 

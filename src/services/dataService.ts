@@ -145,9 +145,9 @@ const safeStorage = {
 
 // Default initial state
 const defaultSettings: SystemSettings = {
-  nextAlumniNumber: 1, // Clean baseline starts at 1 (MA. 0001)
+  nextAlumniNumber: 1, // Clean baseline starts at 1 (MA.0001)
   nextApplicationNumber: 1,
-  prefix: 'MA. ',
+  prefix: 'MA.',
   padDigits: 4,
   systemName: 'MOSA Alumni Management System',
   schoolName: 'Mandela Secondary School Hoima (MASSH)',
@@ -868,24 +868,64 @@ function initLocalStore() {
     safeStorage.removeItem('mosa_admin_lockouts');
     safeStorage.setItem(CLEAN_BASELINE_KEY, 'v5_clean');
   }
+
+  // Ensure prefix has no trailing space and stored alumni numbers have first digit near dot
+  try {
+    const rawSettings = safeStorage.getItem(STORAGE_KEYS.SETTINGS);
+    if (rawSettings) {
+      const s = JSON.parse(rawSettings);
+      if (s.prefix && s.prefix.endsWith(' ')) {
+        s.prefix = s.prefix.trimEnd();
+        safeStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(s));
+      }
+    }
+    const rawUser = safeStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.alumniNumber && /^MA[\.\-\s]/i.test(u.alumniNumber)) {
+        u.alumniNumber = u.alumniNumber.replace(/^MA[\.\-\s]+/i, 'MA.');
+        safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(u));
+      }
+    }
+  } catch {}
 }
 
 initLocalStore();
 
+/**
+ * Universal cleaner: ensures whatever format, the first digit is immediately near the dot (e.g. MA.0001, MA.001)
+ */
+export function cleanMANumber(input?: string | null): string {
+  if (!input) return '';
+  const trimmed = input.trim();
+  if (/^MA[\.\-\s]/i.test(trimmed)) {
+    return trimmed.replace(/^MA[\.\-\s]+/i, 'MA.');
+  }
+  return trimmed;
+}
+
 export const dataService = {
-  // Format membership number, e.g. MA. 0001
-  formatAlumniNumber(num: number, prefix = 'MA. ', pad = 4): string {
-    return `${prefix}${String(num).padStart(pad, '0')}`;
+  // Format membership number, e.g. MA.0001
+  formatAlumniNumber(num: number, prefix = 'MA.', pad = 4): string {
+    const cleanPrefix = (prefix || 'MA.').replace(/\s+$/, '').replace(/^MA\.\s*/i, 'MA.');
+    return `${cleanPrefix}${String(num).padStart(pad, '0')}`;
   },
 
-  // Normalize acceptable formatting consistently (e.g. ma.0001, MA-0001, 0001 -> MA. 0001)
-  normalizeAlumniNumber(input: string, prefix = 'MA. ', pad = 4): string {
+  // Normalize acceptable formatting consistently (e.g. ma.0001, MA-0001, 0001 -> MA.0001)
+  normalizeAlumniNumber(input: string, prefix = 'MA.', pad = 4): string {
     if (!input) return '';
     const trimmed = input.trim();
     const digitMatch = trimmed.match(/\d+/);
-    if (!digitMatch) return trimmed.toUpperCase();
+    if (!digitMatch) {
+      return trimmed.replace(/^MA[\.\-\s]+/i, 'MA.').toUpperCase();
+    }
+    const cleanPrefix = (prefix || 'MA.').replace(/\s+$/, '').replace(/^MA\.\s*/i, 'MA.');
     const num = parseInt(digitMatch[0], 10);
-    return `${prefix}${String(num).padStart(pad, '0')}`;
+    return `${cleanPrefix}${String(num).padStart(pad, '0')}`;
+  },
+
+  cleanAlumniNumber(input?: string | null): string {
+    return cleanMANumber(input);
   },
 
   // Check duplicate applicant
@@ -1459,12 +1499,11 @@ export const dataService = {
         }
         generatedNumber = cleaned;
       } else {
-        // Safe automatic generator skipping any reserved/manual numbers
-        let currentCounter = settings.nextAlumniNumber || 1;
-        while (usedRegistry.has(this.formatAlumniNumber(currentCounter, settings.prefix || 'MA. ', settings.padDigits || 4))) {
+        const activePrefix = (settings.prefix || 'MA.').replace(/\s+$/, '');
+        while (usedRegistry.has(this.formatAlumniNumber(currentCounter, activePrefix, settings.padDigits || 4))) {
           currentCounter++;
         }
-        generatedNumber = this.formatAlumniNumber(currentCounter, settings.prefix || 'MA. ', settings.padDigits || 4);
+        generatedNumber = this.formatAlumniNumber(currentCounter, activePrefix, settings.padDigits || 4);
         settings.nextAlumniNumber = currentCounter + 1;
       }
 
@@ -1694,8 +1733,11 @@ export const dataService = {
       }
     }
 
-    // Ensure all profiles have fullName populated
+    // Ensure all profiles have clean MA number and fullName populated
     list.forEach(a => {
+      if (a.alumniNumber) {
+        a.alumniNumber = cleanMANumber(a.alumniNumber);
+      }
       if (!a.fullName) {
         a.fullName = [a.firstName, a.middleName, a.lastName].filter(Boolean).join(' ');
       }
@@ -1706,8 +1748,11 @@ export const dataService = {
 
   async getAlumniByNumber(alumniNumber: string): Promise<AlumniProfile | null> {
     const list = await this.getAlumniList();
-    const cleanQuery = alumniNumber.trim().toUpperCase().replace(/\s+/g, ' ');
-    return list.find(a => a.alumniNumber.toUpperCase().replace(/\s+/g, ' ') === cleanQuery) || null;
+    const cleanQuery = cleanMANumber(alumniNumber).toUpperCase();
+    return list.find(a => 
+      cleanMANumber(a.alumniNumber).toUpperCase() === cleanQuery || 
+      a.alumniNumber.toUpperCase().replace(/[\s\.]/g, '') === cleanQuery.replace(/[\s\.]/g, '')
+    ) || null;
   },
 
   async getAlumniById(id: string): Promise<AlumniProfile | null> {
@@ -3084,7 +3129,11 @@ export const dataService = {
     const raw = safeStorage.getItem(STORAGE_KEYS.CURRENT_USER);
     if (!raw) return null;
     try {
-      return JSON.parse(raw);
+      const user = JSON.parse(raw);
+      if (user && user.alumniNumber) {
+        user.alumniNumber = cleanMANumber(user.alumniNumber);
+      }
+      return user;
     } catch {
       return null;
     }

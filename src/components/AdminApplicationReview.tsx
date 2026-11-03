@@ -1258,7 +1258,7 @@ export const AdminApplicationReview: React.FC<Props> = ({
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {[0, 1, 2, 3, 4, 5, 6, 7].map(offset => {
                   const num = (systemSettings?.nextAlumniNumber || 1) + offset;
-                  const formatted = dataService.formatAlumniNumber(num, prefixInput || 'MA. ', padDigitsInput || 4);
+                  const formatted = dataService.formatAlumniNumber(num, (prefixInput || 'MA.').replace(/\s+$/, ''), padDigitsInput || 4);
                   return (
                     <div key={num} style={{ background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '0.5rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
                       <div style={{ fontSize: '0.7rem', color: '#94A3B8' }}>#{num}</div>

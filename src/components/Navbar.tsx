@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthUser, ModuleSettings, AlumniProfile } from '../types';
 import { isStaffRole } from '../services/governanceService';
-import { dataService } from '../services/dataService';
+import { dataService, cleanMANumber } from '../services/dataService';
 import { 
   Users, 
   ShieldCheck, 
@@ -109,16 +109,17 @@ export const Navbar: React.FC<NavbarProps> = ({
     (memberProfile ? `${memberProfile.firstName} ${memberProfile.lastName}` : currentUser?.displayName) || 
     (currentUser?.email ? currentUser.email.split('@')[0] : 'Guest Visitor');
 
-  const memberNumber = memberProfile?.alumniNumber || 
+  const rawMemberNumber = memberProfile?.alumniNumber || 
     currentUser?.alumniNumber || 
-    (currentUser ? 'MA. PENDING' : 'NOT VERIFIED');
+    (currentUser ? 'MA.PENDING' : 'NOT VERIFIED');
+  const memberNumber = cleanMANumber(rawMemberNumber);
 
   const memberPhoto = memberProfile?.photoUrl || 
     currentUser?.photoUrl || 
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face';
 
   return (
-    <header className="mosa-header" style={{ position: 'relative', zIndex: 1100 }}>
+    <header className="mosa-header" style={{ position: 'sticky', top: 0, zIndex: 1100, background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
       <div className="mosa-nav-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', padding: '0.65rem 1.25rem' }}>
         {/* Left: Official School Crest linking to Home */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexShrink: 0 }}>
