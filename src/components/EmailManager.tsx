@@ -8,10 +8,14 @@ import {
   Key, 
   ShieldCheck, 
   Clock, 
-  ExternalLink, 
   Save,
   Check,
-  Inbox
+  Inbox,
+  Sparkles,
+  ExternalLink,
+  Globe,
+  Sliders,
+  CheckCircle
 } from 'lucide-react';
 import { 
   emailService, 
@@ -27,13 +31,22 @@ export const EmailManager: React.FC = () => {
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; provider?: string } | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'config' | 'logs'>('config');
+  const [loadingCloud, setLoadingCloud] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setSettings(emailService.getEmailSettings());
+  const loadData = async () => {
+    setLoadingCloud(true);
+    try {
+      const synced = await emailService.syncEmailSettingsFromCloud();
+      setSettings(synced);
+    } catch {
+      setSettings(emailService.getEmailSettings());
+    } finally {
+      setLoadingCloud(false);
+    }
     setLogs(emailService.getEmailLogs());
   };
 
@@ -41,7 +54,7 @@ export const EmailManager: React.FC = () => {
     e.preventDefault();
     emailService.saveEmailSettings(settings);
     setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    setTimeout(() => setSaveSuccess(false), 4000);
   };
 
   const handleSendTest = async (e: React.FormEvent) => {
@@ -55,19 +68,22 @@ export const EmailManager: React.FC = () => {
     setTestResult(null);
 
     try {
+      // First save current inputs before test dispatch
+      emailService.saveEmailSettings(settings);
+
       const res = await emailService.sendTestEmail(testEmail);
       if (res.success) {
         if (res.provider === 'local_offline') {
           setTestResult({
             success: true,
-            provider: 'Offline / Audit Log',
-            message: `Dispatched in offline audit mode. To deliver real emails to actual external inboxes, please enter your Brevo, Resend, or EmailJS API key below.`,
+            provider: 'Offline / Direct Verification Mode',
+            message: `Dispatched in offline audit mode. The email was logged in history. To deliver directly to external email inboxes (e.g. Gmail), enter a free API key from Brevo or Web3Forms below.`,
           });
         } else {
           setTestResult({
             success: true,
-            provider: res.provider,
-            message: `Test email successfully dispatched to ${testEmail} via ${res.provider?.toUpperCase()}! Please check your inbox and spam folder.`,
+            provider: res.provider?.toUpperCase(),
+            message: `Test email successfully dispatched to ${testEmail} via ${res.provider?.toUpperCase()}! Check your inbox (and spam/junk folder).`,
           });
         }
       } else {
@@ -89,7 +105,7 @@ export const EmailManager: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Header */}
+      {/* Header Banner */}
       <div style={{
         background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
         color: '#FFFFFF',
@@ -117,11 +133,11 @@ export const EmailManager: React.FC = () => {
               <Mail size={20} />
             </div>
             <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800 }}>
-              Official Email Dispatcher & Verification
+              Official Email Gateway & Verification Settings
             </h2>
           </div>
           <p style={{ margin: 0, fontSize: '0.86rem', color: '#A7F3D0', maxWidth: '650px', lineHeight: 1.5 }}>
-            Deliver registration OTPs, application receipt notices, and membership approval letters directly into alumni email inboxes.
+            Configure and test how the system dispatches registration OTP codes, application receipt confirmations, and permanent MA approval letters.
           </p>
         </div>
 
@@ -177,7 +193,7 @@ export const EmailManager: React.FC = () => {
 
       {/* TAB 1: PROVIDER CONFIGURATION & TEST */}
       {activeTab === 'config' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: '1.5rem' }}>
           {/* Settings Form */}
           <div style={{
             background: '#FFFFFF',
@@ -186,34 +202,49 @@ export const EmailManager: React.FC = () => {
             padding: '1.5rem',
             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
           }}>
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.05rem', color: '#0F172A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <ShieldCheck size={18} color="#059669" />
-              <span>Email Gateway Configuration</span>
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShieldCheck size={18} color="#059669" />
+                  <span>Email Provider Settings</span>
+                </h3>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
+                  Select which email delivery service sends real emails to recipients. Settings sync to cloud database.
+                </div>
+              </div>
+              {loadingCloud && (
+                <span style={{ fontSize: '0.75rem', color: '#059669', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <RefreshCw size={13} className="animate-spin" />
+                  <span>Syncing...</span>
+                </span>
+              )}
+            </div>
 
             {saveSuccess && (
               <div style={{
                 background: '#ECFDF5',
-                border: '1px solid #6EE7B7',
+                border: '1.5px solid #6EE7B7',
                 borderRadius: '8px',
-                padding: '0.75rem 1rem',
+                padding: '0.85rem 1rem',
                 color: '#065F46',
-                fontSize: '0.86rem',
-                fontWeight: 600,
+                fontSize: '0.88rem',
+                fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                marginBottom: '1rem'
+                marginBottom: '1.25rem'
               }}>
-                <Check size={16} />
-                <span>Email dispatcher settings saved successfully!</span>
+                <Check size={18} />
+                <span>Email gateway settings saved and synchronized to cloud database!</span>
               </div>
             )}
 
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.35rem' }}>
-                  Primary Dispatch Provider
+              
+              {/* Primary Dispatch Mode Selector */}
+              <div style={{ background: '#F8FAFC', padding: '1.15rem', borderRadius: '10px', border: '1.5px solid #CBD5E1' }}>
+                <label style={{ display: 'block', fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', marginBottom: '0.35rem' }}>
+                  Active Email Dispatch Gateway
                 </label>
                 <select
                   value={settings.provider}
@@ -222,91 +253,77 @@ export const EmailManager: React.FC = () => {
                     width: '100%',
                     padding: '0.75rem',
                     borderRadius: '8px',
-                    border: '1px solid #CBD5E1',
-                    fontSize: '0.9rem',
-                    background: '#FFFFFF'
+                    border: '1.5px solid #059669',
+                    fontSize: '0.92rem',
+                    fontWeight: 700,
+                    background: '#FFFFFF',
+                    color: '#0A271B',
+                    outline: 'none'
                   }}
                 >
-                  <option value="auto">Auto-Detect (Gmail SMTP → Brevo → Resend → EmailJS)</option>
-                  <option value="smtp">Official Gmail SMTP (masshalumni@gmail.com • Connected)</option>
-                  <option value="brevo">Brevo / Sendinblue (Recommended • 300 free emails/day)</option>
-                  <option value="resend">Resend (Modern Transactional REST API)</option>
-                  <option value="emailjs">EmailJS (Client-side browser dispatch)</option>
-                  <option value="web3forms">Web3Forms (Zero-config webhook)</option>
+                  <option value="auto">Auto-Detect Relay (Recommended • Brevo → Web3Forms → FormSubmit)</option>
+                  <option value="brevo">Brevo / Sendinblue (Recommended for masshalumni@gmail.com • 300 free/day)</option>
+                  <option value="web3forms">Web3Forms API (Instant CORS delivery to external inboxes)</option>
+                  <option value="resend">Resend REST API (Modern transactional delivery)</option>
+                  <option value="emailjs">EmailJS (Browser SDK client-side dispatch)</option>
+                  <option value="smtp">Direct SMTP (requires browser-compatible relay)</option>
                 </select>
-                <span style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '0.25rem', display: 'block' }}>
-                  Choose which delivery network sends emails to recipient inboxes.
-                </span>
+                <div style={{ fontSize: '0.76rem', color: '#64748B', marginTop: '0.45rem', lineHeight: 1.45 }}>
+                  <strong>Auto-Detect:</strong> Delivers via whichever API key you enter below. If no API key is entered, it safely falls back to direct verification so users are never blocked.
+                </div>
               </div>
 
-              {/* Official Gmail SMTP Settings */}
+              {/* Sender Details */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
+                    Sender Name
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.senderName}
+                    onChange={e => setSettings({ ...settings, senderName: e.target.value })}
+                    style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
+                    Official Sender Email
+                  </label>
+                  <input
+                    type="email"
+                    value={settings.senderEmail}
+                    onChange={e => setSettings({ ...settings, senderEmail: e.target.value })}
+                    style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              {/* Provider 1: Brevo (Sendinblue) */}
               <div style={{
-                background: '#F0FDF4',
-                border: '1.5px solid #86EFAC',
+                background: settings.provider === 'brevo' || settings.brevoApiKey ? '#F0FDF4' : '#F8FAFC',
+                border: settings.provider === 'brevo' ? '2px solid #059669' : '1px solid #E2E8F0',
                 borderRadius: '10px',
                 padding: '1rem'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#065F46' }}>
-                    Official MASSH Gmail SMTP Gateway
-                  </label>
-                  <span style={{
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    padding: '0.2rem 0.5rem',
-                    borderRadius: '4px',
-                    background: '#DCFCE7',
-                    color: '#0A271B'
-                  }}>
-                    Active &bull; Google App Password Linked
-                  </span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <div>
-                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Gmail Address</label>
-                    <input
-                      type="email"
-                      value={settings.smtpUser || ''}
-                      onChange={e => setSettings({ ...settings, smtpUser: e.target.value })}
-                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
-                    />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>
+                      1. Brevo (Sendinblue) REST API Key
+                    </span>
+                    <span style={{ fontSize: '0.72rem', background: '#DCFCE7', color: '#0A271B', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
+                      Recommended
+                    </span>
                   </div>
-                  <div>
-                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Google App Password (16 chars)</label>
-                    <input
-                      type="password"
-                      placeholder="•••• •••• •••• ••••"
-                      value={settings.smtpPass || ''}
-                      onChange={e => setSettings({ ...settings, smtpPass: e.target.value })}
-                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
-                    />
-                  </div>
-                </div>
-                <span style={{ fontSize: '0.74rem', color: '#14532D', marginTop: '0.2rem', display: 'block' }}>
-                  Linked to Google Account: <strong>masshalumni@gmail.com</strong> (App: MASSH ALUMNI).
-                </span>
-              </div>
-
-              {/* Brevo Settings */}
-              <div style={{
-                background: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                borderRadius: '10px',
-                padding: '1rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0F172A' }}>
-                    Brevo (Sendinblue) API Key
-                  </label>
                   <span style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
-                    padding: '0.2rem 0.5rem',
+                    padding: '0.15rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.brevoApiKey ? '#DCFCE7' : '#F1F5F9',
                     color: settings.brevoApiKey ? '#0A271B' : '#64748B'
                   }}>
-                    {settings.brevoApiKey ? 'Configured' : 'Optional'}
+                    {settings.brevoApiKey ? 'Key Saved' : 'Not Set'}
                   </span>
                 </div>
                 <input
@@ -316,38 +333,79 @@ export const EmailManager: React.FC = () => {
                   onChange={e => setSettings({ ...settings, brevoApiKey: e.target.value })}
                   style={{
                     width: '100%',
-                    padding: '0.7rem',
+                    padding: '0.65rem 0.85rem',
                     borderRadius: '6px',
                     border: '1px solid #CBD5E1',
                     fontSize: '0.88rem',
                     boxSizing: 'border-box'
                   }}
                 />
-                <span style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.35rem', display: 'block' }}>
-                  Get your free API key at <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 600 }}>brevo.com</a> (Free tier sends 300 emails/day).
-                </span>
+                <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.35rem' }}>
+                  Free plan sends 300 emails/day directly from <code>masshalumni@gmail.com</code>. Get your free API key at <a href="https://app.brevo.com/settings/keys/api" target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 700 }}>brevo.com/api-keys</a>.
+                </div>
               </div>
 
-              {/* Resend Settings */}
+              {/* Provider 2: Web3Forms */}
               <div style={{
-                background: '#F8FAFC',
-                border: '1px solid #E2E8F0',
+                background: settings.provider === 'web3forms' || settings.web3formsAccessKey ? '#F0FDF4' : '#F8FAFC',
+                border: settings.provider === 'web3forms' ? '2px solid #059669' : '1px solid #E2E8F0',
                 borderRadius: '10px',
                 padding: '1rem'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0F172A' }}>
-                    Resend API Key
-                  </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>
+                    2. Web3Forms Access Key
+                  </span>
                   <span style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
-                    padding: '0.2rem 0.5rem',
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: '4px',
+                    background: settings.web3formsAccessKey ? '#DCFCE7' : '#F1F5F9',
+                    color: settings.web3formsAccessKey ? '#0A271B' : '#64748B'
+                  }}>
+                    {settings.web3formsAccessKey ? 'Key Saved' : 'Optional'}
+                  </span>
+                </div>
+                <input
+                  type="password"
+                  placeholder="Paste Web3Forms Access Key (e.g. 00000000-0000-0000-0000-000000000000)"
+                  value={settings.web3formsAccessKey || ''}
+                  onChange={e => setSettings({ ...settings, web3formsAccessKey: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.85rem',
+                    borderRadius: '6px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '0.88rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.35rem' }}>
+                  Instant zero-config email delivery. Get free access key at <a href="https://web3forms.com" target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 700 }}>web3forms.com</a> (requires no credit card).
+                </div>
+              </div>
+
+              {/* Provider 3: Resend */}
+              <div style={{
+                background: settings.provider === 'resend' || settings.resendApiKey ? '#F0FDF4' : '#F8FAFC',
+                border: settings.provider === 'resend' ? '2px solid #059669' : '1px solid #E2E8F0',
+                borderRadius: '10px',
+                padding: '1rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>
+                    3. Resend API Key
+                  </span>
+                  <span style={{
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    padding: '0.15rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.resendApiKey ? '#DCFCE7' : '#F1F5F9',
                     color: settings.resendApiKey ? '#0A271B' : '#64748B'
                   }}>
-                    {settings.resendApiKey ? 'Configured' : 'Optional'}
+                    {settings.resendApiKey ? 'Key Saved' : 'Optional'}
                   </span>
                 </div>
                 <input
@@ -357,116 +415,92 @@ export const EmailManager: React.FC = () => {
                   onChange={e => setSettings({ ...settings, resendApiKey: e.target.value })}
                   style={{
                     width: '100%',
-                    padding: '0.7rem',
+                    padding: '0.65rem 0.85rem',
                     borderRadius: '6px',
                     border: '1px solid #CBD5E1',
                     fontSize: '0.88rem',
                     boxSizing: 'border-box'
                   }}
                 />
-                <span style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.35rem', display: 'block' }}>
-                  Get your API key at <a href="https://resend.com/api-keys" target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 600 }}>resend.com</a>.
-                </span>
+                <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.35rem' }}>
+                  Get your transactional API key at <a href="https://resend.com/api-keys" target="_blank" rel="noreferrer" style={{ color: '#059669', fontWeight: 700 }}>resend.com</a>.
+                </div>
               </div>
 
-              {/* EmailJS Settings */}
+              {/* Provider 4: EmailJS */}
               <div style={{
-                background: '#F8FAFC',
-                border: '1px solid #E2E8F0',
+                background: settings.provider === 'emailjs' || settings.emailjsPublicKey ? '#F0FDF4' : '#F8FAFC',
+                border: settings.provider === 'emailjs' ? '2px solid #059669' : '1px solid #E2E8F0',
                 borderRadius: '10px',
                 padding: '1rem'
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0F172A' }}>
-                    EmailJS Configuration
-                  </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>
+                    4. EmailJS Configuration
+                  </span>
                   <span style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
-                    padding: '0.2rem 0.5rem',
+                    padding: '0.15rem 0.5rem',
                     borderRadius: '4px',
                     background: settings.emailjsPublicKey ? '#DCFCE7' : '#F1F5F9',
                     color: settings.emailjsPublicKey ? '#0A271B' : '#64748B'
                   }}>
-                    {settings.emailjsPublicKey ? 'Configured' : 'Optional'}
+                    {settings.emailjsPublicKey ? 'Key Saved' : 'Optional'}
                   </span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
                   <div>
-                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Service ID</label>
+                    <label style={{ fontSize: '0.76rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Service ID</label>
                     <input
                       type="text"
                       placeholder="service_xxx"
                       value={settings.emailjsServiceId || ''}
                       onChange={e => setSettings({ ...settings, emailjsServiceId: e.target.value })}
-                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.84rem', boxSizing: 'border-box' }}
                     />
                   </div>
                   <div>
-                    <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Template ID</label>
+                    <label style={{ fontSize: '0.76rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Template ID</label>
                     <input
                       type="text"
                       placeholder="template_xxx"
                       value={settings.emailjsTemplateId || ''}
                       onChange={e => setSettings({ ...settings, emailjsTemplateId: e.target.value })}
-                      style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                      style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.84rem', boxSizing: 'border-box' }}
                     />
                   </div>
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.78rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Public Key</label>
+                  <label style={{ fontSize: '0.76rem', color: '#475569', display: 'block', marginBottom: '0.2rem' }}>Public Key</label>
                   <input
                     type="password"
-                    placeholder="Public Key from Account Settings"
+                    placeholder="Public Key from EmailJS"
                     value={settings.emailjsPublicKey || ''}
                     onChange={e => setSettings({ ...settings, emailjsPublicKey: e.target.value })}
-                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.84rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
-              {/* Sender Info */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
-                    Sender Name
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.senderName}
-                    onChange={e => setSettings({ ...settings, senderName: e.target.value })}
-                    style={{ width: '100%', padding: '0.7rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.88rem', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
-                    Sender Email
-                  </label>
-                  <input
-                    type="email"
-                    value={settings.senderEmail}
-                    onChange={e => setSettings({ ...settings, senderEmail: e.target.value })}
-                    style={{ width: '100%', padding: '0.7rem', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.88rem', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
-
+              {/* Save Settings Action Button */}
               <button
                 type="submit"
                 style={{
                   background: '#0A271B',
                   color: '#FFFFFF',
-                  padding: '0.85rem 1.5rem',
-                  borderRadius: '8px',
+                  padding: '0.9rem 1.5rem',
+                  borderRadius: '10px',
                   border: 'none',
-                  fontWeight: 700,
-                  fontSize: '0.92rem',
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.5rem',
-                  boxShadow: '0 4px 10px rgba(17, 61, 43, 0.2)'
+                  boxShadow: '0 4px 12px rgba(10, 39, 27, 0.25)',
+                  marginTop: '0.5rem'
                 }}
               >
                 <Save size={18} />
@@ -475,26 +509,28 @@ export const EmailManager: React.FC = () => {
             </form>
           </div>
 
-          {/* Test Dispatch Card */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Right Column: Live Test Dispatch & Status */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            
+            {/* Live Test Tool */}
             <div style={{
               background: '#FFFFFF',
               borderRadius: '12px',
-              border: '1.5px solid #E2E8F0',
+              border: '1.5px solid #CBD5E1',
               padding: '1.5rem',
               boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
             }}>
-              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#0F172A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3 style={{ margin: '0 0 0.4rem 0', fontSize: '1rem', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Send size={18} color="#059669" />
                 <span>Live Test Dispatch</span>
               </h3>
               <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: '#64748B', lineHeight: 1.45 }}>
-                Send a real test email to verify that your configured email provider delivers directly to an external recipient inbox.
+                Send a real test email to check delivery into an external inbox.
               </p>
 
               <form onSubmit={handleSendTest} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <div>
-                  <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '0.25rem' }}>
                     Recipient Email Address
                   </label>
                   <input
@@ -506,8 +542,8 @@ export const EmailManager: React.FC = () => {
                     style={{
                       width: '100%',
                       padding: '0.7rem',
-                      borderRadius: '6px',
-                      border: '1px solid #CBD5E1',
+                      borderRadius: '8px',
+                      border: '1.5px solid #CBD5E1',
                       fontSize: '0.88rem',
                       boxSizing: 'border-box'
                     }}
@@ -523,13 +559,14 @@ export const EmailManager: React.FC = () => {
                     padding: '0.75rem',
                     borderRadius: '8px',
                     border: 'none',
-                    fontWeight: 700,
+                    fontWeight: 800,
                     fontSize: '0.88rem',
                     cursor: sendingTest ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.5rem'
+                    gap: '0.5rem',
+                    boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
                   }}
                 >
                   {sendingTest ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
@@ -547,31 +584,33 @@ export const EmailManager: React.FC = () => {
                   fontSize: '0.82rem',
                   color: testResult.success ? '#065F46' : '#991B1B'
                 }}>
-                  <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
+                  <div style={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
                     {testResult.success ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                    <span>{testResult.success ? 'Test Dispatched' : 'Dispatch Failed'}</span>
+                    <span>{testResult.success ? 'Dispatch Completed' : 'Dispatch Failed'}</span>
                   </div>
                   <div>{testResult.message}</div>
                 </div>
               )}
             </div>
 
-            {/* Quick Status Pill */}
+            {/* Verification Flow Info Box */}
             <div style={{
-              background: '#F8FAFC',
+              background: '#F0FDF4',
               borderRadius: '12px',
-              border: '1px solid #E2E8F0',
+              border: '1.5px solid #86EFAC',
               padding: '1.25rem',
               fontSize: '0.82rem',
-              color: '#475569'
+              color: '#14532D'
             }}>
-              <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: '0.5rem' }}>
-                How Email Delivery Works:
+              <div style={{ fontWeight: 800, color: '#0A271B', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <CheckCircle size={16} color="#059669" />
+                <span>Verification Alignment Status:</span>
               </div>
               <ul style={{ margin: 0, paddingLeft: '1.2rem', lineHeight: 1.6 }}>
-                <li><strong>Verification OTP:</strong> Sent when an alumnus registers or resets their password.</li>
-                <li><strong>Application Notice:</strong> Sent with reference ID when an application is submitted.</li>
-                <li><strong>Approval Letter:</strong> Sent with permanent MA number when membership is approved.</li>
+                <li><strong>Registration OTP:</strong> 6-digit confirmation code dispatched when members sign up.</li>
+                <li><strong>Application Notice:</strong> Dispatched immediately upon submission with reference number.</li>
+                <li><strong>Approval Letter:</strong> Dispatched when the Secretariat approves membership with their permanent MA number.</li>
+                <li><strong>Zero Lockout:</strong> If an external provider key runs out of quota, applicants can still verify directly on-screen without stalling.</li>
               </ul>
             </div>
           </div>
@@ -588,7 +627,7 @@ export const EmailManager: React.FC = () => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0F172A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0F172A', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Inbox size={18} color="#059669" />
               <span>Recent Dispatched Emails ({logs.length})</span>
             </h3>
@@ -599,85 +638,77 @@ export const EmailManager: React.FC = () => {
               style={{
                 background: '#F1F5F9',
                 border: '1px solid #CBD5E1',
-                padding: '0.4rem 0.8rem',
+                padding: '0.45rem 0.85rem',
                 borderRadius: '6px',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 fontWeight: 600,
-                color: '#334155',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem'
               }}
             >
-              <RefreshCw size={14} />
-              <span>Refresh Logs</span>
+              <RefreshCw size={13} />
+              <span>Refresh</span>
             </button>
           </div>
 
           {logs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#64748B' }}>
-              <Mail size={36} color="#CBD5E1" style={{ margin: '0 auto 0.75rem auto' }} />
-              <div style={{ fontWeight: 600 }}>No email dispatch events recorded yet.</div>
-              <div style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>
-                When applicants verify their email or register, events will appear here in real-time.
-              </div>
+            <div style={{ padding: '3rem 1rem', textAlign: 'center', color: '#94A3B8' }}>
+              <Mail size={36} style={{ margin: '0 auto 0.5rem auto', opacity: 0.5 }} />
+              <div>No emails dispatched in this session yet.</div>
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
                 <thead>
-                  <tr style={{ background: '#F8FAFC', borderBottom: '1.5px solid #E2E8F0', color: '#475569' }}>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Date & Time</th>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Recipient</th>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Subject</th>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Category</th>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Provider</th>
-                    <th style={{ padding: '0.75rem 0.85rem' }}>Status</th>
+                  <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E2E8F0', textAlign: 'left', color: '#475569' }}>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Timestamp</th>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Recipient</th>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Category</th>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Subject</th>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Provider</th>
+                    <th style={{ padding: '0.65rem 0.75rem' }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {logs.map((log) => (
                     <tr key={log.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                      <td style={{ padding: '0.75rem 0.85rem', color: '#64748B', whiteSpace: 'nowrap' }}>
-                        {new Date(log.timestamp).toLocaleString()}
+                      <td style={{ padding: '0.65rem 0.75rem', color: '#64748B', whiteSpace: 'nowrap' }}>
+                        {new Date(log.timestamp).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                       </td>
-                      <td style={{ padding: '0.75rem 0.85rem', fontWeight: 600, color: '#0F172A' }}>
-                        <div>{log.to}</div>
-                        <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 400 }}>{log.toName}</div>
+                      <td style={{ padding: '0.65rem 0.75rem', fontWeight: 600, color: '#0F172A' }}>
+                        <div>{log.toName}</div>
+                        <div style={{ fontSize: '0.74rem', color: '#64748B' }}>{log.to}</div>
                       </td>
-                      <td style={{ padding: '0.75rem 0.85rem', color: '#334155', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {log.subject}
-                      </td>
-                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                      <td style={{ padding: '0.65rem 0.75rem' }}>
                         <span style={{
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
                           fontSize: '0.72rem',
                           fontWeight: 700,
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '4px',
-                          background: log.category === 'VERIFICATION' ? '#FEF3C7' : log.category === 'MEMBERSHIP_APPROVED' ? '#DCFCE7' : '#E0E7FF',
-                          color: log.category === 'VERIFICATION' ? '#92400E' : log.category === 'MEMBERSHIP_APPROVED' ? '#0A271B' : '#3730A3'
+                          background: log.category === 'VERIFICATION' ? '#FEF3C7' : log.category === 'MEMBERSHIP_APPROVED' ? '#DCFCE7' : '#EFF6FF',
+                          color: log.category === 'VERIFICATION' ? '#92400E' : log.category === 'MEMBERSHIP_APPROVED' ? '#0A271B' : '#1E40AF',
                         }}>
                           {log.category}
                         </span>
                       </td>
-                      <td style={{ padding: '0.75rem 0.85rem', fontFamily: 'monospace', fontSize: '0.78rem', color: '#0F172A' }}>
+                      <td style={{ padding: '0.65rem 0.75rem', color: '#334155' }}>
+                        {log.subject}
+                      </td>
+                      <td style={{ padding: '0.65rem 0.75rem', fontFamily: 'monospace', fontSize: '0.76rem', color: '#0A271B' }}>
                         {log.provider}
                       </td>
-                      <td style={{ padding: '0.75rem 0.85rem' }}>
+                      <td style={{ padding: '0.65rem 0.75rem' }}>
                         <span style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          padding: '0.2rem 0.5rem',
-                          borderRadius: '4px',
-                          background: log.status === 'DELIVERED' ? '#DCFCE7' : log.status === 'QUEUED' ? '#E0F2FE' : '#FEF3C7',
-                          color: log.status === 'DELIVERED' ? '#0A271B' : log.status === 'QUEUED' ? '#075985' : '#92400E',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '0.25rem'
+                          gap: '0.25rem',
+                          color: log.status === 'DELIVERED' ? '#059669' : log.status === 'FAILED' ? '#DC2626' : '#D97706',
+                          fontWeight: 700,
+                          fontSize: '0.78rem'
                         }}>
-                          {log.status === 'DELIVERED' && <Check size={12} />}
-                          <span>{log.status}</span>
+                          {log.status === 'DELIVERED' ? '✓ Delivered' : log.status === 'FAILED' ? '✗ Failed' : '● ' + log.status}
                         </span>
                       </td>
                     </tr>

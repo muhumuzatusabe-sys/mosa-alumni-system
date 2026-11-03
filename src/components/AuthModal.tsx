@@ -1105,44 +1105,6 @@ export const AuthModal: React.FC<Props> = ({
           {/* ========================================================= */}
           {portal === 'admin' && (
             <div>
-              {/* Admin Banner */}
-              <div 
-                style={{ 
-                  background: '#FEF3C7', 
-                  border: '1.5px solid #FCD34D', 
-                  borderRadius: '12px', 
-                  padding: '1rem', 
-                  marginBottom: '1.25rem',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem'
-                }}
-              >
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: '#B45309',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <ShieldCheck size={20} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#92400E' }}>
-                    Executive Administrative Access
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#B45309', marginTop: '0.2rem', lineHeight: 1.4 }}>
-                    Authorized members sign in using the Admin Password. Nothing else is required.
-                  </div>
-                </div>
-              </div>
-
               <form onSubmit={handleAdminSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label required" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0A271B', display: 'block', marginBottom: '0.45rem' }}>
@@ -1187,9 +1149,6 @@ export const AuthModal: React.FC<Props> = ({
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#64748B', marginTop: '0.45rem' }}>
-                    Default Admin Password: <code style={{ background: '#F1F5F9', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>admin123</code>
                   </div>
                 </div>
 

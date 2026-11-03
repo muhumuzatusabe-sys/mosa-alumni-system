@@ -407,13 +407,12 @@ export const AlumniRegistrationWizard: React.FC<Props> = ({ isOpen, onClose, onS
 
       const res = await dataService.submitApplication(applicationPayload);
       if (res.success && res.id) {
-        setSuccessInfo({
-          id: res.id,
-          referenceId: res.referenceId || `MOSA-${new Date().getFullYear()}-${res.id.slice(-5)}`,
-          name: `${formData.firstName} ${formData.lastName}`,
-          alumniNumber: res.alumniNumber,
-        });
         onSuccess();
+        if (onNavigateToDashboard) {
+          onNavigateToDashboard();
+        } else {
+          onClose();
+        }
       } else {
         setErrorMsg(res.error || 'Failed to submit application. Please check details.');
       }

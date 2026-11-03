@@ -20,7 +20,8 @@ import {
   UserCheck,
   TrendingUp,
   BarChart2,
-  ExternalLink
+  ExternalLink,
+  Edit2
 } from 'lucide-react';
 import {
   ElectionCycle,
@@ -71,6 +72,11 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
   // Candidate details modal
   const [inspectCandidate, setInspectCandidate] = useState<Candidate | null>(null);
 
+  // Candidate Self-Service Manifesto State
+  const [editingMyManifesto, setEditingMyManifesto] = useState(false);
+  const [myManifestoDraft, setMyManifestoDraft] = useState('');
+  const [isSavingManifesto, setIsSavingManifesto] = useState(false);
+
   const loadData = async () => {
     setLoading(true);
     try {
@@ -102,6 +108,74 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
   useEffect(() => {
     loadData();
   }, [currentUser]);
+
+  // Real-time live polling & event listeners for ALWAYS LIVE results
+  useEffect(() => {
+    const handleLiveUpdate = () => {
+      if (selectedElection) {
+        dataService.getCandidates(selectedElection.id).then(setCandidates);
+        dataService.getElectionById(selectedElection.id).then(e => {
+          if (e) setSelectedElection(e);
+        });
+      }
+    };
+
+    window.addEventListener('mosa-vote-cast', handleLiveUpdate);
+    window.addEventListener('mosa-election-updated', handleLiveUpdate);
+    window.addEventListener('mosa-candidate-updated', handleLiveUpdate);
+    window.addEventListener('storage', handleLiveUpdate);
+
+    // Live tally polling every 3 seconds
+    const interval = setInterval(() => {
+      if (selectedElection) {
+        dataService.getCandidates(selectedElection.id).then(setCandidates);
+        dataService.getElectionById(selectedElection.id).then(e => {
+          if (e) setSelectedElection(e);
+        });
+      }
+    }, 3000);
+
+    return () => {
+      window.removeEventListener('mosa-vote-cast', handleLiveUpdate);
+      window.removeEventListener('mosa-election-updated', handleLiveUpdate);
+      window.removeEventListener('mosa-candidate-updated', handleLiveUpdate);
+      window.removeEventListener('storage', handleLiveUpdate);
+      clearInterval(interval);
+    };
+  }, [selectedElection?.id]);
+
+  // Identify if logged-in member is a vetted candidate
+  const myCandidateRecord = currentUser ? candidates.find(c =>
+    (currentUser.alumniNumber && c.alumniNumber === currentUser.alumniNumber) ||
+    (currentUser.alumniId && c.alumniId === currentUser.alumniId) ||
+    (currentUser.displayName && c.fullName.toLowerCase() === currentUser.displayName.toLowerCase())
+  ) : null;
+
+  const handleOpenMyManifesto = () => {
+    if (myCandidateRecord) {
+      setMyManifestoDraft(myCandidateRecord.manifesto || '');
+      setEditingMyManifesto(true);
+    }
+  };
+
+  const handleSaveMyManifesto = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!myCandidateRecord) return;
+    setIsSavingManifesto(true);
+    try {
+      await dataService.updateCandidateManifesto(myCandidateRecord.id, myManifestoDraft);
+      setEditingMyManifesto(false);
+      if (selectedElection) {
+        const cands = await dataService.getCandidates(selectedElection.id);
+        setCandidates(cands);
+      }
+      alert('Your candidate policy manifesto has been successfully updated and published.');
+    } catch (err: any) {
+      alert(`Failed to save manifesto: ${err.message}`);
+    } finally {
+      setIsSavingManifesto(false);
+    }
+  };
 
   const handleSelectCandidate = (positionId: string, candidateId: string) => {
     setBallotSelections(prev => ({
@@ -328,6 +402,60 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
         </div>
       </div>
 
+      {/* Candidate Self-Service Banner */}
+      {myCandidateRecord && (
+        <div style={{
+          background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+          border: '1.5px solid #F59E0B',
+          borderRadius: '12px',
+          padding: '1.1rem 1.35rem',
+          marginBottom: '1.75rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          boxShadow: '0 4px 12px rgba(217,119,6,0.15)'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.2rem' }}>
+              <span style={{ fontSize: '0.72rem', background: '#D97706', color: '#FFFFFF', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                OFFICIAL CANDIDATE
+              </span>
+              <span style={{ fontSize: '0.78rem', color: '#B45309', fontWeight: 700 }}>
+                {myCandidateRecord.alumniNumber}
+              </span>
+            </div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#92400E' }}>
+              You are contesting for {selectedElection.positions.find(p => p.id === myCandidateRecord.positionId)?.title || 'Office'}
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#78350F' }}>
+              Keep your campaign policy manifesto current so fellow verified alumni can read your pledges before casting their ballot.
+            </div>
+          </div>
+
+          <button
+            onClick={handleOpenMyManifesto}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: '#0B203E',
+              color: '#FFFFFF',
+              border: 'none',
+              padding: '0.6rem 1.25rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(11,32,62,0.25)'
+            }}
+          >
+            <Edit2 size={15} color="#FCD34D" /> Edit / Publish My Manifesto
+          </button>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="horizontal-scroll-touch" style={{ display: 'flex', borderBottom: '2px solid #E2E8F0', marginBottom: '1.75rem', gap: '0.5rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <button
@@ -396,7 +524,23 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
           }}
         >
           <BarChart2 size={18} color={activeTab === 'results' ? '#D97706' : '#64748B'} />
-          Certified Results & Tally
+          Live Results & Tally
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+            background: '#DCFCE7',
+            color: '#14532D',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            padding: '0.1rem 0.45rem',
+            borderRadius: '999px',
+            border: '1px solid #86EFAC',
+            marginLeft: '0.2rem'
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#0A271B', display: 'inline-block' }} />
+            LIVE
+          </span>
         </button>
 
         <button
@@ -590,15 +734,35 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                                     </div>
                                   )}
 
-                                  <p style={{ fontSize: '0.78rem', color: '#475569', lineHeight: 1.4, margin: '0 0 0.45rem 0', fontStyle: 'italic' }}>
+                                  <p style={{ fontSize: '0.78rem', color: '#475569', lineHeight: 1.4, margin: '0 0 0.35rem 0', fontStyle: 'italic' }}>
                                     "{cand.manifesto}"
                                   </p>
 
-                                  {cand.seconderName && (
-                                    <div style={{ fontSize: '0.7rem', color: '#94A3B8' }}>
-                                      Seconded by: {cand.seconderName}
-                                    </div>
-                                  )}
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.2rem' }}>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setInspectCandidate(cand);
+                                      }}
+                                      style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: '#D97706',
+                                        fontSize: '0.74rem',
+                                        fontWeight: 700,
+                                        cursor: 'pointer',
+                                        padding: 0
+                                      }}
+                                    >
+                                      Read Full Manifesto &rarr;
+                                    </button>
+                                    {cand.seconderName && (
+                                      <div style={{ fontSize: '0.7rem', color: '#94A3B8' }}>
+                                        Seconded by: {cand.seconderName}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -694,8 +858,25 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
                   </div>
 
                   <div style={{ background: '#F8FAFC', borderRadius: '8px', padding: '0.85rem', border: '1px solid #E2E8F0', marginBottom: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0B203E', marginBottom: '0.25rem' }}>
-                      Manifesto Pledge:
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0B203E' }}>
+                        Manifesto Pledge:
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setInspectCandidate(cand)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#D97706',
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          padding: 0
+                        }}
+                      >
+                        Read Full &rarr;
+                      </button>
                     </div>
                     <p style={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.45, margin: 0 }}>
                       "{cand.manifesto}"
@@ -743,7 +924,64 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
       {/* TAB 3: CERTIFIED RESULTS & TALLY                         */}
       {/* ======================================================== */}
       {activeTab === 'results' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Always Live Banner */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0A271B 0%, #14532D 100%)',
+            color: '#FFFFFF',
+            borderRadius: '12px',
+            padding: '1.25rem 1.5rem',
+            border: '1.5px solid #C68A24',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            boxShadow: '0 4px 14px rgba(10,39,27,0.25)'
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  background: 'rgba(52, 211, 153, 0.2)',
+                  color: '#34D399',
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '999px',
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  border: '1px solid #34D399'
+                }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 8px #34D399' }} />
+                  ALWAYS LIVE BALLOT TALLY
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#FCD34D' }}>Auto-updating in real-time</span>
+              </div>
+              <div style={{ fontSize: '1.15rem', fontWeight: 800 }}>
+                {selectedElection.title} &bull; Official Returns
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                dataService.getCandidates(selectedElection.id).then(setCandidates);
+                dataService.getElectionById(selectedElection.id).then(e => { if (e) setSelectedElection(e); });
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.3)',
+                color: '#FFFFFF',
+                padding: '0.5rem 0.95rem',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Refresh Tallies
+            </button>
+          </div>
           {selectedElection.positions.map(position => {
             const posCandidates = candidates.filter(c => c.positionId === position.id);
             const totalPosVotes = posCandidates.reduce((acc, c) => acc + (c.votesCount || 0), 0);
@@ -985,6 +1223,205 @@ export const ElectionsHub: React.FC<ElectionsHubProps> = ({
               </button>
             </form>
           )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL: READ CANDIDATE FULL MANIFESTO                     */}
+      {/* ======================================================== */}
+      {inspectCandidate && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(11,32,62,0.65)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            maxWidth: '620px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '2rem',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <img
+                  src={inspectCandidate.photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(inspectCandidate.fullName)}&background=0B203E&color=fff`}
+                  alt={inspectCandidate.fullName}
+                  style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #D97706' }}
+                />
+                <div>
+                  <span style={{ fontSize: '0.72rem', background: '#FEF3C7', color: '#B45309', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                    {selectedElection.positions.find(p => p.id === inspectCandidate.positionId)?.title || 'Executive Office'}
+                  </span>
+                  <h3 style={{ margin: '0.25rem 0 0.1rem 0', fontSize: '1.25rem', color: '#0B203E', fontWeight: 800 }}>
+                    {inspectCandidate.fullName}
+                  </h3>
+                  <div style={{ fontSize: '0.8rem', color: '#D97706', fontWeight: 700 }}>
+                    {inspectCandidate.alumniNumber} &bull; Cohort {inspectCandidate.cohort}
+                  </div>
+                  {inspectCandidate.profession && (
+                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                      {inspectCandidate.profession}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setInspectCandidate(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ background: '#F8FAFC', padding: '1.25rem', borderRadius: '10px', border: '1px solid #CBD5E1', marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0B203E', marginBottom: '0.45rem', textTransform: 'uppercase' }}>
+                Candidate Vision & Official Policy Manifesto:
+              </div>
+              <p style={{ fontSize: '0.92rem', color: '#334155', lineHeight: 1.6, whiteSpace: 'pre-wrap', margin: 0 }}>
+                {inspectCandidate.manifesto || 'No manifesto pledge recorded.'}
+              </p>
+            </div>
+
+            {inspectCandidate.seconderName && (
+              <div style={{ fontSize: '0.8rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem' }}>
+                <ShieldCheck size={16} color="#047857" />
+                Officially Seconded by: <strong>{inspectCandidate.seconderName}</strong> ({inspectCandidate.seconderAlumniNumber || 'Verified Member'})
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                onClick={() => {
+                  handleSelectCandidate(inspectCandidate.positionId, inspectCandidate.id);
+                  setActiveTab('ballot');
+                  setInspectCandidate(null);
+                }}
+                style={{
+                  background: '#0B203E',
+                  color: '#FFFFFF',
+                  border: '1px solid #D97706',
+                  padding: '0.55rem 1.25rem',
+                  borderRadius: '6px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Select on Ballot
+              </button>
+              <button
+                onClick={() => setInspectCandidate(null)}
+                style={{
+                  padding: '0.55rem 1rem',
+                  background: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: '6px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL: CANDIDATE MANIFESTO SELF-SERVICE EDITOR           */}
+      {/* ======================================================== */}
+      {editingMyManifesto && myCandidateRecord && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(11,32,62,0.65)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '16px',
+            maxWidth: '640px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '2rem',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Edit2 size={20} color="#D97706" />
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#0B203E', fontWeight: 800 }}>
+                  Edit & Publish My Campaign Manifesto
+                </h3>
+              </div>
+              <button
+                onClick={() => setEditingMyManifesto(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMyManifesto} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ background: '#FEF3C7', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #FDE68A', color: '#92400E', fontSize: '0.82rem' }}>
+                <strong>Contesting:</strong> {selectedElection.positions.find(p => p.id === myCandidateRecord.positionId)?.title || 'Office'}
+                <br />
+                <strong>Membership No:</strong> {myCandidateRecord.alumniNumber} &bull; <strong>Candidate:</strong> {myCandidateRecord.fullName}
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 800, color: '#0B203E', marginBottom: '0.35rem' }}>
+                  Policy Commitments, Strategic Priorities & Vision *
+                </label>
+                <textarea
+                  rows={8}
+                  required
+                  value={myManifestoDraft}
+                  onChange={e => setMyManifestoDraft(e.target.value)}
+                  placeholder="Articulate your strategic vision for the association, projects you will champion, and commitments to fellow alumni..."
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '0.88rem', lineHeight: 1.5, boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem', borderTop: '1px solid #E2E8F0', paddingTop: '1rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setEditingMyManifesto(false)}
+                  style={{ padding: '0.55rem 1.1rem', background: '#F1F5F9', border: '1px solid #CBD5E1', borderRadius: '6px', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingManifesto}
+                  style={{ padding: '0.55rem 1.4rem', background: '#0B203E', color: '#FFFFFF', border: '1px solid #D97706', borderRadius: '6px', fontWeight: 700, fontSize: '0.85rem', cursor: isSavingManifesto ? 'not-allowed' : 'pointer' }}
+                >
+                  {isSavingManifesto ? 'Publishing...' : 'Publish Updated Manifesto'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

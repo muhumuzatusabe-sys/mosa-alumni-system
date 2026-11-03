@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { 
   Users, 
   ShieldCheck, 
-  UserPlus, 
   LogOut, 
   LogIn, 
   Award, 
   Calendar, 
-  Landmark, 
   FileText, 
   Mail, 
   ChevronRight,
@@ -15,16 +13,18 @@ import {
   ChevronUp,
   Briefcase, 
   GraduationCap, 
-  Building2, 
   BookOpen, 
   Newspaper, 
-  HeartHandshake, 
   Image as ImageIcon,
-  CheckCircle2,
-  Home
+  Home,
+  Phone,
+  MapPin,
+  Globe,
+  MessageSquare,
+  ExternalLink
 } from 'lucide-react';
 import { AuthUser, ModuleSettings } from '../types';
-import { isStaffRole, isRegisteredAlumni } from '../services/governanceService';
+import { isStaffRole } from '../services/governanceService';
 
 interface MoreMenuViewProps {
   currentUser: AuthUser | null;
@@ -42,8 +42,8 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
   currentUser,
   moduleSettings: _moduleSettings,
   onNavigateTab,
-  onOpenRegister,
-  onOpenVerify,
+  onOpenRegister: _onOpenRegister,
+  onOpenVerify: _onOpenVerify,
   onOpenAuth,
   onLogout,
   onOpenAdmin,
@@ -54,17 +54,16 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const isStaff = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || isStaffRole(currentUser?.role);
-  const isRegistered = isRegisteredAlumni(currentUser);
 
   const toggleSection = (key: string) => {
     setExpandedSection(prev => (prev === key ? null : key));
   };
 
   const handleAdminClick = () => {
-    if (isStaff && onSwitchToAdmin) {
-      onSwitchToAdmin();
-    } else if (onOpenAdmin) {
+    if (onOpenAdmin) {
       onOpenAdmin();
+    } else if (onSwitchToAdmin) {
+      onSwitchToAdmin();
     } else {
       onOpenAuth();
     }
@@ -73,7 +72,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.25rem 1rem 5rem 1rem' }}>
       
-      {/* 1. STRUCTURED MENU ACCORDIONS & CATEGORIES */}
+      {/* 1. STRUCTURED MENU ITEMS & CATEGORIES */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
         {/* SECTION 1: REGISTRY & MEMBERSHIP */}
@@ -103,7 +102,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   REGISTRY &amp; MEMBERSHIP
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#4B5563' }}>
-                  Alumni records, directory search, registration &amp; ID verification
+                  Alumni overview, student orientation &amp; official membership tiers
                 </div>
               </div>
             </div>
@@ -144,28 +143,6 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
 
               <button
                 type="button"
-                onClick={() => onNavigateTab('directory')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Users size={16} color="#0A271B" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                      <span>Alumni Directory &amp; Member Search</span>
-                      {!isRegistered && (
-                        <span style={{ fontSize: '0.64rem', fontWeight: 800, padding: '0.1rem 0.4rem', borderRadius: '4px', background: '#FEF3C7', color: '#B45309' }}>
-                          Registered Only
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Search classmates by year of completion and profession</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
-
-              <button
-                type="button"
                 onClick={() => onNavigateTab('membership')}
                 style={itemButtonStyle}
               >
@@ -178,54 +155,23 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
               </button>
-
-              <button
-                type="button"
-                onClick={onOpenRegister}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <UserPlus size={16} color="#059669" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#059669' }}>Register as an Alumnus</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Apply for permanent MOSA Alumni Number</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
-
-              <button
-                type="button"
-                onClick={onOpenVerify}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <CheckCircle2 size={16} color="#D97706" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Verify Permanent Alumni Number</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Public verification portal for authenticity verification</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
             </div>
           )}
         </div>
 
-        {/* SECTION 2: CAREERS & OPPORTUNITIES */}
+        {/* SECTION 2: CAREERS & OPPORTUNITIES (DIRECT SINGLE ITEM — NO SUB-ITEM) */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
           <button
             type="button"
-            onClick={() => toggleSection('careers')}
+            onClick={() => onNavigateTab('opportunities')}
             style={{
               width: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '1rem 1.25rem',
-              background: '#F8FAFC',
+              background: '#FFFFFF',
               border: 'none',
-              borderBottom: expandedSection === 'careers' ? '1.5px solid #E2E8F0' : 'none',
               cursor: 'pointer',
               textAlign: 'left'
             }}
@@ -243,84 +189,11 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 </div>
               </div>
             </div>
-            {expandedSection === 'careers' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+            <ChevronRight size={16} color="#94A3B8" />
           </button>
-
-          {expandedSection === 'careers' && (
-            <div style={{ padding: '0.5rem 0' }}>
-              <button
-                type="button"
-                onClick={() => onNavigateTab('opportunities')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Briefcase size={16} color="#4338CA" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Job Opportunities &amp; Career Hub</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Discover open job vacancies, attachments &amp; business tenders</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
-            </div>
-          )}
         </div>
 
-        {/* SECTION 3: CONTRIBUTIONS & GIVING */}
-        <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
-          <button
-            type="button"
-            onClick={() => toggleSection('giving')}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '1rem 1.25rem',
-              background: '#F8FAFC',
-              border: 'none',
-              borderBottom: expandedSection === 'giving' ? '1.5px solid #E2E8F0' : 'none',
-              cursor: 'pointer',
-              textAlign: 'left'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: '#FEF3C7', padding: '0.45rem', borderRadius: '8px', color: '#B45309' }}>
-                <Landmark size={18} />
-              </div>
-              <div>
-                <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
-                  GIVING &amp; CONTRIBUTIONS
-                </span>
-                <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Annual subscription, project contributions &amp; fundraising
-                </div>
-              </div>
-            </div>
-            {expandedSection === 'giving' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
-          </button>
-
-          {expandedSection === 'giving' && (
-            <div style={{ padding: '0.5rem 0' }}>
-              <button
-                type="button"
-                onClick={() => onNavigateTab('payments')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <HeartHandshake size={16} color="#B45309" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Association Giving &amp; Dues</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Annual dues, school infrastructure support &amp; donation pledges</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* SECTION 4: COMMUNITY & PROGRAMS */}
+        {/* SECTION 3: COMMUNITY & PROGRAMS (RETAINING EVENTS & REUNIONS + HERITAGE GALLERY) */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
           <button
             type="button"
@@ -347,7 +220,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   COMMUNITY &amp; PROGRAMS
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  Assembly attendance roll call, reunions, galleries &amp; university chapters
+                  Alumni reunions, official events calendar &amp; campus photo gallery
                 </div>
               </div>
             </div>
@@ -356,21 +229,6 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
 
           {expandedSection === 'community' && (
             <div style={{ padding: '0.5rem 0' }}>
-              <button
-                type="button"
-                onClick={() => onNavigateTab('attendance')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <CheckCircle2 size={16} color="#0A271B" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Roll Call &amp; Assembly Sign-In</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Self check-in for physical &amp; online alumni reunions</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
-
               <button
                 type="button"
                 onClick={() => onNavigateTab('events')}
@@ -400,26 +258,11 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
               </button>
-
-              <button
-                type="button"
-                onClick={() => onNavigateTab('chapters')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Building2 size={16} color="#7C3AED" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>University &amp; Regional Chapters</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Connect with MUMASA, Kampala, Hoima and global branches</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
             </div>
           )}
         </div>
 
-        {/* SECTION 5: INFORMATION & HERITAGE */}
+        {/* SECTION 4: INFORMATION & HERITAGE */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
           <button
             type="button"
@@ -446,7 +289,7 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                   INFORMATION &amp; HERITAGE
                 </span>
                 <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                  School history, announcements, circulars &amp; secretariat contacts
+                  School history, circulars, resolutions &amp; announcements
                 </div>
               </div>
             </div>
@@ -484,26 +327,11 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
                 </div>
                 <ChevronRight size={15} color="#94A3B8" />
               </button>
-
-              <button
-                type="button"
-                onClick={() => onNavigateTab('contact')}
-                style={itemButtonStyle}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <Mail size={16} color="#0A271B" />
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.87rem', color: '#1E293B' }}>Secretariat Contact &amp; Helpdesk</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Physical address, phone lines &amp; email support</div>
-                  </div>
-                </div>
-                <ChevronRight size={15} color="#94A3B8" />
-              </button>
             </div>
           )}
         </div>
 
-        {/* SECTION 6: ARCHIVES */}
+        {/* SECTION 5: ARCHIVES & CONSTITUTION (DIRECT SINGLE ITEM) */}
         <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
           <button
             type="button"
@@ -535,6 +363,157 @@ export const MoreMenuView: React.FC<MoreMenuViewProps> = ({
             </div>
             <ChevronRight size={16} color="#94A3B8" />
           </button>
+        </div>
+
+        {/* SECTION 6: CONTACTS & OFFICIAL SOCIALS (DEDICATED SECTION WITH COMPLETE DETAILS & SOCIALS) */}
+        <div style={{ background: '#FFFFFF', borderRadius: '12px', border: '1.5px solid #E2E8F0', overflow: 'hidden' }}>
+          <button
+            type="button"
+            onClick={() => toggleSection('contacts')}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '1rem 1.25rem',
+              background: '#F8FAFC',
+              border: 'none',
+              borderBottom: expandedSection === 'contacts' ? '1.5px solid #E2E8F0' : 'none',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ background: '#DCFCE7', padding: '0.45rem', borderRadius: '8px', color: '#14532D' }}>
+                <Phone size={18} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1E293B' }}>
+                  CONTACTS &amp; OFFICIAL SOCIALS
+                </span>
+                <div style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                  Secretariat phone lines, official email, campus location &amp; social channels
+                </div>
+              </div>
+            </div>
+            {expandedSection === 'contacts' ? <ChevronUp size={18} color="#64748B" /> : <ChevronDown size={18} color="#64748B" />}
+          </button>
+
+          {expandedSection === 'contacts' && (
+            <div style={{ padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {/* Phone Lines */}
+              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#14532D', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Phone size={14} />
+                  <span>Official Secretariat Phone Lines</span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  <a href="tel:+256772411921" style={contactLinkStyle}>+256 772 411921</a>
+                  <a href="tel:+256706599793" style={contactLinkStyle}>+256 706 599793</a>
+                  <a href="tel:+256773432413" style={contactLinkStyle}>+256 773 432413</a>
+                </div>
+              </div>
+
+              {/* Official Email */}
+              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#14532D', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Mail size={14} />
+                  <span>Official Email Address</span>
+                </div>
+                <div>
+                  <a href="mailto:masshalumni@gmail.com" style={contactLinkStyle}>masshalumni@gmail.com</a>
+                </div>
+              </div>
+
+              {/* Physical Location */}
+              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#14532D', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <MapPin size={14} />
+                  <span>Physical Secretariat Office</span>
+                </div>
+                <div style={{ fontSize: '0.84rem', color: '#334155', lineHeight: 1.5 }}>
+                  Mandela Secondary School Hoima, Plot 14, Main Street, P.O. Box 244, Hoima, Uganda
+                </div>
+              </div>
+
+              {/* Social Channels */}
+              <div style={{ background: '#F8FAFC', borderRadius: '10px', padding: '0.85rem 1rem', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#14532D', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Globe size={14} />
+                  <span>Official Social Media &amp; Community Channels</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
+                  <a 
+                    href="https://wa.me/256772411921" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={socialButtonStyle}
+                  >
+                    <MessageSquare size={15} color="#25D366" />
+                    <span>WhatsApp Secretariat</span>
+                    <ExternalLink size={12} color="#94A3B8" style={{ marginLeft: 'auto' }} />
+                  </a>
+
+                  <a 
+                    href="https://facebook.com" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={socialButtonStyle}
+                  >
+                    <Globe size={15} color="#1877F2" />
+                    <span>Facebook Community</span>
+                    <ExternalLink size={12} color="#94A3B8" style={{ marginLeft: 'auto' }} />
+                  </a>
+
+                  <a 
+                    href="https://twitter.com" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={socialButtonStyle}
+                  >
+                    <Globe size={15} color="#0F172A" />
+                    <span>X (Twitter) @masshalumni</span>
+                    <ExternalLink size={12} color="#94A3B8" style={{ marginLeft: 'auto' }} />
+                  </a>
+
+                  <a 
+                    href="https://linkedin.com" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    style={socialButtonStyle}
+                  >
+                    <Globe size={15} color="#0A66C2" />
+                    <span>LinkedIn Alumni Network</span>
+                    <ExternalLink size={12} color="#94A3B8" style={{ marginLeft: 'auto' }} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Action Button to Full Inquiry Page */}
+              <button
+                type="button"
+                onClick={() => onNavigateTab('contact')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem 1rem',
+                  borderRadius: '8px',
+                  background: '#0A271B',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '0.25rem'
+                }}
+              >
+                <Mail size={15} />
+                <span>Open Secretariat Helpdesk &amp; Inquiry Form</span>
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
@@ -654,4 +633,30 @@ const itemButtonStyle: React.CSSProperties = {
   cursor: 'pointer',
   textAlign: 'left',
   transition: 'background 0.15s ease'
+};
+
+const contactLinkStyle: React.CSSProperties = {
+  display: 'inline-block',
+  fontSize: '0.85rem',
+  fontWeight: 700,
+  color: '#0A271B',
+  background: '#FFFFFF',
+  padding: '0.35rem 0.75rem',
+  borderRadius: '6px',
+  border: '1px solid #CBD5E1',
+  textDecoration: 'none',
+};
+
+const socialButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  padding: '0.45rem 0.75rem',
+  borderRadius: '6px',
+  background: '#FFFFFF',
+  border: '1px solid #E2E8F0',
+  fontSize: '0.8rem',
+  fontWeight: 600,
+  color: '#334155',
+  textDecoration: 'none',
 };

@@ -12,7 +12,7 @@
  */
 
 import { db, isFirebaseConfigured } from './firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc, getDoc } from 'firebase/firestore';
 
 export interface EmailDispatchResult {
   success: boolean;
@@ -55,7 +55,7 @@ const DEFAULT_SETTINGS: EmailSettings = {
   smtpHost: 'smtp.gmail.com',
   smtpPort: 465,
   smtpUser: 'masshalumni@gmail.com',
-  smtpPass: 'iuzqyofmqxfuawdr',
+  smtpPass: '',
   emailjsServiceId: '',
   emailjsTemplateId: '',
   emailjsPublicKey: '',
@@ -85,11 +85,36 @@ export const getEmailSettings = (): EmailSettings => {
   return DEFAULT_SETTINGS;
 };
 
+export const syncEmailSettingsFromCloud = async (): Promise<EmailSettings> => {
+  if (isFirebaseConfigured() && db) {
+    try {
+      const snap = await getDoc(doc(db, 'system_settings', 'email_gateway'));
+      if (snap.exists()) {
+        const cloudData = snap.data() as Partial<EmailSettings>;
+        const current = getEmailSettings();
+        const merged = { ...current, ...cloudData };
+        localStorage.setItem('mosa_email_settings', JSON.stringify(merged));
+        window.dispatchEvent(new CustomEvent('mosa-email-settings-updated', { detail: merged }));
+        return merged;
+      }
+    } catch (e) {
+      console.warn('Cloud email settings fetch error:', e);
+    }
+  }
+  return getEmailSettings();
+};
+
 export const saveEmailSettings = (settings: Partial<EmailSettings>): void => {
   try {
     const current = getEmailSettings();
     const updated = { ...current, ...settings };
     localStorage.setItem('mosa_email_settings', JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent('mosa-email-settings-updated', { detail: updated }));
+    if (isFirebaseConfigured() && db) {
+      setDoc(doc(db, 'system_settings', 'email_gateway'), updated, { merge: true }).catch(err => {
+        console.warn('Firestore email settings sync error:', err);
+      });
+    }
   } catch (err) {
     console.warn('Failed to save email settings:', err);
   }
@@ -142,8 +167,8 @@ export const dispatchEmail = async (params: {
     'background: #0A271B; color: #FCD34D; font-size: 12px; padding: 4px 8px; border-radius: 4px; font-weight: bold;'
   );
 
-  // 1. Try Official Gmail SMTP dispatch via secure cloud relay
-  if (settings.smtpUser && settings.smtpPass && (settings.provider === 'auto' || settings.provider === 'smtp')) {
+  // 1. Try Official Gmail SMTP dispatch via secure cloud relay ONLY if explicitly selected
+  if (settings.smtpUser && settings.smtpPass && settings.provider === 'smtp') {
     try {
       const cleanPass = settings.smtpPass.replace(/\s+/g, '');
       const formData = new URLSearchParams();
@@ -740,6 +765,7 @@ export const emailService = {
   dispatchEmail,
   getEmailSettings,
   saveEmailSettings,
+  syncEmailSettingsFromCloud,
   getEmailLogs,
 };
 

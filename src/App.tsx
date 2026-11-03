@@ -30,6 +30,7 @@ import { isStaffRole, isRegisteredAlumni } from './services/governanceService';
 import { MemberAttendanceView } from './components/MemberAttendanceView';
 import { OpportunitiesHub } from './components/OpportunitiesHub';
 import { DigitalMembershipCardModal } from './components/DigitalMembershipCardModal';
+import { AdminPasswordModal } from './components/AdminPasswordModal';
 import { AlumniProfile, AuthUser, ModuleSettings } from './types';
 import { ShieldCheck, Lock, Sliders, ArrowUpRight, ArrowLeft, GraduationCap, Loader2 } from 'lucide-react';
 import { MosaLogo } from './components/MosaLogo';
@@ -153,6 +154,7 @@ export const App: React.FC = () => {
   const [cardTargetAlumnus, setCardTargetAlumnus] = useState<AlumniProfile | null>(null);
   const [selectedAlumnus, setSelectedAlumnus] = useState<AlumniProfile | null>(null);
   const [verifyInitialQuery, setVerifyInitialQuery] = useState<string>('');
+  const [isAdminPasswordOpen, setIsAdminPasswordOpen] = useState(false);
 
   const openAuth = (portal: 'alumni' | 'admin' = 'alumni', mode: 'create-account' | 'login' | 'reset-password' | 'admin-login' = 'login') => {
     setAuthPortal(portal);
@@ -230,11 +232,7 @@ export const App: React.FC = () => {
   };
 
   const handleAdminGateClick = () => {
-    if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'SUPER_ADMIN' || isStaffRole(currentUser.role))) {
-      setPortalMode('admin');
-    } else {
-      openAuth('admin');
-    }
+    setIsAdminPasswordOpen(true);
   };
 
   // ==============================================================
@@ -389,13 +387,31 @@ export const App: React.FC = () => {
               } else {
                 setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
               }
+              setCurrentTab('home');
+              handleNavigate('home');
+              refreshUserData();
+            }}
+            onNavigateToDashboard={() => {
+              setIsRegisterOpen(false);
+              const latestUser = dataService.getCurrentUser();
+              if (latestUser) {
+                setCurrentUser(latestUser);
+              } else {
+                setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
+              }
+              setCurrentTab('home');
+              handleNavigate('home');
               refreshUserData();
             }}
             onSuccess={async () => {
               if (currentUser) {
                 await dataService.completeAlumniOnboarding(currentUser.uid);
-                refreshUserData();
+                setCurrentUser(prev => prev ? { ...prev, alumniOnboardingDecision: 'COMPLETED' } : null);
               }
+              setIsRegisterOpen(false);
+              setCurrentTab('home');
+              handleNavigate('home');
+              refreshUserData();
             }}
             currentUser={currentUser}
           />
@@ -413,7 +429,10 @@ export const App: React.FC = () => {
       return (
         <AdminControlPanel
           currentUser={currentUser}
-          onReturnToMemberPortal={() => setPortalMode('member')}
+          onReturnToMemberPortal={() => {
+            setPortalMode('member');
+            refreshUserData();
+          }}
           onRefreshData={refreshUserData}
         />
       );
@@ -727,6 +746,18 @@ export const App: React.FC = () => {
         initialPortal={authPortal}
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Admin Password Modal — Zero Descriptions, Pure Password Entry */}
+      <AdminPasswordModal
+        isOpen={isAdminPasswordOpen}
+        onClose={() => setIsAdminPasswordOpen(false)}
+        onSuccess={(adminUser) => {
+          setCurrentUser(adminUser);
+          setPortalMode('admin');
+          setIsAdminPasswordOpen(false);
+          refreshUserData();
+        }}
       />
 
       {/* Notifications Drawer */}

@@ -206,11 +206,8 @@ export const AlumniRegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSu
 
       const res = await dataService.submitApplication(applicationPayload);
       if (res.success && res.id) {
-        setSuccessInfo({
-          id: res.id,
-          name: `${formData.firstName} ${formData.lastName}`,
-        });
         onSuccess();
+        onClose();
       } else {
         setErrorMsg(res.error || 'Failed to submit application. Please check details.');
       }

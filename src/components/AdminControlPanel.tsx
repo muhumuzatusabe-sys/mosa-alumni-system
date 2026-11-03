@@ -64,8 +64,6 @@ import {
   PermissionModule,
   OpportunityItem,
   MentorProfile,
-  ElectionCycle,
-  Candidate,
   AlumniApplication
 } from '../types';
 import { dataService } from '../services/dataService';
@@ -80,6 +78,7 @@ import { MemberDataExportManager } from './MemberDataExportManager';
 import { SecretariatManager } from './SecretariatManager';
 import { EmailManager } from './EmailManager';
 import { NotificationsModal } from './NotificationsModal';
+import { AdminElectionManager } from './AdminElectionManager';
 
 const DEFAULT_MODULES_BY_ROLE: Record<string, PermissionModule[]> = {
   SUPER_ADMIN: ['REGISTRY', 'FINANCE', 'ATTENDANCE', 'EVENTS', 'COMMUNICATIONS', 'CHAPTERS', 'DOCUMENTS', 'USERS', 'REPORTS', 'SETTINGS', 'AUDIT', 'OPPORTUNITIES', 'ELECTIONS'],
@@ -196,12 +195,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
   const [oppActionLoading, setOppActionLoading] = useState(false);
   const [oppStatusNotice, setOppStatusNotice] = useState('');
 
-  // Elections Admin State
-  const [electionCycles, setElectionCycles] = useState<ElectionCycle[]>([]);
-  const [adminCandidates, setAdminCandidates] = useState<Candidate[]>([]);
-  const [selectedElectionId, setSelectedElectionId] = useState<string>('elec-2026');
-  const [electionNotice, setElectionNotice] = useState('');
-  const [certifyingLoading, setCertifyingLoading] = useState(false);
+
 
   // Staff Management State (Linked to Alumni Registry & Modular Permissions)
   const [allAlumni, setAllAlumni] = useState<AlumniProfile[]>([]);
@@ -379,12 +373,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
       const m = await dataService.getMentorProfiles();
       setMentors(m);
 
-      const elecs = await dataService.getElectionCycles();
-      setElectionCycles(elecs);
-      if (elecs.length > 0) {
-        const cands = await dataService.getCandidates(elecs[0].id);
-        setAdminCandidates(cands);
-      }
+
 
       // Compute Live Executive Overview Statistics
       const [exportMembers, applicationsList, officesList] = await Promise.all([
@@ -527,33 +516,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
     }
   };
 
-  const handleUpdateCycleStatus = async (cycleId: string, status: any) => {
-    try {
-      await dataService.updateElectionCycle({ id: cycleId, status });
-      const updated = await dataService.getElectionCycles();
-      setElectionCycles(updated);
-      setElectionNotice(`Election cycle status updated to ${status}`);
-      setTimeout(() => setElectionNotice(''), 3500);
-    } catch (e: any) {
-      setElectionNotice(`Failed: ${e.message}`);
-    }
-  };
 
-  const handleCertifyElection = async (cycleId: string) => {
-    if (!confirm('Are you sure you want to officially certify and seal this election cycle?')) return;
-    setCertifyingLoading(true);
-    try {
-      await dataService.certifyElection(cycleId, currentUser.email, `Officially certified by ${currentUser.displayName || currentUser.email} (${currentUser.role}) on ${new Date().toLocaleDateString()}`);
-      const updated = await dataService.getElectionCycles();
-      setElectionCycles(updated);
-      setElectionNotice('Election has been officially certified and declaration recorded.');
-      setTimeout(() => setElectionNotice(''), 4500);
-    } catch (e: any) {
-      setElectionNotice(`Failed: ${e.message}`);
-    } finally {
-      setCertifyingLoading(false);
-    }
-  };
 
   const handleToggleModule = (key: keyof ModuleSettings) => {
     setModuleSettings(prev => ({
@@ -2368,186 +2331,7 @@ export const AdminControlPanel: React.FC<AdminControlPanelProps> = ({
 
         {/* SECTION 2: MEMBERS & APPROVALS (ELECTIONS & SECRET BALLOT) */}
         {activeSection === 'approvals' && approvalsSubTab === 'elections' && canAccessElections && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {/* Header & Electoral Commission Controls */}
-            <div className="mosa-card" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                    <Vote size={20} color="#D97706" />
-                    <h2 style={{ fontSize: '1.25rem', color: '#0B203E', margin: 0 }}>MOSA Electoral Commission Operations Desk</h2>
-                  </div>
-                  <p style={{ color: '#64748B', fontSize: '0.85rem', margin: 0 }}>
-                    Oversee biennial NEC general elections, open or close secret ballot voting, track quorum thresholds, and certify declarations.
-                  </p>
-                </div>
-                {electionNotice && (
-                  <div style={{ background: '#ECFDF5', color: '#065F46', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #A7F3D0' }}>
-                    {electionNotice}
-                  </div>
-                )}
-              </div>
-
-              {/* Active Cycle Status Overview */}
-              {electionCycles.map(ec => {
-                const quorumCount = Math.round((ec.eligibleVotersCount || 250) * ((ec.quorumRequiredPercentage || 25) / 100));
-                const isQuorumMet = (ec.totalBallotsCast || 0) >= quorumCount;
-                return (
-                  <div key={ec.id} style={{ marginTop: '1.25rem', background: '#F8FAFC', border: '1.5px solid #CBD5E1', borderRadius: '10px', padding: '1.25rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid #E2E8F0', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
-                      <div>
-                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0B203E' }}>{ec.title}</div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Cycle ID: <code>{ec.id}</code> &bull; Electoral Term: {ec.term}</div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>Current Stage:</span>
-                        <span style={{
-                          padding: '0.35rem 0.85rem',
-                          borderRadius: '999px',
-                          fontSize: '0.78rem',
-                          fontWeight: 800,
-                          letterSpacing: '0.04em',
-                          background: ec.status === 'VOTING_ACTIVE' ? '#DCFCE7' : ec.status === 'CONCLUDED' ? '#E0E7FF' : '#FEF3C7',
-                          color: ec.status === 'VOTING_ACTIVE' ? '#0A271B' : ec.status === 'CONCLUDED' ? '#3730A3' : '#92400E',
-                        }}>
-                          {ec.status.replace('_', ' ')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Quorum & Ballots Count */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
-                      <div style={{ background: '#FFFFFF', padding: '0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Ballots Tallied</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0B203E', marginTop: '0.2rem' }}>{ec.totalBallotsCast || 0}</div>
-                      </div>
-                      <div style={{ background: '#FFFFFF', padding: '0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Quorum Required</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#D97706', marginTop: '0.2rem' }}>
-                          {quorumCount} ({ec.quorumRequiredPercentage}%)
-                        </div>
-                      </div>
-                      <div style={{ background: '#FFFFFF', padding: '0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Quorum Status</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: isQuorumMet ? '#059669' : '#D97706', marginTop: '0.4rem' }}>
-                          {isQuorumMet ? 'Quorum Met' : 'Quorum Pending'}
-                        </div>
-                      </div>
-                      <div style={{ background: '#FFFFFF', padding: '0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Electoral Positions</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#1E40AF', marginTop: '0.2rem' }}>{ec.positions.length}</div>
-                      </div>
-                    </div>
-
-                    {/* Stage Switcher Controls */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', background: '#FFFFFF', padding: '1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0B203E' }}>
-                        Advance Electoral Commission Stage:
-                      </div>
-                      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
-                        {(['NOMINATIONS_OPEN', 'VOTING_ACTIVE', 'TALLYING', 'CONCLUDED'] as const).map(st => (
-                          <button
-                            key={st}
-                            onClick={() => handleUpdateCycleStatus(ec.id, st)}
-                            style={{
-                              padding: '0.4rem 0.8rem',
-                              fontSize: '0.75rem',
-                              fontWeight: ec.status === st ? 800 : 600,
-                              borderRadius: '6px',
-                              border: ec.status === st ? '1.5px solid #0B203E' : '1px solid #CBD5E1',
-                              background: ec.status === st ? '#0B203E' : '#F8FAFC',
-                              color: ec.status === st ? '#FFFFFF' : '#334155',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {st.replace('_', ' ')}
-                          </button>
-                        ))}
-                        {ec.status !== 'CONCLUDED' && (
-                          <button
-                            disabled={certifyingLoading}
-                            onClick={() => handleCertifyElection(ec.id)}
-                            style={{
-                              padding: '0.4rem 0.9rem',
-                              fontSize: '0.75rem',
-                              fontWeight: 800,
-                              borderRadius: '6px',
-                              background: '#059669',
-                              color: '#FFFFFF',
-                              border: 'none',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                            }}
-                          >
-                            <ShieldCheck size={14} />
-                            <span>Certify Results & Declaration</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {ec.certifiedAt && (
-                      <div style={{ marginTop: '0.85rem', padding: '0.75rem 1rem', background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '8px', fontSize: '0.8rem', color: '#3730A3' }}>
-                        <strong>Official Electoral Seal:</strong> Certified by {ec.certifiedBy} on {new Date(ec.certifiedAt).toLocaleString()}. {ec.declarationSummary}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Candidates & Tallies Roster */}
-            <div className="mosa-card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1.05rem', color: '#0B203E', margin: '0 0 1rem 0', fontWeight: 700 }}>
-                Vetted Candidates & Secret Vote Tallies ({adminCandidates.length})
-              </h3>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
-                  <thead>
-                    <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0', color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '0.75rem 1rem' }}>Candidate</th>
-                      <th style={{ padding: '0.75rem 1rem' }}>Position</th>
-                      <th style={{ padding: '0.75rem 1rem' }}>Seconder</th>
-                      <th style={{ padding: '0.75rem 1rem' }}>Status</th>
-                      <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Tallied Votes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adminCandidates.map(c => {
-                      const posTitle = electionCycles.find(e => e.id === c.electionId)?.positions.find(p => p.id === c.positionId)?.title || c.positionId;
-                      return (
-                        <tr key={c.id} style={{ borderBottom: '1px solid #E2E8F0' }}>
-                          <td style={{ padding: '0.85rem 1rem' }}>
-                            <div style={{ fontWeight: 700, color: '#0B203E' }}>{c.fullName}</div>
-                            <div style={{ fontSize: '0.75rem', color: '#64748B' }}>{c.alumniNumber} &bull; Cohort {c.cohort}</div>
-                          </td>
-                          <td style={{ padding: '0.85rem 1rem', color: '#334155', fontWeight: 600 }}>
-                            {posTitle}
-                          </td>
-                          <td style={{ padding: '0.85rem 1rem', fontSize: '0.8rem', color: '#64748B' }}>
-                            {c.seconderName} ({c.seconderAlumniNumber})
-                          </td>
-                          <td style={{ padding: '0.85rem 1rem' }}>
-                            <span style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: '#DCFCE7', color: '#0A271B', fontWeight: 700 }}>
-                              {c.status === 'APPROVED' ? 'VETTED' : c.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
-                            <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0B203E' }}>
-                              {c.votesCount || 0}
-                            </span>
-                            <span style={{ fontSize: '0.75rem', color: '#64748B', marginLeft: '0.25rem' }}>votes</span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          <AdminElectionManager currentUser={activeUser} />
         )}
 
         {/* SECTION 2: MEMBERS & APPROVALS (SYSTEM & FEATURE CONTROLS) */}

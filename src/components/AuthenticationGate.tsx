@@ -1230,42 +1230,6 @@ export const AuthenticationGate: React.FC<AuthenticationGateProps> = ({
           {/* VIEW 4: PURE PASSWORD-ONLY ADMINISTRATOR ACCESS */}
           {authMode === 'admin-login' && (
             <form onSubmit={handleAdminLogin}>
-              <div
-                style={{
-                  background: '#FEF3C7',
-                  border: '1.5px solid #FCD34D',
-                  borderRadius: '12px',
-                  padding: '1rem',
-                  marginBottom: '1.5rem',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.75rem',
-                }}
-              >
-                <div
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: '#B45309',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <ShieldCheck size={20} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#92400E' }}>
-                    MOSA Secretariat & Administrator Gate
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#B45309', marginTop: '0.2rem', lineHeight: 1.4 }}>
-                    Executive members sign in using the Admin Password. Nothing else is required.
-                  </div>
-                </div>
-              </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
                 <label

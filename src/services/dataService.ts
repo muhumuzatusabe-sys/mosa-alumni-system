@@ -2513,15 +2513,6 @@ export const dataService = {
       console.warn('Email dispatch warning:', mailErr);
     }
 
-    // Try sending verification code email via Firebase if available
-    if (isFirebaseConfigured() && auth) {
-      try {
-        await sendPasswordResetEmail(auth, cleanEmail);
-      } catch (err) {
-        // Silent catch
-      }
-    }
-
     const isDeliveredToRealInbox = Boolean(
       dispatchRes?.success && 
       dispatchRes?.provider && 
@@ -2935,9 +2926,14 @@ export const dataService = {
       return { success: false, error: 'Please enter the administrative password.' };
     }
 
+    const current = this.getCurrentUser();
+
     // Direct Super Admin Password entry
     if (input === superAdminPass) {
-      const superUser: AuthUser = {
+      const superUser: AuthUser = current ? {
+        ...current,
+        role: 'SUPER_ADMIN',
+      } : {
         uid: 'superadmin-master',
         email: 'masshalumni@gmail.com',
         displayName: 'MOSA National Secretariat',
@@ -2945,30 +2941,53 @@ export const dataService = {
         mustChangePassword: false,
       };
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(superUser));
+      if (current) {
+        try {
+          const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+          const idx = users.findIndex(u => u.uid === superUser.uid || (u.email && superUser.email && u.email.toLowerCase() === superUser.email.toLowerCase()));
+          if (idx !== -1) {
+            users[idx] = { ...users[idx], role: 'SUPER_ADMIN' };
+            safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+          }
+        } catch {}
+      }
       await this.logAudit({
         action: 'SUPER_ADMIN_LOGIN',
-        performedBy: 'masshalumni@gmail.com',
-        affectedRecord: 'superadmin-master',
-        metadata: { role: 'SUPER_ADMIN' },
+        performedBy: superUser.email,
+        affectedRecord: superUser.uid,
+        metadata: { role: 'SUPER_ADMIN', displayName: superUser.displayName },
       });
       return { success: true, user: superUser };
     }
 
     // Standard Executive Admin Password entry
     if (input === adminPass) {
-      const adminUser: AuthUser = {
+      const adminUser: AuthUser = current ? {
+        ...current,
+        role: 'ADMIN',
+      } : {
         uid: 'admin-exec',
         email: 'admin@massh.ac.ug',
-        displayName: 'Head of ICT / MOSA Admin',
-        role: 'SUPER_ADMIN',
+        displayName: 'Administrator',
+        role: 'ADMIN',
         mustChangePassword: false,
       };
       safeStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(adminUser));
+      if (current) {
+        try {
+          const users: AuthUser[] = JSON.parse(safeStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+          const idx = users.findIndex(u => u.uid === adminUser.uid || (u.email && adminUser.email && u.email.toLowerCase() === adminUser.email.toLowerCase()));
+          if (idx !== -1) {
+            users[idx] = { ...users[idx], role: 'ADMIN' };
+            safeStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+          }
+        } catch {}
+      }
       await this.logAudit({
         action: 'ADMIN_LOGIN',
-        performedBy: 'admin@massh.ac.ug',
-        affectedRecord: 'admin-exec',
-        metadata: { role: 'SUPER_ADMIN' },
+        performedBy: adminUser.email,
+        affectedRecord: adminUser.uid,
+        metadata: { role: 'ADMIN', displayName: adminUser.displayName },
       });
       return { success: true, user: adminUser };
     }
@@ -2992,12 +3011,13 @@ export const dataService = {
     }
 
     const current = this.getCurrentUser();
-    const elevatedUser: AuthUser = {
-      ...(current || {
-        uid: 'superadmin-master',
-        email: 'masshalumni@gmail.com',
-      }),
-      displayName: current?.displayName || 'MOSA National Secretariat',
+    const elevatedUser: AuthUser = current ? {
+      ...current,
+      role: 'SUPER_ADMIN',
+    } : {
+      uid: 'superadmin-master',
+      email: 'masshalumni@gmail.com',
+      displayName: 'MOSA National Secretariat',
       role: 'SUPER_ADMIN',
       mustChangePassword: false,
     };
@@ -3015,12 +3035,13 @@ export const dataService = {
 
   async downgradeToStandardAdmin(): Promise<{ success: boolean; user: AuthUser }> {
     const current = this.getCurrentUser();
-    const downgradedUser: AuthUser = {
-      ...(current || {
-        uid: 'admin-exec',
-        email: 'admin@massh.ac.ug',
-      }),
-      displayName: 'Executive Administrator',
+    const downgradedUser: AuthUser = current ? {
+      ...current,
+      role: 'ADMIN',
+    } : {
+      uid: 'admin-exec',
+      email: 'admin@massh.ac.ug',
+      displayName: 'Administrator',
       role: 'ADMIN',
       mustChangePassword: false,
     };
@@ -5308,6 +5329,24 @@ export const dataService = {
   // ELECTIONS & DIGITAL SECRET VOTING
   // ==========================================
   async getElectionCycles(): Promise<ElectionCycle[]> {
+    if (isFirebaseConfigured && db) {
+      try {
+        const snap = await getDocs(collection(db, 'elections'));
+        if (!snap.empty) {
+          const cloudElections: ElectionCycle[] = [];
+          snap.forEach(d => {
+            const data = d.data() as ElectionCycle;
+            cloudElections.push({ ...data, id: d.id });
+          });
+          cloudElections.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+          safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(cloudElections));
+          return cloudElections;
+        }
+      } catch (err) {
+        console.warn('Could not fetch elections from cloud Firestore, using local cache:', err);
+      }
+    }
+
     const raw = safeStorage.getItem(STORAGE_KEYS.ELECTIONS);
     let items: ElectionCycle[] = raw ? JSON.parse(raw) : defaultSeedElections;
     if (!items || items.length === 0) {
@@ -5322,7 +5361,173 @@ export const dataService = {
     return elections.find(e => e.id === id) || null;
   },
 
+  async createElectionCycle(cycleData: Partial<ElectionCycle>): Promise<ElectionCycle> {
+    const defaultPositions: ElectionPosition[] = [
+      { id: `pos-${Date.now()}-1`, title: 'President / National Chairperson', description: 'Head of National Executive Committee, overall executive governance & spokesperson', maxSelect: 1, order: 1 },
+      { id: `pos-${Date.now()}-2`, title: 'Vice President', description: 'Deputy head of NEC, chapter coordination & institutional development', maxSelect: 1, order: 2 },
+      { id: `pos-${Date.now()}-3`, title: 'General Secretary', description: 'Official secretariat records, AGM minutes, correspondence & notices', maxSelect: 1, order: 3 },
+      { id: `pos-${Date.now()}-4`, title: 'Treasurer', description: 'Treasury management, financial reporting, subscription audits & budgeting', maxSelect: 1, order: 4 },
+      { id: `pos-${Date.now()}-5`, title: 'Publicity & Public Relations Secretary', description: 'Alumni brand, press communications, digital presence & publications', maxSelect: 1, order: 5 },
+      { id: `pos-${Date.now()}-6`, title: 'Electoral Commissioner', description: 'Oversight of democratic processes, constitution compliance & secret ballots', maxSelect: 1, order: 6 },
+    ];
+
+    const newId = cycleData.id || `elec-${Date.now()}`;
+    const newCycle: ElectionCycle = {
+      id: newId,
+      title: cycleData.title || 'MOSA National Executive Committee General Elections',
+      theme: cycleData.theme || 'Integrity, Service & Institutional Progress',
+      description: cycleData.description || 'Official general elections for the MOSA National Executive Committee.',
+      term: cycleData.term || `${new Date().getFullYear()} - ${new Date().getFullYear() + 2}`,
+      status: cycleData.status || 'UPCOMING',
+      nominationDeadline: cycleData.nominationDeadline || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+      votingStartDate: cycleData.votingStartDate || new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+      votingEndDate: cycleData.votingEndDate || new Date(Date.now() + 17 * 86400000).toISOString().split('T')[0],
+      eligibleVotersCount: cycleData.eligibleVotersCount || 250,
+      totalBallotsCast: 0,
+      quorumRequiredPercentage: cycleData.quorumRequiredPercentage || 25,
+      positions: cycleData.positions && cycleData.positions.length > 0 ? cycleData.positions : defaultPositions,
+      createdAt: new Date().toISOString(),
+    };
+
+    const elections = await this.getElectionCycles();
+    elections.unshift(newCycle);
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(elections));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await setDoc(doc(db, 'elections', newId), newCycle);
+      } catch (err) {
+        console.warn('Failed to sync new election to Firestore:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-election-updated', { detail: { electionId: newId } }));
+    }
+
+    await this.logAudit({
+      action: 'ELECTION_CREATED',
+      performedBy: 'admin@massh.ac.ug',
+      affectedRecord: newId,
+      metadata: { title: newCycle.title, term: newCycle.term, positionsCount: newCycle.positions.length },
+    });
+
+    return newCycle;
+  },
+
+  async updateElectionCycle(cycleData: Partial<ElectionCycle> & { id: string }): Promise<ElectionCycle | null> {
+    const elections = await this.getElectionCycles();
+    const idx = elections.findIndex(e => e.id === cycleData.id);
+    if (idx === -1) return null;
+
+    elections[idx] = { ...elections[idx], ...cycleData };
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(elections));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await setDoc(doc(db, 'elections', cycleData.id), elections[idx], { merge: true });
+      } catch (err) {
+        console.warn('Failed to update election in Firestore:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-election-updated', { detail: { electionId: cycleData.id } }));
+    }
+
+    await this.logAudit({
+      action: 'ELECTION_UPDATED',
+      performedBy: 'admin@massh.ac.ug',
+      affectedRecord: cycleData.id,
+      metadata: cycleData,
+    });
+
+    return elections[idx];
+  },
+
+  async deleteElectionCycle(electionId: string): Promise<boolean> {
+    const elections = await this.getElectionCycles();
+    const filtered = elections.filter(e => e.id !== electionId);
+    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(filtered));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await deleteDoc(doc(db, 'elections', electionId));
+      } catch (err) {
+        console.warn('Failed to delete election from Firestore:', err);
+      }
+    }
+
+    // Also remove associated candidates
+    const rawCands = safeStorage.getItem(STORAGE_KEYS.CANDIDATES);
+    if (rawCands) {
+      const cands: Candidate[] = JSON.parse(rawCands);
+      const remainingCands = cands.filter(c => c.electionId !== electionId);
+      safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(remainingCands));
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-election-updated', { detail: { electionId } }));
+    }
+
+    return true;
+  },
+
+  async addPositionToElection(electionId: string, position: Omit<ElectionPosition, 'id'> & { id?: string }): Promise<ElectionCycle | null> {
+    const elections = await this.getElectionCycles();
+    const cycle = elections.find(e => e.id === electionId);
+    if (!cycle) return null;
+
+    const newPos: ElectionPosition = {
+      id: position.id || `pos-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      title: position.title,
+      description: position.description || '',
+      maxSelect: position.maxSelect || 1,
+      order: position.order || (cycle.positions.length + 1),
+    };
+
+    cycle.positions.push(newPos);
+    return this.updateElectionCycle(cycle);
+  },
+
+  async updatePositionInElection(electionId: string, position: ElectionPosition): Promise<ElectionCycle | null> {
+    const elections = await this.getElectionCycles();
+    const cycle = elections.find(e => e.id === electionId);
+    if (!cycle) return null;
+
+    const posIdx = cycle.positions.findIndex(p => p.id === position.id);
+    if (posIdx === -1) return null;
+
+    cycle.positions[posIdx] = { ...cycle.positions[posIdx], ...position };
+    return this.updateElectionCycle(cycle);
+  },
+
+  async deletePositionFromElection(electionId: string, positionId: string): Promise<ElectionCycle | null> {
+    const elections = await this.getElectionCycles();
+    const cycle = elections.find(e => e.id === electionId);
+    if (!cycle) return null;
+
+    cycle.positions = cycle.positions.filter(p => p.id !== positionId);
+    return this.updateElectionCycle(cycle);
+  },
+
   async getCandidates(electionId: string, positionId?: string): Promise<Candidate[]> {
+    if (isFirebaseConfigured && db) {
+      try {
+        const snap = await getDocs(query(collection(db, 'candidates'), where('electionId', '==', electionId)));
+        if (!snap.empty) {
+          const cloudCands: Candidate[] = [];
+          snap.forEach(d => {
+            cloudCands.push({ ...(d.data() as Candidate), id: d.id });
+          });
+          safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(cloudCands));
+          return cloudCands.filter(c => !positionId || c.positionId === positionId);
+        }
+      } catch (err) {
+        console.warn('Could not fetch candidates from cloud Firestore, fallback to local:', err);
+      }
+    }
+
     const raw = safeStorage.getItem(STORAGE_KEYS.CANDIDATES);
     let items: Candidate[] = raw ? JSON.parse(raw) : defaultSeedCandidates;
     if (!items || items.length === 0) {
@@ -5337,17 +5542,126 @@ export const dataService = {
     });
   },
 
+  async saveCandidate(candData: Partial<Candidate> & { electionId: string; positionId: string }): Promise<Candidate> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.CANDIDATES);
+    let candidates: Candidate[] = raw ? JSON.parse(raw) : [];
+
+    const candId = candData.id || `cand-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const existingIdx = candidates.findIndex(c => c.id === candId);
+
+    let savedCandidate: Candidate;
+    if (existingIdx !== -1) {
+      savedCandidate = {
+        ...candidates[existingIdx],
+        ...candData,
+        id: candId,
+        votesCount: candData.votesCount ?? candidates[existingIdx].votesCount ?? 0,
+      };
+      candidates[existingIdx] = savedCandidate;
+    } else {
+      savedCandidate = {
+        id: candId,
+        electionId: candData.electionId,
+        positionId: candData.positionId,
+        alumniId: candData.alumniId || '',
+        alumniNumber: candData.alumniNumber || '',
+        fullName: candData.fullName || 'Candidate',
+        cohort: candData.cohort || 'MASSH Alumni',
+        profession: candData.profession || '',
+        photoUrl: candData.photoUrl || '',
+        manifesto: candData.manifesto || '',
+        seconderName: candData.seconderName || '',
+        seconderAlumniNumber: candData.seconderAlumniNumber || '',
+        status: candData.status || 'APPROVED',
+        votesCount: candData.votesCount ?? 0,
+        nominatedAt: candData.nominatedAt || new Date().toISOString().split('T')[0],
+      };
+      candidates.push(savedCandidate);
+    }
+
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(candidates));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await setDoc(doc(db, 'candidates', candId), savedCandidate);
+      } catch (err) {
+        console.warn('Failed to save candidate to Firestore:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-candidate-updated', { detail: { candidateId: candId, electionId: candData.electionId } }));
+      window.dispatchEvent(new CustomEvent('mosa-vote-cast', { detail: { electionId: candData.electionId } }));
+    }
+
+    await this.logAudit({
+      action: existingIdx !== -1 ? 'CANDIDATE_UPDATED' : 'CANDIDATE_REGISTERED',
+      performedBy: 'admin@massh.ac.ug',
+      affectedRecord: candId,
+      metadata: { candidate: savedCandidate.fullName, alumniNumber: savedCandidate.alumniNumber, positionId: savedCandidate.positionId },
+    });
+
+    return savedCandidate;
+  },
+
+  async updateCandidateManifesto(candidateId: string, manifesto: string): Promise<Candidate | null> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.CANDIDATES);
+    let candidates: Candidate[] = raw ? JSON.parse(raw) : [];
+    const idx = candidates.findIndex(c => c.id === candidateId);
+    if (idx === -1) return null;
+
+    candidates[idx].manifesto = manifesto;
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(candidates));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await setDoc(doc(db, 'candidates', candidateId), candidates[idx], { merge: true });
+      } catch (err) {
+        console.warn('Failed to sync manifesto to Firestore:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-candidate-updated', { detail: { candidateId, electionId: candidates[idx].electionId } }));
+    }
+
+    return candidates[idx];
+  },
+
+  async deleteCandidate(candidateId: string): Promise<boolean> {
+    const raw = safeStorage.getItem(STORAGE_KEYS.CANDIDATES);
+    if (!raw) return true;
+    let candidates: Candidate[] = JSON.parse(raw);
+    const target = candidates.find(c => c.id === candidateId);
+    const filtered = candidates.filter(c => c.id !== candidateId);
+    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(filtered));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await deleteDoc(doc(db, 'candidates', candidateId));
+      } catch (err) {
+        console.warn('Failed to delete candidate in Firestore:', err);
+      }
+    }
+
+    if (typeof window !== 'undefined' && target) {
+      window.dispatchEvent(new CustomEvent('mosa-candidate-updated', { detail: { candidateId, electionId: target.electionId } }));
+      window.dispatchEvent(new CustomEvent('mosa-vote-cast', { detail: { electionId: target.electionId } }));
+    }
+
+    return true;
+  },
+
   async nominateCandidate(
     nomData: Partial<Candidate>,
     user: AuthUser
   ): Promise<Candidate> {
-    const candidates = await this.getCandidates(nomData.electionId || 'elec-2026');
-    const newCand: Candidate = {
-      id: `cand-${Date.now()}`,
+    return this.saveCandidate({
+      ...nomData,
       electionId: nomData.electionId || 'elec-2026',
       positionId: nomData.positionId || 'pos-pres',
-      alumniId: nomData.alumniId || user.alumniId || 'alumni-0001',
-      alumniNumber: nomData.alumniNumber || user.alumniNumber || 'MA. 0001',
+      alumniId: nomData.alumniId || user.alumniId || user.uid,
+      alumniNumber: nomData.alumniNumber || user.alumniNumber || 'MA. PENDING',
       fullName: nomData.fullName || user.displayName || 'Nominee',
       cohort: nomData.cohort || 'MASSH Alumni',
       profession: nomData.profession,
@@ -5358,19 +5672,7 @@ export const dataService = {
       status: 'APPROVED',
       votesCount: 0,
       nominatedAt: new Date().toISOString().split('T')[0],
-    };
-
-    candidates.push(newCand);
-    safeStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(candidates));
-
-    await this.logAudit({
-      action: 'CANDIDATE_NOMINATED',
-      performedBy: user.email,
-      affectedRecord: newCand.id,
-      metadata: { candidate: newCand.fullName, positionId: newCand.positionId },
     });
-
-    return newCand;
   },
 
   async castSecretBallot(
@@ -5428,6 +5730,25 @@ export const dataService = {
     if (elecIdx !== -1) {
       elections[elecIdx].totalBallotsCast = (elections[elecIdx].totalBallotsCast || 0) + 1;
       safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(elections));
+      if (isFirebaseConfigured && db) {
+        try {
+          await setDoc(doc(db, 'elections', electionId), elections[elecIdx], { merge: true });
+        } catch {}
+      }
+    }
+
+    // Sync updated candidates
+    if (isFirebaseConfigured && db) {
+      try {
+        for (const cand of candidates) {
+          await setDoc(doc(db, 'candidates', cand.id), cand, { merge: true });
+        }
+      } catch {}
+    }
+
+    // Broadcast LIVE vote cast event immediately across all open tabs/views
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-vote-cast', { detail: { electionId, token } }));
     }
 
     await this.logAudit({
@@ -5440,7 +5761,7 @@ export const dataService = {
     return {
       success: true,
       receiptToken: token,
-      message: 'Your official secret ballot has been securely tallied and certified.',
+      message: 'Your official secret ballot has been securely tallied and certified in real-time.',
     };
   },
 
@@ -5465,24 +5786,6 @@ export const dataService = {
     return Array.from(new Set(myVotes.map(v => v.verificationToken)));
   },
 
-  async updateElectionCycle(cycleData: Partial<ElectionCycle> & { id: string }): Promise<ElectionCycle | null> {
-    const elections = await this.getElectionCycles();
-    const idx = elections.findIndex(e => e.id === cycleData.id);
-    if (idx === -1) return null;
-
-    elections[idx] = { ...elections[idx], ...cycleData };
-    safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(elections));
-
-    await this.logAudit({
-      action: 'ELECTION_UPDATED',
-      performedBy: 'admin@massh.ac.ug',
-      affectedRecord: cycleData.id,
-      metadata: cycleData,
-    });
-
-    return elections[idx];
-  },
-
   async certifyElection(
     electionId: string,
     adminEmail = 'admin@massh.ac.ug',
@@ -5498,6 +5801,17 @@ export const dataService = {
     elections[idx].declarationSummary = summary || 'Official certified declaration of election results by the MOSA Electoral Commission.';
 
     safeStorage.setItem(STORAGE_KEYS.ELECTIONS, JSON.stringify(elections));
+
+    if (isFirebaseConfigured && db) {
+      try {
+        await setDoc(doc(db, 'elections', electionId), elections[idx], { merge: true });
+      } catch {}
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('mosa-election-updated', { detail: { electionId } }));
+      window.dispatchEvent(new CustomEvent('mosa-vote-cast', { detail: { electionId } }));
+    }
 
     await this.logAudit({
       action: 'ELECTION_CERTIFIED',
